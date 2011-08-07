@@ -1,0 +1,23 @@
+
+. config/options
+
+setup_toolchain --optimize target
+
+cd $BUILD/$1*
+
+if [ $TARGET_ARCH = mips ]; then
+./Configure linux-mips -DL_ENDIAN linux:' mipsel-unknown-linux-uclibc-gcc -mips32r2' \
+	--prefix=$LIB_PREFIX \
+  -no-asm 
+fi
+
+if [ $TARGET_CPU = x86_64 ]; then
+# -DHAVE_DLFCN_H -DDSO_DLFCN -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DMD5_ASM -DAES_ASM
+./config --prefix=$LIB_PREFIX 
+#./Configure linux-x86_64  -DOPENSSL_THREADS -D_REENTRANT   -m64 -DL_ENDIAN -DTERMIO -O3 -Wall -DMD32_REG_T=int linux-x86_64:' x86_64-pc-linux-gnu-gcc ' --prefix=$LIB_PREFIX 
+fi
+
+
+make
+make install
+

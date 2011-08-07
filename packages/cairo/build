@@ -1,0 +1,51 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+setup_toolchain target
+echo "|||||||||||||||||||| prepareing to build $1 |||||||||||||||||||||||"
+PKG_CONFIG=${SYSROOT_PREFIX}/usr/local/bin/pkg-config
+cd $BUILD/$1*
+if [ $GTK_FB = yes ] ;then
+    echo "+++++++++++++++++ without x +++++++++++++++++++++"
+
+    if [ $DIRECTFB = yes ]; then
+        ################# 2008.6.3 add #######
+        ./configure 	--prefix=$LIB_PREFIX \
+        --build=$HOST_NAME \
+        --host=$TARGET_NAME \
+        --disable-xlib \
+        --disable-xlib-xrender \
+        --enable-directfb \
+        --without-x \
+        --enable-pdf \
+        --enable-ps \
+        --enable-svg
+        make
+        make install
+        #find . -name '*.pc' -exec cp {} ../toolchain/arm-unknown-linux-gnu/sysroot/usr/local/lib/pkgconfig/ \;
+
+    else
+        ./configure --build=$HOST_NAME \
+        --host=$TARGET_NAME \
+        -prefix=$LIB_PREFIX #--enable-freetype
+
+    fi
+
+else
+    echo "+++++++++++++++++ withx +++++++++++++++++++++"
+    echo ------------- $LD_FLAGS $CFLAGS
+
+    ./configure 	--build=$HOST_NAME \
+    --host=$TARGET_NAME \
+    --prefix=$LIB_PREFIX \
+    --enable-freetype \
+    --with-x \
+    --x-includes=$SYSROOT_PREFIX/usr/X11R6/include \
+    --x-libraries=$SYSROOT_PREFIX/usr/local/lib 
+    make
+    make install
+fi
+
+

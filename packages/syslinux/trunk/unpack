@@ -1,0 +1,9 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+sed -i s%'/isolinux'%/NEOUBOX/boot% $BUILD/$1*/isolinux.asm
+
+make -C $BUILD/$1* spotless

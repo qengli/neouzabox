@@ -1,0 +1,1172 @@
+﻿/**
+ * Copyright (C) by B-Star.
+ *
+ * Do not use, copy, modify, and distribute this software and its documentation
+ * out of the Open Lab for Interactive Media of B-Star company.
+ * File:  
+ *    galeBrowser.js
+ * Description:
+ *    this file defines the behavior of the main bowrser of the gale stb.
+ */
+
+//TODO : xbluo, remove all magic number before release! 
+
+// global variable that shared by functions 
+var gBrowser          = null;       // Browser instance
+var StatusHandler     = null;       // Browser State Callback
+var strBundle         = null;       // string bundle object
+
+var bLoginOK          = false;      // login flag, true if login OK  
+var bAutoLogin        = false;       // true if auto login
+
+var bUserShutdown     = false;      // if shut down event from user 
+var strErrorMessage   = null;       // set it before loading error page
+
+var boxHeight         = 48;         // messagebox height
+
+var winMenu           = null;       // menu window object
+
+// global config, read from galeBrowser.xml at startup
+// login page , make sure it's corecct, or gale-stb halt
+var strLoginPage      = ''; 
+var strLoginURL       = '';
+
+/* vars below are set by login module after sucessfully login */
+// home page that loaded after sucessful login
+var strHomeURL        = ''; 
+
+var bHomePage         = false;
+
+// menu window url
+var strMenuURL        = '';
+// the id of user login
+var strUserID         = '';
+
+const PBWIN_PAGETIP   = 0;
+const PBWIN_PHONETIP  = 1;
+const PBWIN_CURPHONE  = 2;
+const PBWIN_MENU      = 3;
+
+var menuLeft          = 0;
+var menuWidth         = 800;
+var menuHeight        = 126;
+var menuTop           = 0;//screen.height - menuHeight;
+
+//the window relative to phone
+var winPhone          = null;
+
+//the phone window is open
+
+/**
+ * innerBrowserHome
+ * 
+ * Description:
+ *  Load the homepage into browser
+ *
+ * History:
+ *  2007.4.13      xbluo        Creation
+ * 
+ * @param  none
+ * @return none
+ */ 
+function innerBrowserHome()
+{
+    if (bLoginOK)
+    {
+        gBrowser.goHome();
+        bHomePage = true;
+    }
+    else
+    {
+        loadLoginPage();
+    }
+}
+
+/**
+ * readConfig
+ * 
+ * Description:
+ *  read config and set the vars
+ *
+ * History:
+ *  2007.6.28      xbluo        Creation
+ * 
+ * @param  strHome home page url
+ * @return none
+ */ 
+/* galeBrowser.xml format
+<?xml version="1.0" encoding="UTF-8"?> 
+<galeBrowser> 
+    <trustablesite>
+        <site> 
+             <domin>http://192.168.1.32:3001</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site> 
+        <site>
+             <domin>http://192.168.1.32:3001</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site> 
+    </trustablesite>
+    <loginPageURL>chrome://gale/content/login/login.html</loginPageURL>
+    <getMessageURL>http://192.168.1.2:7022/gateway/action/00000/000053/</getMessageURL>
+    <homeURL>http://192.168.1.2:7022/gateway/action/00000/000051/</homeURL>
+    <loginURL>http://192.168.1.2:7022/gateway/action/00000/000001/</loginURL>
+</galeBrowser>   
+*/
+function readConfig ()
+{
+    try 
+    {   
+        // get xml file absolute path     
+        var dirSrv    = Components.classes["@mozilla.org/file/directory_service;1"]
+          .getService(Components.interfaces.nsIProperties);
+        var curPath   = dirSrv.get("CurProcD", Components.interfaces.nsILocalFile);
+        curPath       = curPath.parent;     
+        var xmlPath   = curPath.path + '/chrome/content/browser/galeBrowser.xml';
+        
+        var file      = Components.classes["@mozilla.org/file/local;1"]
+                          .createInstance (Components.interfaces.nsILocalFile);
+        file.initWithPath (xmlPath);  
+        var stream    = Components.classes["@mozilla.org/network/file-input-stream;1"]
+        	              .createInstance (Components.interfaces.nsIFileInputStream );
+        stream.init (file, 0x01, 00004, null);
+        var parser    = new DOMParser();
+        var dom       = parser.parseFromStream (stream, "UTF8", 
+                           stream.available(), "application/xml");
+        stream.close ();
+         
+        // read trustable sites
+        var root = dom.getElementsByTagName ('trustablesite');
+        if (root.length) 
+        {
+            var prefsObject;
+            prefsObject = Components.classes["@mozilla.org/preferences-service;1"]
+               .getService(Components.interfaces.nsIPrefBranch);
+            var sites = root[0].getElementsByTagName ('site');   
+            var domin, priviliege;     
+            for (var i = 0; i < sites.length; i++)
+            {
+                domin = sites[i].getElementsByTagName ('domin');
+                if (!domin.length)
+                {
+                    continue;
+                }
+                priviliege = sites[i].getElementsByTagName ('privilege');
+                if (!priviliege.length)
+                {
+                    continue;
+                }
+
+                prefsObject.setCharPref ('capability.principal.codebase.p' + i + '.granted', priviliege[0].textContent);  
+                prefsObject.setCharPref ('capability.principal.codebase.p' + i + '.id', domin[0].textContent); 
+                prefsObject.setCharPref ('capability.principal.codebase.p' + i + '.subjectName', ''); 
+            }
+        }
+        
+        // read other vars
+        var items;
+        items = dom.getElementsByTagName ('loginPageURL');
+        if (items.length)
+        {
+            strLoginPage       = items[0].textContent; 
+        }
+        items = dom.getElementsByTagName ('getMessageURL');
+        if (items.length)
+        {
+            strGetMsgURL   = items[0].textContent;
+            dump(strGetMsgURL + "\n"); 
+        }    
+        items = dom.getElementsByTagName ('loginURL');
+        if (items.length)
+        {
+            strLoginURL        = items[0].textContent; 
+        }
+        items = dom.getElementsByTagName ('homeURL');
+        if (items.length)
+        {
+            strHomeURL        = items[0].textContent; 
+        }
+        items = dom.getElementsByTagName ('menuURL');
+        if (items.length)
+        {
+            strMenuURL        = items[0].textContent; 
+        }
+    }
+    catch (ex)
+    { 
+         debugalert (ex); 
+         return;
+    }    
+}
+
+/**
+ * setHomeURL 
+ * 
+ * Description:
+ *  set the homepage url
+ *
+ * History:
+ *  2007.5.13      xbluo        Creation
+ * 
+ * @param  strHome home page url
+ * @return none
+ */ 
+function setHomeURL (strHome)
+{ 
+    gBrowser.homePage = strHome;
+}
+
+/**
+ * prepareForStartup
+ * 
+ * Description:
+ *  Initialize the Browser
+ *
+ * History:
+ *  2007.4.13      xbluo        Creation
+ *
+ * @param  none
+ * @return none
+ */
+function prepareForStarptup()
+{   
+    //TODO: trustable site data read from config
+    readConfig ();       
+    StatusHandler = new BrowserStatusHandler();
+    gBrowser.addProgressListener(StatusHandler, 
+        Components.interfaces.nsIWebProgress.NOTIFY_ALL);
+         
+    gBrowser.webNavigation.sessionHistory = 
+       Components.classes["@mozilla.org/browser/shistory;1"]
+       .createInstance(Components.interfaces.nsISHistory);
+    
+    // remove the disablehistory attribute so the browser cleans up, as
+    // though it had done this work itself
+    gBrowser.browsers[0].removeAttribute("disablehistory");
+
+    // enable global history
+    gBrowser.docShell.QueryInterface(Components.interfaces.nsIDocShellHistory)
+       .useGlobalHistory = true;
+     
+    addEventListener('keydown', onKeydown, true);   
+    comChgFullScreen (true, 500);
+}
+
+/**
+ * showMenu
+ * 
+ * Description:
+ *  Show the level 1 menu 
+ *
+ * History:
+ *  2007.4.13      xbluo        Creation
+ *
+ * @param  none
+ * @return none
+ */ 
+function showMenu()
+{
+    if (!isMenuOpen () && bLoginOK && strMenuURL != '')
+	{
+        try
+        {
+            winMenu = window.openDialog(
+                "chrome://gale/content/browser/plusBrowser.xul",
+                "menu-window",
+                "dependent=yes",
+                strMenuURL, 
+                menuLeft,
+                menuTop,
+                menuWidth,
+                menuHeight, PBWIN_MENU);
+        }
+        catch(ex)
+        {
+            winMenu = null;
+        } 
+    }
+}
+
+/**
+ * closeMenu
+ * 
+ * Description:
+ *  Close the level 1 menu
+ *
+ * History:
+ *  2007.5.9      xbluo        Creation
+ *
+ * @param  none
+ * @return none
+ */ 
+function closeMenu ()
+{ 
+    if (isMenuOpen ())
+    {
+        setTimeout(
+            function(){
+                winMenu.close ();
+                winMenu = null;
+            },
+            400);
+    }
+}
+
+/**
+ * isMenuOpen
+ * 
+ * Description:
+ *  return true if the menu is opend
+ *
+ * History:
+ *  2007.5.9      xbluo        Creation
+ *
+ * @param  none
+ * @return true if if the menu is opend
+ */
+function isMenuOpen ()
+{ 
+     return winMenu && !winMenu.closed;
+}
+
+/**
+ * isPhoneWinOpen
+ * 
+ * Description:
+ *  return true if the phone window is opend
+ *
+ * History:
+ *  2007.9.6      xszhong        Creation
+ *
+ * @param  none
+ * @return none
+ */
+function isPhoneWinOpen()
+{
+    var ret = false; 
+    ret = (winPhone != null) && !winPhone.closed;
+    return ret;
+}
+ 
+/**
+ * browserStartup
+ * 
+ * Description:
+ *  Entry point of the Browser
+ *
+ * History:
+ *  2007.4.13      xbluo        Creation
+ *
+ * @param  none
+ * @return none
+ */
+function browserStartup()
+{
+    gBrowser = document.getElementById("content");
+    strBundle = document.getElementById("strings");
+    initPos ();
+    prepareForStarptup ();
+    loadLoginPage ();
+}
+
+/*
+ * browserShutdown
+ * 
+ * Description:
+ *  Clearup before unload the main window 
+ *
+ * History:
+ *  2007.4.13      xbluo        Creation
+ *
+ * @param  none
+ * @return none
+ */  
+function browserShutdown(Event)
+{
+    if (!bUserShutdown)
+    {
+         /* I donot know how to prevent it from shutdown ...*/
+         var msg = strBundle.getString ('errDown');
+         debugalert (msg);
+         return;
+    }
+    StatusHandler.destroy ();
+    return;
+}
+
+/**
+ * innerBrowserGo
+ * 
+ * Description:
+ *  Load the uri into the browser
+ *
+ * History:
+ *  2007.4.13      xbluo        Creation
+ *
+ * @param  uri  string  
+ * @return none
+ */ 
+function innerBrowserGo(uri) 
+{   
+    // should this function disable before login ?
+    try  
+    {
+        gBrowser.loadURI (uri , null, null); 
+    }
+    catch (ex)
+    {
+        return;     
+    }
+} 
+
+
+ /**
+ * initPos
+ * 
+ * Description:
+ *  Initial main window element position 
+ *
+ * History:
+ *  2007.4.13      xbluo        Creation
+ *
+ * @param  none
+ * @return none
+ */ 
+function initPos ()
+{
+    var w = screen.width;
+    var h = screen.height; 
+       
+    var statusBox = document.getElementById ("statusBox");  
+    statusBox.style.top     = h - boxHeight + 'px';
+    statusBox.style.left    = '0px';
+    statusBox.style.width   = w + 'px';
+    statusBox.style.height  = boxHeight + 'px';
+    statusBox.style.visibilty = "hidden";
+    
+    gBrowser.width  = w + 'px';
+    gBrowser.height = h + 'px'; 
+}
+
+
+/**
+ * onKeydown
+ * 
+ * Description:
+ *  Keydown event listener
+ *
+ * History:
+ *  2007.4.13      xbluo        Creation
+ *
+ * @param  Event
+ * @return none
+ */ 
+function onKeydown (evt)
+{ 
+    var key = getKey(evt);
+    switch (key)
+    {
+        /* Notice: return if donot handle the key,else break.
+	    * Notice: some keys should be disable before login, check bLoginOK .
+        */ 
+        default:
+            return;
+
+        case  GK_MENU:
+            if (bLoginOK)
+            { 
+		        if (innerGetCurPageType() == 0)
+		        {
+                    //bHomePage = false;
+                    return;
+		        }
+                else
+		        {
+                    showMenu();
+                    break;
+                }
+            }
+            return; 
+
+        case  GK_POWEROFF:  
+            onClose();
+            //stbStandBy();
+            break; 
+
+        case  GK_MESSAGE:
+            if (bLoginOK)
+            {
+                if (gStatusManager)
+                { 
+                    gStatusManager.showMsgDetail(); 
+                }     
+                break; 
+            }
+            return;
+
+        case  GK_HOME:
+            innerBrowserHome ();
+            break; 
+
+        case  GK_BACK:
+        case  GK_CLEAR: // same action here
+            if (winPhone && !winPhone.closed && winPhone.bTransmitEvt)
+            {
+                return; 
+            }
+            if (gStatusManager)
+            {
+                if (gStatusManager.detailWinIsOpen())
+                {
+                    gStatusManager.closeMsgDetail();
+                }
+                else
+                {
+                    gStatusManager.closeMsgShow(false);
+                }
+            }
+            return;   
+
+        case  GK_SWITCH:
+            //not implemented          
+            return;       
+    }
+    // if we handle the key, prevent its default action
+    evt.preventDefault();
+    evt.stopPropagation();  
+    return;
+}
+
+/**
+ * BrowserStatusHandler
+ * 
+ * Description:
+ *  Browser's Progress listener,which implement the nsIWebProgressListener interface
+ *
+ * History:
+ *  2007.4.13      xbluo        Creation
+ */ 
+function BrowserStatusHandler()
+{
+    this.init();
+}
+
+BrowserStatusHandler.prototype =
+{
+
+  QueryInterface : function(aIID)
+  {
+    if (aIID.equals(Components.interfaces.nsIWebProgressListener) ||
+        aIID.equals(Components.interfaces.nsISupportsWeakReference) ||
+        aIID.equals(Components.interfaces.nsIXULBrowserWindow) ||
+        aIID.equals(Components.interfaces.nsISupports))
+      return this;
+    throw Components.results.NS_NOINTERFACE;
+  },
+
+  init : function()
+  {
+  },
+
+  destroy : function()
+  {
+  },
+
+
+
+  onProgressChange : function (aWebProgress, aRequest,
+                               aCurSelfProgress, aMaxSelfProgress,
+                               aCurTotalProgress, aMaxTotalProgress)
+  {
+  },
+
+  onStateChange : function(aWebProgress, aRequest, aStateFlags, aStatus)
+  {
+    const kErrorNetTimeout     = 0x804B000E;
+    const kErrorDNSNotFound    = 0x804B001E;
+    const kErrorNetReset       = 0x804B0014
+    const kErrorBindingAborted = 0x804B0002;
+    const kErrorNetRefused     = 0x804B000D;
+     
+    const statWinMask          = 0x80000;  
+    const statNetworkMask      = 0x40000;
+    const statDocMask          = 0x20000;  
+    const statReqMask          = 0x10000;
+        
+    const statStopMask         = 0x10;           
+    const nsIWebProgressListener = Components.interfaces
+        .nsIWebProgressListener;
+    if (aStateFlags & nsIWebProgressListener.STATE_START)
+    {
+        //showTipWin();
+        bHomePage = false;
+        /*
+        //because the url may be redirect, so the actual url isnot got here,
+        //so add principal to this domain, have no meaning.
+        try
+        {
+            if (aRequest)
+            {
+                const nsIChannel = Components.interfaces.nsIChannel;
+                var channel  = aRequest.QueryInterface(nsIChannel);
+                var location = channel.URI;
+                if (location.scheme == 'http')
+                {
+                    var domain;
+                    if (location.port == -1)
+                    {
+                        domain = location.scheme + '://' + location.host; 
+                    }
+                    else
+                    {
+                        domain = location.scheme + '://' + location.host 
+                            + ':' + location.port;
+                    }
+                    addPrincipal('UniversalXPConnect', domain);
+                }
+            }
+        }
+        catch(ex)
+        {
+            ;
+        }
+        */
+    }
+    else if (aStateFlags & nsIWebProgressListener.STATE_STOP)
+    {
+        /*
+        after the url have been redirect, though the actual url can be got here,
+        but the principal which is relativeto the document had been set, so here 
+        adding principal to pref, have no meaning.But should try another way to 
+        change or notify the principal of the document.
+        */
+        ;
+    }
+    if (aStateFlags & statNetworkMask && aStateFlags & statStopMask)
+    {
+        switch (aStatus) 
+        {
+            case 0:
+                // successfully end document load 
+                disableScroll ();
+                focusPage ();
+                setDefCharacterSign();
+                return;   
+            case kErrorNetTimeout :
+                strErrorMessage = strBundle.getString ('errTimeout'); 
+                break;
+            case kErrorDNSNotFound :
+                strErrorMessage = strBundle.getString ('errDNS'); 
+                break;
+            case kErrorNetReset :
+                strErrorMessage = strBundle.getString ('errReset'); 
+                break;
+            case kErrorNetRefused:
+                strErrorMessage = strBundle.getString ('errRefuse'); 
+                break;
+            case kErrorBindingAborted:
+                //strErrorMessage = 'Network Error: Binding aborted!';
+                // treat it not as an error
+                return;
+            default :
+                strErrorMessage = strBundle.getString ('errUnknown') + 
+                 ' 0x' + aStatus.toString (16);
+                break;        
+        }
+        innerBrowserGo ('chrome://gale/content/browser/error.xul');
+    }
+  },
+
+  onLocationChange : function(aWebProgress, aRequest, aLocation)
+  {
+  },
+
+  onStatusChange : function(aWebProgress, aRequest, aStatus, aMessage)
+  {
+  },
+
+  onSecurityChange : function(aWebProgress, aRequest, aState)
+  {
+  },
+   
+} 
+
+
+/**
+ * onClose
+ * 
+ * Description:
+ *  clear the resoure 
+ *  before user shutdown the browser 
+ *
+ * History:
+ *  2007.4.13      xbluo        Creation
+ *  2007.9.3      xszhong      modification
+ * @param  
+ * @return true if user choose to close the browser
+ */
+function onClose()
+{
+    bUserShutdown = true;
+    userLogout();
+    setTimeout(
+        function(){
+            self.close();
+        }
+        , 2000);
+    return true;
+}
+
+
+/**
+ * removeAllCookie
+ * 
+ * Description:
+ *  Remove all cookies
+ *
+ * History:
+ *  2007.5.10      xbluo        Creation
+ *
+ * @param  none
+ * @return none
+ */
+function removeAllCookie ()
+{
+    // to control more about cookie, see pref network.cookie.
+    var cookieManager = Components.classes["@mozilla.org/cookiemanager;1"].
+            getService(Components.interfaces.nsICookieManager);
+    cookieManager.removeAll ();        
+}
+
+/**
+ * onLoginOK
+ * 
+ * Description:
+ *  called after user login OK
+ *
+ * History:
+ *  2007.5.10      xbluo        Creation
+ *
+ * @param  none
+ * @return none
+ */
+function onLoginOK ()
+{ 
+    bLoginOK = true;
+    setHomeURL(strHomeURL); 
+    innerBrowserHome();
+    startProcMessage();
+}
+
+/**
+ * userLogout
+ * 
+ * Description:
+ *  Logout user, DO NOT use it now,for the login module will auto login
+ *
+ * History:
+ *  2007.5.10      xbluo        Creation
+ *
+ * @param  none
+ * @return none
+ */
+function userLogout()
+{ 
+    bLoginOK = false;
+    closeMenu();
+    stopProcMessage();
+    loadLoginPage();
+}
+
+/**
+ * loadLoginPage
+ * 
+ * Description:
+ *  Load login page
+ *
+ * History:
+ *  2007.5.10      xbluo        Creation
+ *
+ * @param  none
+ * @return none
+ */
+function loadLoginPage ()
+{
+    try
+    {
+        gBrowser.loadURI(strLoginPage, null, null);
+    }
+    catch (ex)
+    { 
+        return;
+    }
+}
+
+
+/**
+ * focusPage
+ * 
+ * Description:
+ *  set focus to the loaded document
+ *
+ * History:
+ *  2007.6.19      xbluo        Creation
+ *
+ * @param  none
+ * @return none
+ */
+function focusPage ()
+{
+    setTimeout (
+        function () 
+        {
+            try
+            { 
+                gBrowser.browsers[0].contentWindow.focus ();                       
+            } 
+            catch (ex)
+            {
+                debugalert (ex);
+                return;
+            } 
+        }, 
+        200);
+}
+
+/**
+ * disableScroll
+ * 
+ * Description:
+ *  force the loaded document has no scroll bar
+ *
+ * History:
+ *  2007.6.19      xbluo        Creation
+ *
+ * @param  none
+ * @return none
+ */
+function disableScroll ()
+{ 
+    try
+    { 
+        gBrowser.browsers[0].contentDocument.body.style.overflow = "hidden";
+    } 
+    catch(ex)
+    {
+        debugalert (ex);
+        return;
+    }
+}
+
+/**
+ * setPageCsign
+ * 
+ * Description:
+ *  set the character sign of the current page
+ *
+ * History:
+ *  2007.8.20      xszhong        Creation
+ *
+ * @param  string the sign number
+ * @return none
+ */
+function setPageCsign(csign)
+{ 
+    try
+    { 
+        if (gStatusManager && gStatusManager.chgSign)
+        {
+            gStatusManager.chgSign(csign);
+        }
+    } 
+    catch(ex)
+    {
+        ;
+    }
+}
+
+/**
+ * getPageCsign
+ * 
+ * Description:
+ *  get the character sign of the current page
+ *
+ * History:
+ *  2007.8.20      xszhong        Creation
+ *
+ * @param  none
+ * @return string the sign number
+ */
+function getPageCsign()
+{ 
+    var ret = null;
+    try
+    { 
+        if (gStatusManager && gStatusManager.curSign)
+        {
+            ret = gStatusManager.curSign;
+        }
+    } 
+    catch(ex)
+    {
+    }
+    return ret;
+}
+
+/**
+ * innerGetCurPageType
+ * 
+ * Description:
+ *  get the type of the current page
+ *
+ * History:
+ *  2007.8.28      xszhong        Creation
+ *
+ * @param  none
+ * @return int 0 ->homepage
+               1 ->televison
+               2 ->no television
+               -1->error 
+ */
+function innerGetCurPageType()
+{ 
+    var ret = -1;
+    try
+    {
+/*
+        if (gBrowser && gBrowser.currentURI 
+            && gBrowser.currentURI.spec == strHomeURL)
+*/
+        if (bHomePage)
+        {
+            ret = 0;
+            return ret;
+        }
+        var curSign = getPageCsign();
+        if (curSign.indexOf(PRECSIGN_LIVE) == 0 
+            || curSign.indexOf(PRECSIGN_VOD) == 0)
+        {
+            ret = 1;
+        }
+        else
+        {
+            ret = 2;
+        }
+    } 
+    catch(ex)
+    {
+        ;
+    }
+    return ret;
+}
+
+/**
+ * setDefCharacterSign()
+ * 
+ * Description:
+ *  check the current load page is using character sign.
+ *
+ * History:
+ *  2007.8.20      xszhong        Creation
+ *
+ * @param  none
+ * @return none
+ */
+function setDefCharacterSign()
+{
+    try
+    { 
+        if (gBrowser.browsers[0].contentWindow.useCharacterSign)
+        {
+            ;
+        }
+        else
+        {
+            setPageCsign(DEFAULT_CSIGN);
+        }                       
+    } 
+    catch (ex)
+    {
+        ;
+    }
+} 
+
+/**
+ * innerOpenPhoneWin()
+ * 
+ * Description:
+ *   open a dialog win which is relative to phone
+ *
+ * History:
+ *  2007.8.29      xszhong        Creation
+ *
+ * @param  string url->the url sholud be open in the phone window.
+           left   int->the left position of the open phone window.
+           top    int->the top position  of the open phone window.
+           width  int->the width position of the open phone window.
+           height int->the height position of the open phone window.
+           type   int describe the type of the open phone window.
+             0  ->tip
+             1  ->phone
+             2  ->message detail
+ * @return  boolean describing open successfully or not
+ */
+function innerOpenPhoneWin(url, left, top, width, height, type)
+{
+    var ret = false;
+    if (winPhone && !winPhone.closed)
+    {
+        return ret;
+    }
+    try
+    {
+        winPhone = window.openDialog(
+            "chrome://gale/content/browser/plusBrowser.xul",
+            "phone-window",
+            "dependent=yes",
+            url, left, top, width, height, type);
+        ret = true;
+    } 
+    catch(ex)
+    {
+        ;
+    }
+    return ret;
+} 
+
+/**
+ * innerClosePhoneWin()
+ * 
+ * Description:
+ *   close the phone window
+ *
+ * History:
+ *  2007.8.29      xszhong        Creation
+ *
+ * @param  none.
+ * @return boolean  
+ */
+function innerClosePhoneWin()
+{
+    var ret = false;
+    try
+    {
+        if (winPhone && !winPhone.closed)
+        {
+            if (winPhone.closeWin)
+            {
+                winPhone.closeWin();
+            }
+            if (winPhone && !winPhone.closed)
+            {
+                winPhone.close();
+                winPhone    = null;
+            }
+        }
+        else
+        {
+            winPhone    = null;
+        }
+        ret = true; 
+    } 
+    catch(ex)
+    {
+        ;
+    }
+    return ret;
+}
+
+/**
+ * innerSetPhoneWinPos()
+ * 
+ * Description:
+ *   set the position of the phone window
+ *
+ * History:
+ *  2007.8.29      xszhong        Creation
+ *
+ * @param  none.
+ * @return boolean  
+ */
+function innerSetPhoneWinPos(left, top, width, height)
+{
+    var ret = false;
+    try
+    {
+        if (winPhone && !winPhone.closed)
+        {
+            if (winPhone.setWinPos)
+            {
+                winPhone.setWinPos(left, top, width, height);
+            }
+            else
+            {
+                winPhone.moveTo(left, top);
+                winPhone.resizeTo(width, height);
+            }
+        }
+        ret = true; 
+    } 
+    catch(ex)
+    {
+        ;
+    }
+    return ret;
+}
+
+/**
+ * innerSetPhoneWinTransmitEvent()
+ * 
+ * Description:
+ *   set the phone window to transmit event to gale browser
+ *
+ * History:
+ *  2007.8.29      xszhong        Creation
+ *
+ * @param  none.
+ * @return boolean  
+ */
+function innerSetPhoneWinTransmitEvent(flag)
+{
+    var ret = false;
+    try
+    {
+        if (winPhone && !winPhone.closed
+            && winPhone.setWinFocus)
+        {
+            winPhone.setWinFocus(!flag);
+        }
+        ret = true; 
+    } 
+    catch(ex)
+    {
+        ;
+    }
+    return ret;
+} 
+
+/**
+ * addPrincipal()
+ * 
+ * Description:
+ *   add the domain a set of priv
+ *
+ * History:
+ *  2007.9.17      xszhong        Creation
+ *
+ * @param  priv string describe the privilegd.
+ * @param  domain string describe the domain of the url.
+ * @return none  
+ */
+var privCount = 0;
+function addPrincipal(priv, domain)
+{
+    var prefsObject;
+    prefsObject = Components.classes["@mozilla.org/preferences-service;1"]
+        .getService(Components.interfaces.nsIPrefBranch);
+    privCount++;
+    var preCapability = 'capability.principal.codebase.p' + privCount;
+    prefsObject.setCharPref(preCapability + '.granted', priv);  
+    prefsObject.setCharPref(preCapability + '.id', domain); 
+    prefsObject.setCharPref(preCapability + '.subjectName', ''); 
+}

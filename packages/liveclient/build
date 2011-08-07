@@ -1,0 +1,11 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+setup_toolchain target
+export LDFLAGS="-L$SYSROOT_PREFIX/usr/lib/ "
+export CFLAGS="-I$SYSROOT_PREFIX/usr/include"
+cd $BUILD/$1*/
+make

@@ -1,0 +1,10 @@
+#!/bin/sh 
+
+. config/options
+
+#if [ "$TARGET_LIBC" = uClibc ]; then 
+#fi
+
+cp -f $SYSROOT_PREFIX/usr/local/lib/libcairo.so.2 $INSTALL/usr/lib #firefox-bin needed
+
+exit 0

@@ -1,0 +1,42 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build libtorrent
+
+cd $BUILD/$1*
+
+setup_toolchain target
+
+sed -i -e 's/^ac_cv_page_size=0$/ac_cv_page_size=12/' configure
+sed -i -e 's/(ld -/(${LD-ld} -/' configure
+sed -i -e 's/'\''ld -/"${LD-ld}"'\'' -/' configure
+sed -i -e 's/ar cr/$(AR) cr/' Makefile.in
+
+CXXFLAGS="-mips32r2 -D_FILE_OFFSET_BITS=64" \
+CFLAGS="-mips32r2 -D_FILE_OFFSET_BITS=64" \
+./configure \
+	--host=$TARGET_NAME \
+	--build=$HOST_NAME \
+	--target=$TARGET_NAME \
+	--prefix=/usr \
+   --exec-prefix=/usr \
+   --bindir=/usr/bin \
+   --sbindir=/usr/sbin \
+   --libdir=/lib \
+  --libexecdir=/usr/lib \
+  --sysconfdir=/etc \
+   --datadir=/usr/share \
+  --localstatedir=/var \
+   --includedir=/include \
+   --mandir=/usr/man \
+  --infodir=/usr/info \
+   --enable-shlib \
+ --enable-cxx --enable-threads
+
+make
+make -j1  includedir="$LIB_PREFIX/include" \
+    bindir="$ROOT/$BUILD/rootfs/usr/bin" \
+    libdir="$LIB_PREFIX/lib" \
+    shlibdir="$LIB_PREFIX/lib" \
+    install

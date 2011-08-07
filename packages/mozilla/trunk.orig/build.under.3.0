@@ -1,0 +1,92 @@
+#!/bin/sh
+
+. config/options
+
+#to avoid /usr/bin/libIDL2-config output uncorrect result
+export PATH=/usr/bin:/bin
+
+$SCRIPTS/build toolchain
+
+cd $BUILD/$1*
+sed /'a.tm_zone = NULL'/d $ROOT/$BUILD/$1/nsprpub/pr/src/misc/prtime.c >$ROOT/$BUILD/$1/nsprpub/pr/src/misc/prtime.tmp
+sed /'a.tm_gmtoff'/d $ROOT/$BUILD/$1/nsprpub/pr/src/misc/prtime.tmp >$ROOT/$BUILD/$1/nsprpub/pr/src/misc/prtime.c
+
+#added by Leo 2007-7-1 see neouzbox.doc problem 38
+#to avoid problem undefind symbol _PR_x86_AtomicSet ......
+sed s/"#if defined(__i386__)"/"#if defined(__xxxx__)"/ $ROOT/$BUILD/$1/nsprpub/pr/include/md/_linux.h > $ROOT/$BUILD/$1/nsprpub/pr/include/md/_linux.tmp.h
+mv -f $ROOT/$BUILD/$1/nsprpub/pr/include/md/_linux.tmp.h $ROOT/$BUILD/$1/nsprpub/pr/include/md/_linux.h
+
+#added by Leo 2007-7-2 to avoid assert crash , reference to doc problem #41
+sed /"PR_ASSERT(0 == rv)"/d $ROOT/$BUILD/$1/nsprpub/pr/src/misc/prnetdb.c >$ROOT/$BUILD/$1/nsprpub/pr/src/misc/prnetdb.tmp.c
+mv -f $ROOT/$BUILD/$1/nsprpub/pr/src/misc/prnetdb.tmp.c $ROOT/$BUILD/$1/nsprpub/pr/src/misc/prnetdb.c
+
+#added by Leo 2007-7-12 to avoid jpeg lib caller mismatch
+THE_BOOLEAN_DEFINE=`egrep "typedef .{3,} boolean" $ROOT/$BUILD/jpeg*/jmorecfg.h` 
+sed -i s/"typedef .* boolean;"/"$THE_BOOLEAN_DEFINE"/g $ROOT/$BUILD/$1/jpeg/jmorecfg.h
+
+mkdir -p objdir
+cd objdir
+
+if [ $DIRECTFB = yes ]; then
+   CONFIG_EXT=.directfb 
+fi
+
+if [ "$MOZ_APP" = "xulrunner" ]; then
+	cp $ROOT/packages/$VDIR/.mozconfig.xulrunner${CONFIG_EXT} $ROOT/$BUILD/$1/.mozconfig
+else
+        cp $ROOT/packages/$VDIR/.mozconfig${CONFIG_EXT} $ROOT/$BUILD/$1/.mozconfig
+fi
+
+sed -i -e "s@\${SYSROOT_PREFIX}@${SYSROOT_PREFIX}@g" $ROOT/$BUILD/$1/.mozconfig
+sed -i -e "s@\${TARGET_NAME}@${TARGET_NAME}@g" $ROOT/$BUILD/$1/.mozconfig
+sed -i -e "s@\${HOST_NAME}@${HOST_NAME}@g" $ROOT/$BUILD/$1/.mozconfig
+sed -i -e "s@\${ROOT}@${ROOT}@g" $ROOT/$BUILD/$1/.mozconfig
+sed -i -e "s@\${LIB_PREFIX}@${LIB_PREFIX}@g" $ROOT/$BUILD/$1/.mozconfig
+sed -i -e "s@\${TOOLCHAIN}@${TOOLCHAIN}@g" $ROOT/$BUILD/$1/.mozconfig
+sed -i -e "s@\${BUILD_NAME}@${BUILD_NAME}@g" $ROOT/$BUILD/$1/.mozconfig
+
+
+if [ "$JAVA" = "yes" ]; then
+        export JAVA_HOME=$ROOT/$BUILD/jdk1.5.0_14/
+        echo "ac_add_options --with-java-include-path=$JAVA_HOME/include" >>  $ROOT/$BUILD/$1/.mozconfig
+else
+        echo "ac_add_options --disable-oji" >>  $ROOT/$BUILD/$1/.mozconfig
+        echo "ac_add_options --disable-javaxpcom" >> $ROOT/$BUILD/$1/.mozconfig
+        echo "ac_add_options --without-java" >>  $ROOT/$BUILD/$1/.mozconfig
+fi    
+
+if [ "$DEBUG" = yes ]; then
+        echo "ac_add_options --enable-debug=-g1" >> $ROOT/$BUILD/$1/.mozconfig
+else
+        echo "ac_add_options --enable-optimize" >> $ROOT/$BUILD/$1/.mozconfig
+fi
+
+#../configure 
+
+#Leo added 20070708 xulrunner needed
+if [ "$MOZ_APP" = "xulrunner" ]; then
+	# make -f client.mk build MOZ_CURRENT_PROJECT=browser only build browser
+	cd ..
+	make -f client.mk  
+	make -f client.mk build 
+else
+  cd ..
+  make -f client.mk build
+	#make -j8
+fi 
+
+
+#to let make use host_xpt_link
+if [ "$MOZ_APP" = "xulrunner" ]; then
+	cp -f $ROOT/$BUILD/mozilla/objdir/xulrunner/xpcom/typelib/xpt/tools/host_xpt_dump $ROOT/$BUILD/mozilla/objdir/xulrunner/xpcom/typelib/xpt/tools/xpt_dump
+	cp -f $ROOT/$BUILD/mozilla/objdir/xulrunner/xpcom/typelib/xpt/tools/host_xpt_link $ROOT/$BUILD/mozilla/objdir/xulrunner/xpcom/typelib/xpt/tools/xpt_link
+	make -C objdir/xulrunner/xulrunner/installer #leo added 20070708
+else
+	cp -f $ROOT/$BUILD/mozilla/objdir/xpcom/typelib/xpt/tools/host_xpt_dump $ROOT/$BUILD/mozilla/objdir/xpcom/typelib/xpt/tools/xpt_dump
+	cp -f $ROOT/$BUILD/mozilla/objdir/xpcom/typelib/xpt/tools/host_xpt_link $ROOT/$BUILD/mozilla/objdir/xpcom/typelib/xpt/tools/xpt_link
+	make -C browser/installer #leo commentted 20070630
+fi
+
+#build browser installer need enable-static option 
+#but build xulrunner cannot use enable-static options
+

@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# start MPlayer's utilities
+#
+# runlevels: neoubox, debug
+
+echo "### Starting MPlayer's utilities ###"
+
+# create the mplayer control pipe for external programs
+mkfifo /var/mp_control
+
+# start the autolaunching script
+. /etc/autoplay
+[ $AUTOPLAY == "yes" ] && echo -n "" > /var/autoplay
+/usr/bin/autoplay 8 > /var/mp_control &
+
+# proceed to dvdnav setting
+. /etc/dvd
+[ $DVDNAV == "yes" ] && echo -n "" > /var/dvdnav
+
+# start the file copy daemon
+/usr/bin/cpd &
+
+exit 0

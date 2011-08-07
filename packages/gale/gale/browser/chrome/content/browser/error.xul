@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE window SYSTEM "chrome://gale/locale/galeBrowser.dtd">
+<?xml-stylesheet href="chrome://gale/skin/galeBrowser.css" type="text/css"?> 
+
+<window id="error-window"
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        xmlns:html="http://www.w3.org/1999/xhtml"
+        hidechrome="true"
+        sizemode="normal"
+        onload="onStart();">
+
+    <script type="application/x-javascript" src="chrome://gale/content/common/inf.js"/>
+    <script type="application/x-javascript" src="chrome://gale/content/common/keyboard.js"/>
+    <script type="application/x-javascript" src="chrome://gale/content/browser/error.js"/>
+    
+    <stack>
+    
+        <html:div style="left:0px;top:0px;width:0px;height:0px;">
+            <image id= "errorbg"    src= "chrome://gale/skin/errbg1.jpg" width="800" height= "600" />
+        </html:div>
+        
+        <html:div style="left:0px;top:477px;width:0px;height:0px;-moz-opacity:0.6;">
+            <stack>
+                <image id= "errorpanel" src= "chrome://gale/skin/errpanel.jpg" width="800" height= "123" />
+                <groupbox style="font-size:15pt;color: #285A63">
+                    <label value= "&errpage.errtitle;"      />
+                    <label id="errmsg" value = ""           />     
+                    <label value = "&errpage.backbykey;"    />
+                </groupbox>
+            </stack>
+        </html:div>
+        
+    </stack>                 
+</window>

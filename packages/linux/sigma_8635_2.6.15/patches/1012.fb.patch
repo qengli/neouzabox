@@ -1,0 +1,52 @@
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/drivers/video/Kconfig linux-2.6.15/drivers/video/Kconfig
+--- linux-2.6.15.ref/drivers/video/Kconfig	2006-01-25 20:51:50.000000000 -0800
++++ linux-2.6.15/drivers/video/Kconfig	2006-05-11 12:46:37.000000000 -0700
+@@ -41,7 +41,7 @@
+ config FB_CFB_FILLRECT
+ 	tristate
+ 	depends on FB
+-	default n
++	default FB
+ 	---help---
+ 	  Include the cfb_fillrect function for generic software rectangle
+ 	  filling. This is used by drivers that don't provide their own
+@@ -50,7 +50,7 @@
+ config FB_CFB_COPYAREA
+ 	tristate
+ 	depends on FB
+-	default n
++	default FB
+ 	---help---
+ 	  Include the cfb_copyarea function for generic software area copying.
+ 	  This is used by drivers that don't provide their own (accelerated)
+@@ -59,7 +59,7 @@
+ config FB_CFB_IMAGEBLIT
+ 	tristate
+ 	depends on FB
+-	default n
++	default FB
+ 	---help---
+ 	  Include the cfb_imageblit function for generic software image
+ 	  blitting. This is used by drivers that don't provide their own
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/README.1012.fb.patch linux-2.6.15/README.1012.fb.patch
+--- linux-2.6.15.ref/README.1012.fb.patch	1969-12-31 16:00:00.000000000 -0800
++++ linux-2.6.15/README.1012.fb.patch	2006-05-11 12:52:53.000000000 -0700
+@@ -0,0 +1,18 @@
++Feature:
++--------
++To enable more support for frame buffer driver.
++
++Prerequisite patch numbers:
++---------------------------
++none
++
++Primary author:
++---------------
++YH Lin
++
++Related to which chip version SMP86xx xx=?
++------------------------------------------
++all
++
++(linux patches) which CONFIG_... are provided:
++----------------------------------------------

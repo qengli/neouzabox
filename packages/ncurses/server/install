@@ -1,0 +1,11 @@
+#!/bin/sh
+
+. config/options
+
+SO=`ls -d $BUILD/$1*`/lib/libncurses.so.5
+
+mkdir -p $INSTALL/usr/lib
+cp $SO $INSTALL/usr/lib/libncurses.so.5
+
+mkdir -p $INSTALL/usr/share/terminfo/l
+TERMINFO=$INSTALL/usr/share/terminfo LD_LIBRARY_PATH=`ls -d $BUILD/$1*/ncurses-host/lib`:$LD_LIBRARY_PATH $BUILD/$1*/ncurses-host/progs/tic -xe linux $BUILD/$1*/misc/terminfo.src

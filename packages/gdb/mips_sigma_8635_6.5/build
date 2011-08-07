@@ -1,0 +1,113 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+$SCRIPTS/build ncurses
+
+cd $ROOT/${BUILD}/$1-*
+
+######################################################################
+#
+# gdb target
+#
+######################################################################
+
+GDB_TARGET_DIR=./obj-target
+
+GDB_TARGET_CONFIGURE_VARS= \
+	ac_cv_type_uintptr_t=yes \
+	gt_cv_func_gettext_libintl=yes \
+	ac_cv_func_dcgettext=yes \
+	gdb_cv_func_sigsetjmp=yes \
+	bash_cv_func_strcoll_broken=no \
+	bash_cv_must_reinstall_sighandlers=no \
+	bash_cv_func_sigsetjmp=present \
+	bash_cv_have_mbstate_t=yes
+
+mkdir -p ${GDB_TARGET_DIR}
+cd ${GDB_TARGET_DIR}; \
+gdb_cv_func_sigsetjmp=yes \
+${TARGET_CONFIGURE_OPTS} \
+${GDB_TARGET_CONFIGURE_VARS} \
+		../configure \
+		--build=${HOST_NAME} \
+		--host=${TARGET_NAME} \
+		--target=${TARGET_NAME} \
+		--prefix=/usr \
+		--disable-nls \
+		--without-uiout \
+		--disable-tui --disable-gdbtk --without-x \
+		--disable-sim \
+		--without-included-gettext \
+    --disable-nls \
+    --disable-libada \
+    --with-sysroot=$SYSROOT_PREFIX
+find . -name config.cache -exec rm {} \;
+cd ..
+make CC=${TARGET_CC} -C ${GDB_TARGET_DIR}
+
+#${STRIP) $(GDB_TARGET_DIR)/gdb/gdb
+
+######################################################################
+#
+# gdbserver
+#
+######################################################################
+GDB_SERVER_DIR=./obj-server
+
+mkdir -p ${GDB_SERVER_DIR}
+cd ${GDB_SERVER_DIR}; \
+ gdb_cv_func_sigsetjmp=yes \
+		../gdb/gdbserver/configure \
+		--build=${HOST_NAME} \
+		--host=${TARGET_NAME} \
+		--target=${TARGET_NAME} \
+		--prefix=/usr \
+		--exec-prefix=/usr \
+		--bindir=/usr/bin \
+		--sbindir=/usr/sbin \
+		--libexecdir=/usr/lib \
+		--sysconfdir=/etc \
+		--datadir=/usr/share \
+		--localstatedir=/var \
+		--mandir=/usr/man \
+		--infodir=/usr/info \
+		--includedir=${SYSROOT_PREFIX}/usr/include \
+		--disable-nls \
+		--disable-libada \
+    --without-uiout --disable-gdbmi \
+		--disable-tui --disable-gdbtk --without-x \
+		--without-included-gettext 
+cd ..
+make CC=${TARGET_CC} -C ${GDB_SERVER_DIR}
+#	${STRIP) $(GDB_SERVER_DIR)/gdbserver
+
+######################################################################
+#
+# gdb client
+#
+######################################################################
+
+GDB_CLIENT_DIR=./obj-client
+
+CC=$HOST_CC mkdir -p ${GDB_CLIENT_DIR}
+cd ${GDB_CLIENT_DIR}
+find . -name config.cache -exec rm {} \;
+setup_toolchain host
+gdb_cv_func_sigsetjmp=yes \
+		../configure \
+		--prefix=${SYSROOT_PREFIX} \
+		--build=${HOST_NAME} \
+		--host=${HOST_NAME} \
+		--target=${TARGET_NAME} \
+		--disable-nls \
+		--without-uiout \
+		--disable-tui --disable-gdbtk --without-x \
+		--without-included-gettext \
+		--enable-threads 
+cd ..
+make CC=$HOST_CC -C ${GDB_CLIENT_DIR}
+#strip ${GDB_CLIENT_DIR)/gdb/gdb
+
+

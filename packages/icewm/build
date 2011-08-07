@@ -1,0 +1,46 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+echo $TARGET_ARCH
+echo $TARGET_NAME
+echo $CC
+echo $HOST_CC
+echo $LIB_PREFIX/lib
+#CC=build*/toolchain/bin/i386-pc-linux-uclibc-gcc
+
+cd $BUILD/$1*
+
+export CFLAGS="-DFT_FREETYPE_H -I${SYSROOT_PREFIX}/usr/local/include/freetype2 -I${LIB_PREFIX}/include"
+export CXXFLAGS="-DFT_FREETYPE_H -I${SYSROOT_PREFIX}/usr/local/include/freetype2 -I${LIB_PREFIX}/include"
+if [ $TARGET_LIBC = glibc]; then
+./configure --prefix=$SYSROOT_PREFIX/usr/local/icewm -sysconfdir=$SYSROOT/etc \
+	 --host=$HOST_NAME \
+	 --build=$HOST_NAME \
+	 --target=$TARGET_NAME \
+	 --x-include=$ROOT/$BUILD/xc/exports/include \
+	 --x-libraries=$ROOT/$BUILD/xc/lib \
+	 --disable-i18n \
+	 --disable-nls \
+         --with-x \
+         --disable-xinerama \
+	--enable-lite \
+	--without-imlib
+else
+./configure --prefix=$SYSROOT_PREFIX/usr/local/icewm -sysconfdir=$SYSROOT/etc \
+	 --host=$TARGET_NAME \
+	 --build=$HOST_NAME \
+	 --target=$TARGET_NAME \
+	 --x-include=$ROOT/$BUILD/xc/exports/include \
+	 --x-libraries=$ROOT/$BUILD/xc/lib \
+	 --disable-i18n \
+	 --disable-nls \
+         --with-x \
+         --disable-xinerama \
+	--enable-lite \
+	--without-imlib
+
+fi
+make
+#make install #comment by Leo 2008.5.5 for uClibc version

@@ -1,0 +1,29 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/install ccache
+
+setup_toolchain host
+
+cd $BUILD/$1*
+mkdir -p objdir
+cd objdir
+
+if [ $TARGET_ARCH = "arm" ]; then
+
+../configure --host=$HOST_NAME \
+             --target=$TARGET_NAME \
+             --prefix=$ROOT/$TOOLCHAIN \
+             --with-sysroot=$SYSROOT_PREFIX \
+             --disable-multilib \
+             --enable-shared \
+             --disable-nls
+make configure-host
+
+fi
+make
+make install
+mkdir -p $SYSROOT_PREFIX/usr/include
+cp -v ../include/libiberty.h $SYSROOT_PREFIX/usr/include/
+

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+export LDFLAGS="-L$SYSROOT_PREFIX/usr/lib/ -lcrypt"
+
+cd $BUILD/$1*/
+./configure 
+cd pppd
+make

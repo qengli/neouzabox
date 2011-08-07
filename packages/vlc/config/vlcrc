@@ -1,0 +1,4 @@
+[main]
+audio=1
+volume=257
+alsadev=hw:0,0

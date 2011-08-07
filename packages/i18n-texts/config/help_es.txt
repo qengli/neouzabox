@@ -1,0 +1,20 @@
+TECLAS UTILES
+m  : Mostrar/Ocultar el Menu
+o  : Mostrar temporizador OSD
+s  : Conmutar salida a TV/CRT
+v  : Mostrar/Ocultar Subtitulos
+Izquierda : Cancelar / Atras
+Derecha : Aceptar / Adelante
+Abajo : Atras 1 minute
+Arriba : Adelante 1 minute
++/-  : Retardo del sonido +/- 100ms
+O/9 : Volumen +/- 1
+
+TECLAS EN SELECCION DE ARCHIVOS
+d  : establecer directorio destino
+c  : copiar a destino
+r  : borrar archivo
+o  : confirmar borrado de archivos
+p  : reproducir directorio entero
+l  : recursively view the entire directory
+

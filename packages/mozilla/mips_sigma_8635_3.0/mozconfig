@@ -1,0 +1,81 @@
+# sh
+# Build configuration script
+#
+# See http://www.mozilla.org/build/unix.html for build instructions.
+#
+
+CROSS_COMPILE=1
+GLIB_CONFIG=${SYSROOT_PREFIX}/usr/local/bin/glib-config 
+GMODULE_CONFIG=${SYSROOT_PREFIX}/usr/local/bin/gmodule-config 
+GTK_CONFIG=${SYSROOT_PREFIX}/usr/local/bin/gtk-config 
+LIBIDL_CONFIG=${SYSROOT_PREFIX}/usr/local/bin/libIDL-config-2
+HOST_LIBIDL_CONFIG=/usr/bin/libIDL-config-2
+PKG_CONFIG=${TOOLCHAIN_PREFIX}/bin/pkg-config
+CFLAGS="-DFT_FREETYPE_H -I${SYSROOT_PREFIX}/usr/local/include/freetype2 -I${LIB_PREFIX}/include"
+CXXFLAGS="-DFT_FREETYPE_H -I${SYSROOT_PREFIX}/usr/local/include/freetype2 -I${LIB_PREFIX}/include"
+
+mk_add_options MOZ_MAKE_FLAGS=-j8
+ac_add_options --prefix=$SYSROOT_PREFIX/usr/local/mozilla 
+ac_add_options  --target=x86_32-unknown-linux-gnu 
+ac_add_options   --host=x86_64-unknown-linux-gnu 
+ac_add_options   --build=x86_64-unknown-linux-gnu
+
+#if the version is 2.0.0.1 and want to build installer , the following needed
+ac_add_options --enable-static --disable-shared  #commented by Leo 2007-07-04
+#ac_add_options --disable-static --enable-shared #added by Leo 2007-07-04
+
+ac_add_options  --x-includes=$SYSROOT_PREFIX/usr/local/include 
+ac_add_options  --x-libraries=$SYSROOT_PREFIX/usr/local/lib
+
+
+# Options for client.mk.
+mk_add_options MOZ_CO_PROJECT="browser"
+mk_add_options MOZ_BUILD_PROJECTS="browser"
+
+mk_add_options MOZ_OBJDIR=@TOPSRCDIR@/objdir
+
+#important for 3.0 ! 
+#jemalloc use TLS (thread local storage) but uClibc can't support it
+#so I disable it
+ac_add_options --disable-jemalloc
+
+# Options for 'configure' (same as command-line options).
+ac_add_options --enable-default-toolkit=cairo-gtk2 #uncomment by Leo 20070613
+#ac_add_app_options browser --enable-application=browser
+#ac_add_app_options xulrunner --enable-application=xulrunner
+ac_add_options --enable-application=browser
+#ac_add_options --enable-application=xulrunner
+ac_add_options --enable-pango
+#ac_add_options --enable-native-uconv #comment by Leo 2006-03-21
+#ac_add_options --enable-native-uconv
+ac_add_options --disable-tests
+ac_add_options --disable-pedantic
+ac_add_options --disable-gtktest 
+ac_add_options --disable-tests 
+ac_add_options --disable-glibtest
+#ac_add_options --disable-xft #comment by Leo 2007-7-1 this make build failed see doc problem #36
+ac_add_options --disable-libIDLtest
+ac_add_options --disable-installer
+ac_add_options --enable-image-decoders=png,gif,jpeg
+ac_add_options --with-system-jpeg=$LIB_PREFIX
+#ac_add_options --with-system-png=$LIB_PREFIX
+ac_add_options --disable-dbus #3.0 added
+ac_add_options --disable-libxul #3.0 added
+
+#for reduce size
+ac_add_options --disable-updater
+ac_add_options --disable-view-source 
+ac_add_options --disable-mailnews
+ac_add_options --disable-ldap
+ac_add_options --disable-postscript
+ac_add_options --disable-xprint
+ac_add_options --disable-printing 
+ac_add_options --disable-airbag 
+ac_add_options --disable-profilesharing
+ac_add_options --disable-profilelocking
+ac_add_options --disable-gnomeui
+ac_add_options --disable-gnomevfs 
+#ac_add_options --disable-feeds  from 3.0 it can't be disabled
+
+ac_add_options --enable-strip
+

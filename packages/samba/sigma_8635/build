@@ -1,0 +1,42 @@
+#!/bin/sh
+
+. config/options
+
+cd $BUILD/$1-*/source
+
+rm -rf config.cache; \
+./autogen.sh; \
+ samba_cv_HAVE_GETTIMEOFDAY_TZ=yes \
+ samba_cv_USE_SETREUID=yes \
+ samba_cv_HAVE_KERNEL_OPLOCKS_LINUX=yes \
+ samba_cv_HAVE_IFACE_IFCONF=yes \
+ ./configure \
+ --target=$TARGET_NAME \
+ --host=$TARGET_NAME \
+ --build=$HOST_NAME \
+ --prefix=/mnt/usb/export/usr \
+ --localstatedir=/mnt/usb/export/var \
+ --with-lockdir=/mnt/usb/export/var/cache/samba \
+ --with-piddir=/mnt/usb/export/var/run \
+ --with-privatedir=/mnt/usb/export/etc/samba \
+ --with-logfilebase=/mnt/usb/export/var/log/samba \
+ --with-configdir=/mnt/usb/export/etc/samba \
+ --without-ldap \
+ --without-libaddns \
+ --with-included-popt \
+ --with-included-iniparser \
+ --disable-cups \
+ --disable-static 
+
+make
+#make \
+#   prefix="$ROOT/$BUILD/rootfs/usr" \
+#   BASEDIR="$ROOT/$BUILD/rootfs/usr" \
+#   SBINDIR="$ROOT/$BUILD/rootfs/$usr/sbin" \
+#   LOCKDIR="$ROOT/$BUILD/rootfs/$var/cache/samba" \
+#   PRIVATEDIR="$ROOT/$BUILD/rootfs/$etc/samba" \
+#   CONFIGDIR="$ROOT/$BUILD/rootfs/$etc/samba" \
+#   VARDIR="$ROOT/$BUILD/rootfs/$var/log/samba" \
+#    installservers installbin installcifsmount
+
+

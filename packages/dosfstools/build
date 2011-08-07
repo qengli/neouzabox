@@ -1,0 +1,8 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+make -C $BUILD/$1*/mkdosfs \
+     mkdosfs

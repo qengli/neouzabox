@@ -1,0 +1,12 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/install make
+$SCRIPTS/install sed
+
+LINUX=`ls -d $BUILD/$1*`
+
+TARGET_LINUX_ARCH=mips
+
+cp $PACKAGES/$1/$VERSION/config/$1.$TARGET_CPU.conf $LINUX/.config

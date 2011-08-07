@@ -1,0 +1,26 @@
+#!/bin/sh
+
+. config/options
+
+mkdir -p $INSTALL/etc
+cp $PACKAGES/$1/config/network $INSTALL/etc
+cp $PACKAGES/$1/config/nfs $INSTALL/etc
+cp $CONFIG/issue $INSTALL/etc
+$SCRIPTS/install bftpd
+$SCRIPTS/install samba
+
+[ "$UPNP" = yes ] && $SCRIPTS/install djmount
+
+if [ "$WIFI" = yes ]; then
+  $SCRIPTS/install wireless_tools
+  $SCRIPTS/install rt2400
+  $SCRIPTS/install rt2500
+fi
+
+NET=$INSTALL/etc/network
+sed -i "s/^TELNET_SERVER=.*/TELNET_SERVER=\"$SERVICES\"/" $NET
+sed -i "s/^FTP_SERVER=.*/FTP_SERVER=\"$SERVICES\"/" $NET
+sed -i "s/^HTTP_SERVER=.*/HTTP_SERVER=\"$SERVICES\"/" $NET
+
+#Leo added 2008-02-18
+cp -f $PACKAGES/$1*/init.d/* $INSTALL/etc/init.d/

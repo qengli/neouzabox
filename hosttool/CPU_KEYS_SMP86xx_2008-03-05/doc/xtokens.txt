@@ -1,0 +1,109 @@
+
+tokens: Binding certificates and Unloading xtasks.
+---------------------------------------------------
+ 
+ tokens are fixed binary payload signed and (optionally)
+ encrypted in the xload format and which can be used to
+ perform some specific operations.
+
+tokens binary files:
+--------------------
+ 
+ The token binary files are stored in $XSDK_ROOT/items/xtokens.
+
+ Currently the following tokens are defined:
+ - bind : Used to bind the chip to a specific certificate.
+ - unbind : Used to unbind a certificate.
+ - unload : Used to unload an xtask image.
+
+ Each token binary file is a fixed binary whose size is a multiple of 16 bytes.
+ The 3 current defined tokens are defined by a NULL terminated string, padded
+ with zeores to 16 bytes.
+ 
+
+How to create the token xload:
+------------------------------
+
+ Before being used in any way, the tokens binary need to signed and encrypted
+ in the xload format. Helper scripts in the xbin can be used for that
+ purpose.
+
+ You first need to know with which certificate and chip revision you need
+ to use the token. For bind and unbind, this is the certificate you wish to
+ bind the chip to. For unload this is the certificate you are signing your
+ xtask with.
+
+ Then you create a token xload in 2 steps:
+
+ 1/ You sign the token binary with the private key of the certificate.
+ 2/ You create the token xload with eventually encrypting using the
+    certificate AES keys.
+
+ Using the xbin script, and assuming you have the certificates and keys
+ at the right places in you $XSDK_ROOT, here is an example of how to
+ create the xload bind token for certificate ID 0x0008:
+
+ 1/ Create the signature (and move it in the XSDK_ROOT repository)
+ $ xsign.bash $XSDK_ROOT/items/tokens/bind.bin 0008 ES4_dev
+ $ mv bind.bin.8634_ES4_dev_0008.bin $XSDK_ROOT/signatures/tokens/
+
+ 2/ Create the xload (and move it in the XSDK_ROOT repository)
+ $ build_token_xload.bash bind 0008 ES4_dev
+ $ mv bind_8634_ES4_dev_0008.xload $XSDK_ROOT/xloads/tokens/
+ 
+
+How to use tokens xloads:
+------------------------
+
+1/ Binding and Unbinding:
+-------------------------
+
+  For each certificates you may create a bind and unbind token xloads.
+ 
+  The token xload then need to be sent using the XBIND xrpc.
+
+  This can be done using an xrpc utility supporting the -xbind option:
+
+  # Binding :
+  $ xrpc -xbind $XSDK_ROOT/xloads/tokens/bind_8634_ES4_dev_0008.xload
+  
+  # Unbinding :
+  $ xrpc -xbind $XSDK_ROOT/xloads/tokens/unbind_8634_ES4_dev_0008.xload
+ 
+  You can also create an XBIND xrpc packet if you are using an xrpc utility
+  than only support the xrpc format:
+  
+  # Binding:
+  $ build_xbind_xrpc.bash bind 000a ES4_dev
+  $ xrpc xrpc_xbind-8634_ES4_dev_000a.bin
+
+  # Unbinding:
+  $ build_xbind_xrpc.bash unbind 000a ES4_dev
+  $ xrpc xrpc_xunbind-8634_ES4_dev_000a.bin
+
+  (See your platform/driver documentation for more details on the xrpc
+  utility, and the -xbind option)
+
+2/ Unloading xtasks:
+--------------------
+
+  For each certificate you may create a unload token xload. The unload token
+  doesnt have any use for other types of certificate.
+
+  The unload xtoken can then be sent using the XUNLOAD xrpc.
+
+  For example, using an xrpc utility that support the -xunload option:
+  
+  $ xrpc -xunload 1 0 $XSDK_ROOT/xloads/tokens/unload_8634_ES4_dev_0008.xload
+
+  You can also generate an XUNLOAD xrpc packet for use with an xrpc utility
+  that doesnt support -xunload option. You'll need to know the image number
+  into which the xtask has been loaded:
+
+  $ build_xunload_xrpc.bash 1 0008 ES4_dev
+  $ xrpc xrpc_xunload-8634_ES4_dev_0008.bin
+  
+  (See your platform/driver documentation for more details on the xrpc
+  utility, and the -xunload option)
+  
+

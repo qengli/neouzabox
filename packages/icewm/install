@@ -1,0 +1,15 @@
+#!/bin/sh
+
+. config/options
+
+#dependency files
+cp -f $LIB_PREFIX/lib/libXpm.so.4 $INSTALL/usr/lib
+
+#modified by Leo 2008.5.5 for uClibc not make install
+#cp $LIB_PREFIX/$1/bin/icewm $INSTALL/usr/bin/
+#cp $LIB_PREFIX/$1/bin/icewm-session $INSTALL/usr/bin/
+cp $ROOT/$BUILD/$1*/src/icewm $INSTALL/usr/bin/
+cp $ROOT/$BUILD/$1*/src/icewm-session $INSTALL/usr/bin/
+
+
+exit 0

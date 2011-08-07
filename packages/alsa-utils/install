@@ -1,0 +1,12 @@
+#!/bin/sh
+
+. config/options
+
+mkdir -p $INSTALL/usr/bin
+cp $BUILD/$1*/amixer/amixer $INSTALL/usr/bin
+[ "$DEVTOOLS" = yes ] && cp $BUILD/$1*/iecset/iecset $INSTALL/usr/bin
+
+#Leo added 2008-02-18
+cp -f $PACKAGES/$1*/init.d/* $INSTALL/etc/init.d/
+
+exit 0

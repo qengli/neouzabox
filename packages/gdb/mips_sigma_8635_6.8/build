@@ -1,0 +1,29 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+$SCRIPTS/build ncurses
+
+export bash_cv_have_mbstate_t=set
+
+export CC_FOR_BUILD="$HOST_CC"
+export CFLAGS_FOR_BUILD="$HOST_CFLAGS"
+echo "||||||||||||| $HOST_NAME $TARGET_NAME |||||||||||||"
+cd $BUILD/$1*/
+mkdir -p objdir
+LDFLAGS=
+cd objdir
+../configure --host=$TARGET_NAME \
+		--target=$TARGET_NAME \
+             --build=$HOST_NAME \
+             --with-sysroot=$SYSROOT_PREFIX \
+             --disable-nls \
+             --disable-sim \
+             --without-x \
+             --disable-libada \
+	     --disable-gdbtk \
+	     --with-expat=no 
+#             --disable-tui \
+find . -name config.cache -exec rm {} \;
+make

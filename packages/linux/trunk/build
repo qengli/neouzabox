@@ -1,0 +1,27 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+$SCRIPTS/build module-init-tools
+
+DEPMOD=`ls -d $ROOT/$BUILD/module-init-tool*/depmod`
+LINUX=$(kernel_path)
+MODDIR=$LINUX/modules
+
+rm -rf $MODDIR
+mkdir -p $MODDIR
+
+case $TARGET_ARCH in
+  i386)
+    make bzImage -C "$LINUX"
+    ;;
+  powerpc)
+    unset LDFLAGS
+    make vmlinux -C "$LINUX"
+    ;;
+esac
+make modules -C "$LINUX"
+make INSTALL_MOD_PATH=$MODDIR DEPMOD=$DEPMOD modules_install -C "$LINUX"
+rm -f $MODDIR/lib/modules/*/build
+rm -f $MODDIR/lib/modules/*/source

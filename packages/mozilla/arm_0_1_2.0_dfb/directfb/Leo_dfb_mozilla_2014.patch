@@ -1,0 +1,3964 @@
+diff -Nur orig.mozilla/browser/app/nsBrowserApp.cpp work.mozilla/browser/app/nsBrowserApp.cpp
+--- orig.mozilla/browser/app/nsBrowserApp.cpp	2008-01-01 05:14:43.000000000 +0800
++++ work.mozilla/browser/app/nsBrowserApp.cpp	2008-06-13 14:07:59.000000000 +0800
+@@ -42,7 +42,7 @@
+ #include <stdlib.h>
+ #endif
+ #include "nsBuildID.h"
+-
++#include "stdio.h"
+ static const nsXREAppData kAppData = {
+   sizeof(nsXREAppData),
+   nsnull,
+@@ -52,12 +52,13 @@
+   NS_STRINGIFY(BUILD_ID),
+   "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}",
+   "Copyright (c) 1998 - 2008 mozilla.org",
+-  NS_XRE_ENABLE_PROFILE_MIGRATOR |
++//Leo  NS_XRE_ENABLE_PROFILE_MIGRATOR |
+   NS_XRE_ENABLE_EXTENSION_MANAGER
+ };
+ 
+ int main(int argc, char* argv[])
+ {
++  printf("--- main start \n");
+   return XRE_main(argc, argv, &kAppData);
+ }
+ 
+diff -Nur orig.mozilla/configure work.mozilla/configure
+--- orig.mozilla/configure	2007-12-19 05:42:55.000000000 +0800
++++ work.mozilla/configure	2008-06-09 15:15:01.000000000 +0800
+@@ -74,6 +74,8 @@
+                             Win32 - windows
+                             * - gtk"
+ ac_help="$ac_help
+++  --enable-directfb    Enable DirectFB Backend..."
++ac_help="$ac_help
+   --with-gtk-prefix=PFX   Prefix where GTK is installed (optional)"
+ ac_help="$ac_help
+   --with-gtk-exec-prefix=PFX 
+@@ -12256,7 +12258,7 @@
+ 
+ gtk2)
+     MOZ_ENABLE_GTK2=1
+-    MOZ_ENABLE_XREMOTE=1
++#Leo    MOZ_ENABLE_XREMOTE=1
+     MOZ_ENABLE_COREXFONTS=${MOZ_ENABLE_COREXFONTS-}
+     TK_CFLAGS='$(MOZ_GTK2_CFLAGS)'
+     TK_LIBS='$(MOZ_GTK2_LIBS)'
+@@ -12333,7 +12335,7 @@
+     MOZ_GFX_TOOLKIT=cairo
+     MOZ_ENABLE_CAIRO_GFX=1
+     MOZ_ENABLE_GTK2=1
+-    MOZ_ENABLE_XREMOTE=1
++#Leo    MOZ_ENABLE_XREMOTE=1
+     TK_CFLAGS='$(MOZ_GTK2_CFLAGS) $(MOZ_CAIRO_CFLAGS)'
+     TK_LIBS='$(MOZ_GTK2_LIBS) $(MOZ_CAIRO_LIBS)'
+     cat >> confdefs.h <<\EOF
+@@ -12964,18 +12966,18 @@
+ 
+ 
+ 
+-
+-if test "$MOZ_ENABLE_GTK" \
+-|| test "$MOZ_ENABLE_QT" \
+-|| test "$MOZ_ENABLE_XLIB" \
+-|| test "$MOZ_ENABLE_GTK2"
+-then
+-    cat >> confdefs.h <<\EOF
+-#define MOZ_X11 1
+-EOF
+-
+-    MOZ_X11=1
+-fi
++#Leo
++#if test "$MOZ_ENABLE_GTK" \
++#|| test "$MOZ_ENABLE_QT" \
++#|| test "$MOZ_ENABLE_XLIB" \
++#|| test "$MOZ_ENABLE_GTK2"
++#then
++#    cat >> confdefs.h <<\EOF
++##define MOZ_X11 1
++#EOF
++#    AC_DEFINE(MOZ_X11)
++#    MOZ_X11=1
++#fi
+ 
+ 
+ 
+@@ -19211,8 +19213,9 @@
+        fi
+        
+        
+-
+-       
++#Leo 
++            FT_FONT_FEATURE="#define CAIRO_HAS_FT_FONT 1"
++      
+        
+        
+        
+@@ -20482,7 +20485,7 @@
+ s%@MOZ_QT_CFLAGS@%$MOZ_QT_CFLAGS%g
+ s%@MOZ_QT_LDFLAGS@%$MOZ_QT_LDFLAGS%g
+ s%@MOC@%$MOC%g
+-s%@MOZ_X11@%$MOZ_X11%g
++#s%@MOZ_X11@%$MOZ_X11%g
+ s%@MOZ_BUILD_APP@%$MOZ_BUILD_APP%g
+ s%@MOZ_XUL_APP@%$MOZ_XUL_APP%g
+ s%@MOZ_SUITE@%$MOZ_SUITE%g
+diff -Nur orig.mozilla/configure.in work.mozilla/configure.in
+--- orig.mozilla/configure.in	2007-12-19 05:34:10.000000000 +0800
++++ work.mozilla/configure.in	2008-06-07 15:34:24.000000000 +0800
+@@ -3983,7 +3983,7 @@
+ case "$MOZ_WIDGET_TOOLKIT" in
+ gtk)
+ 	MOZ_ENABLE_GTK=1
+-    MOZ_ENABLE_XREMOTE=1
++#Leo    MOZ_ENABLE_XREMOTE=1
+     if test "$_HAVE_FREETYPE2"; then
+         MOZ_ENABLE_FREETYPE2=1
+     fi
+@@ -3991,6 +3991,11 @@
+     TK_CFLAGS='$(MOZ_GTK_CFLAGS)'
+     TK_LIBS='$(MOZ_GTK_LDFLAGS)'
+ 	AC_DEFINE(MOZ_WIDGET_GTK)
++####Leo
++    if test "$no_x" != "yes"; then
++        MOZ_ENABLE_XREMOTE=1
++    fi
++#####Leo
+     ;;
+ 
+ gtk2)
+@@ -4083,6 +4088,7 @@
+     PKG_CHECK_MODULES(MOZ_GTK2, gtk+-2.0 >= 1.3.7)
+ fi
+ 
++
+ if test "$MOZ_ENABLE_XLIB"
+ then
+     MOZ_XLIB_CFLAGS="$X_CFLAGS"
+@@ -4185,15 +4191,16 @@
+ 
+ AC_SUBST(MOC)
+ 
+-if test "$MOZ_ENABLE_GTK" \
+-|| test "$MOZ_ENABLE_QT" \
+-|| test "$MOZ_ENABLE_XLIB" \
+-|| test "$MOZ_ENABLE_GTK2"
+-then
+-    AC_DEFINE(MOZ_X11)
+-    MOZ_X11=1
+-fi
+-AC_SUBST(MOZ_X11)
++#Leo
++#if test "$MOZ_ENABLE_GTK" \
++#|| test "$MOZ_ENABLE_QT" \
++#|| test "$MOZ_ENABLE_XLIB" \
++#|| test "$MOZ_ENABLE_GTK2"
++#then
++#    AC_DEFINE(MOZ_X11)
++#    MOZ_X11=1
++#fi
++#AC_SUBST(MOZ_X11)
+ 
+ dnl ========================================================
+ dnl =
+diff -Nur orig.mozilla/content/canvas/src/nsCanvasRenderingContext2D.cpp work.mozilla/content/canvas/src/nsCanvasRenderingContext2D.cpp
+--- orig.mozilla/content/canvas/src/nsCanvasRenderingContext2D.cpp	2008-03-07 03:54:20.000000000 +0800
++++ work.mozilla/content/canvas/src/nsCanvasRenderingContext2D.cpp	2008-06-09 19:31:53.000000000 +0800
+@@ -142,10 +142,10 @@
+ #endif
+ 
+ #ifdef MOZ_WIDGET_GTK2
+-#include "cairo-xlib.h"
+-#include "cairo-xlib-xrender.h"
++//Leo #include "cairo-xlib.h"
++//Leo #include "cairo-xlib-xrender.h"
+ #include <gdk/gdk.h>
+-#include <gdk/gdkx.h>
++//Leo #include <gdk/gdkx.h>
+ #endif
+ 
+ #ifdef XP_MACOSX
+@@ -476,7 +476,7 @@
+     }
+ 
+ #ifdef MOZ_WIDGET_GTK2
+-    Pixmap mSurfacePixmap;
++//Leo fixme    Pixmap mSurfacePixmap;
+ #endif
+ 
+     // stolen from nsJSUtils
+@@ -530,7 +530,8 @@
+       mSaveCount(0), mCairo(nsnull), mSurface(nsnull), mImageSurfaceData(nsnull), mStyleStack(20)
+ {
+ #ifdef MOZ_WIDGET_GTK2
+-    mSurfacePixmap = None;
++printf("----- reach to nsCanvasRenderingContext2D.cpp nsCanvasRenderingContext@d() \n");
++//Leo fixme    mSurfacePixmap = None;
+ #endif
+ }
+ 
+@@ -564,10 +565,13 @@
+     }
+ 
+ #ifdef MOZ_WIDGET_GTK2
+-    if (mSurfacePixmap != None) {
++printf("----- reach to nsCanvasRenderingContext2D.cpp mSurfacePixmap != None \n");
++/* Leo fixme
++if (mSurfacePixmap != None) {
+         XFreePixmap(GDK_DISPLAY(), mSurfacePixmap);
+         mSurfacePixmap = None;
+     }
++*/
+ #endif
+ 
+     if (mImageSurfaceData) {
+@@ -819,21 +823,23 @@
+     // However, we provide MOZ_CANVAS_USE_RENDER for whomever wants to
+     // go that route.
+     if (getenv("MOZ_CANVAS_USE_RENDER")) {
+-        XRenderPictFormat *fmt = XRenderFindStandardFormat (GDK_DISPLAY(),
++printf("----- reach to nsCanvasRenderingContext2D.cpp XRenderFindStandFormat \n");
++/*Leo fixme        
++  XRenderPictFormat *fmt = XRenderFindStandardFormat (GDK_DISPLAY(),
+                                                             PictStandardARGB32);
+         if (fmt) {
+             int npfmts = 0;
+-            XPixmapFormatValues *pfmts = XListPixmapFormats(GDK_DISPLAY(), &npfmts);
++           XPixmapFormatValues *pfmts = XListPixmapFormats(GDK_DISPLAY(), &npfmts);
+             for (int i = 0; i < npfmts; i++) {
+                 if (pfmts[i].depth == 32) {
+                     npfmts = -1;
+                     break;
+                 }
+             }
+-            XFree(pfmts);
++            fixme XFree(pfmts);
+ 
+             if (npfmts == -1) {
+-                mSurfacePixmap = XCreatePixmap (GDK_DISPLAY(),
++  mSurfacePixmap = XCreatePixmap (GDK_DISPLAY(),
+                                                 DefaultRootWindow(GDK_DISPLAY()),
+                                                 width, height, 32);
+                 mSurface = cairo_xlib_surface_create_with_xrender_format
+@@ -841,6 +847,7 @@
+                      fmt, mWidth, mHeight);
+             }
+         }
++        */
+     }
+ #endif
+ 
+@@ -968,10 +975,12 @@
+ 
+     gint w, h;
+     gdk_drawable_get_size (gdkdraw, &w, &h);
+-    dest = cairo_xlib_surface_create (GDK_DRAWABLE_XDISPLAY(gdkdraw),
++printf("----- reach to nsCanvasRenderingContext2D.cpp cairo_create(dest) \n");
++/* Leo fixme    dest = cairo_xlib_surface_create (GDK_DRAWABLE_XDISPLAY(gdkdraw),
+                                       GDK_DRAWABLE_XID(gdkdraw),
+                                       GDK_VISUAL_XVISUAL(gdk_drawable_get_visual(gdkdraw)),
+                                       w, h);
++*/
+     dest_cr = cairo_create (dest);
+ #endif
+ 
+diff -Nur orig.mozilla/embedding/browser/gtk/src/EmbedPrivate.cpp work.mozilla/embedding/browser/gtk/src/EmbedPrivate.cpp
+--- orig.mozilla/embedding/browser/gtk/src/EmbedPrivate.cpp	2005-11-02 06:58:16.000000000 +0800
++++ work.mozilla/embedding/browser/gtk/src/EmbedPrivate.cpp	2008-06-11 11:10:59.000000000 +0800
+@@ -98,6 +98,10 @@
+ 
+ static NS_DEFINE_CID(kAppShellCID, NS_APPSHELL_CID);
+ 
++//Leo
++static NS_DEFINE_CID(kWindowCID, NS_WINDOW_CID);
++//Leo
++
+ PRUint32     EmbedPrivate::sWidgetCount = 0;
+ char        *EmbedPrivate::sCompPath    = nsnull;
+ nsIAppShell *EmbedPrivate::sAppShell    = nsnull;
+@@ -253,8 +257,28 @@
+   // Create our session history object and tell the navigation object
+   // to use it.  We need to do this before we create the web browser
+   // window.
+-  mSessionHistory = do_CreateInstance(NS_SHISTORY_CONTRACTID);
+-  mNavigation->SetSessionHistory(mSessionHistory);
++///////////////////////////Leo
++//Leo  mSessionHistory = do_CreateInstance(NS_SHISTORY_CONTRACTID);
++nsresult rv;  
++mSessionHistory =  do_CreateInstance(NS_SHISTORY_CONTRACTID, &rv);
++if(NS_SUCCEEDED(rv))
++{	g_print("\n Successful in creation NS_SHISTORY_CONTRACTID; ");}
++else
++{	g_print("\nUnsuccessful in Creation NS_SHISTORY_CONTRACTID; ");}
++ nsCOMPtr<nsIWidget> newWidget;
++
++    newWidget = do_CreateInstance(kWindowCID, &rv);// NS_WINDOW_CID, &rv);
++
++if(NS_SUCCEEDED(rv))
++{	g_print("\n Successful in creation NS_WINDOW_CID;  NS_SHISTORYCONTRACTID");}
++else
++{	g_print("\nUnsuccessful in Creation NS_WINDOW_CID;  NS_SHISTORYCONTRACTID");}
++
++
++if(NS_FAILED(rv))
++	g_print("\nFailed....!");
++//END Remove if	
++    mNavigation->SetSessionHistory(mSessionHistory);
+ 
+   // create the window
+   mWindow->CreateWindow();
+@@ -276,9 +300,23 @@
+   nsCOMPtr<nsIWidget> mozWidget;
+   mWindow->mBaseWindow->GetMainWidget(getter_AddRefs(mozWidget));
+   // get the native drawing area
+-  GdkWindow *tmp_window =
++/* Leo  GdkWindow *tmp_window =
+     NS_STATIC_CAST(GdkWindow *,
+ 		   mozWidget->GetNativeData(NS_NATIVE_WINDOW));
++       */
++  GdkWindow *tmp_window = NS_STATIC_CAST(GdkWindow *, mozWidget->GetNativeData(NS_NATIVE_WINDOW));
++
++
++/*    NS_STATIC_CAST(GdkWindow *,
++		   mozWidget->GetNativeData(NS_NATIVE_WINDOW));*/
++//Leo
++        g_print("\nIn Realize(): After NS_STATIC_CAST, get_native_data");
++//END
++
++//Leo
++        g_print("\nIn Realize(): Before gdk_window_get_parent");
++//END
++ 
+   // and, thanks to superwin we actually need the parent of that.
+   tmp_window = gdk_window_get_parent(tmp_window);
+   // save the widget ID - it should be the mozarea of the window.
+diff -Nur orig.mozilla/embedding/browser/gtk/tests/TestGtkEmbedChild.cpp work.mozilla/embedding/browser/gtk/tests/TestGtkEmbedChild.cpp
+--- orig.mozilla/embedding/browser/gtk/tests/TestGtkEmbedChild.cpp	2004-04-19 06:00:39.000000000 +0800
++++ work.mozilla/embedding/browser/gtk/tests/TestGtkEmbedChild.cpp	2008-06-07 15:56:00.000000000 +0800
+@@ -37,7 +37,7 @@
+ 
+ #include "gtkmozembed.h"
+ #include <gtk/gtk.h>
+-#include <gdk/gdkx.h>
++//Leo #include <gdk/gdkx.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ 
+@@ -87,7 +87,7 @@
+ 
+   gtk_init(&argc, &argv);
+ 
+-  old_handler = XSetErrorHandler (error_handler);
++//Leo  old_handler = XSetErrorHandler (error_handler);
+ 
+   if (argc < 2) {
+     fprintf(stderr, "Usage: TestGtkEmbedChild WINDOW_ID\n");
+diff -Nur orig.mozilla/embedding/browser/gtk/tests/TestGtkEmbedSocket.cpp work.mozilla/embedding/browser/gtk/tests/TestGtkEmbedSocket.cpp
+--- orig.mozilla/embedding/browser/gtk/tests/TestGtkEmbedSocket.cpp	2004-04-19 06:00:39.000000000 +0800
++++ work.mozilla/embedding/browser/gtk/tests/TestGtkEmbedSocket.cpp	2008-06-07 15:59:51.000000000 +0800
+@@ -36,7 +36,7 @@
+  * ***** END LICENSE BLOCK ***** */
+ 
+ #include <gtk/gtk.h>
+-#include <gdk/gdkx.h>
++//Leo #include <gdk/gdkx.h>
+ #include <stdio.h>
+ #include <sys/types.h>
+ #include <unistd.h>
+@@ -91,7 +91,7 @@
+   gtk_box_pack_start(GTK_BOX(vbox), gtk_socket, TRUE, TRUE, 0);
+   gtk_widget_show(gtk_socket);
+ 
+-  sprintf(buffer, "%#lx", GDK_WINDOW_XWINDOW(gtk_socket->window));
++//Leo  sprintf(buffer, "%#lx", GDK_WINDOW_XWINDOW(gtk_socket->window));
+ 
+   gdk_flush();
+ 
+diff -Nur orig.mozilla/gfx/cairo/cairo/src/Makefile.in work.mozilla/gfx/cairo/cairo/src/Makefile.in
+--- orig.mozilla/gfx/cairo/cairo/src/Makefile.in	2007-01-03 05:08:29.000000000 +0800
++++ work.mozilla/gfx/cairo/cairo/src/Makefile.in	2008-06-09 16:13:50.000000000 +0800
+@@ -63,8 +63,6 @@
+ 	cairo-debug.c \
+ 	cairo-fixed.c \
+ 	cairo-font-options.c \
+-	cairo-font.c \
+-	cairo-gstate.c \
+ 	cairo-hash.c \
+ 	cairo-hull.c \
+ 	cairo-image-surface.c \
+@@ -86,8 +84,9 @@
+ 	cairo-traps.c \
+ 	cairo-unicode.c \
+ 	cairo-wideint.c \
++	cairo-font.c \
++	cairo-gstate.c \
+ 	$(NULL)
+-
+ EXPORTS		= cairo.h cairo-features.h cairo-rename.h
+ 
+ 
+@@ -116,19 +115,19 @@
+ EXPORTS += cairo-ps.h cairo-pdf.h
+ endif
+ 
++#Leo
++#ifdef MOZ_X11
++#CSRCS	+=	cairo-xlib-surface.c \
++#		cairo-xlib-screen.c
++#EXPORTS += cairo-xlib.h cairo-xlib-xrender.h
++#LOCAL_INCLUDES += $(FT2_CFLAGS)
++#endif
+ 
+-ifdef MOZ_X11
+-CSRCS	+=	cairo-xlib-surface.c \
+-		cairo-xlib-screen.c
+-EXPORTS += cairo-xlib.h cairo-xlib-xrender.h
+-LOCAL_INCLUDES += $(FT2_CFLAGS)
+-endif
+-
+-ifdef MOZ_ENABLE_CAIRO_FT
++#Leo ifdef MOZ_ENABLE_CAIRO_FT
+ CSRCS	+=	cairo-ft-font.c
+ EXPORTS += cairo-ft.h
+ OS_INCLUDES += $(CAIRO_FT_CFLAGS)
+-endif
++#Leo endif
+ 
+ ifdef BUILD_CAIRO_GL
+ CSRCS	+= 	cairo-glitz-surface.c
+diff -Nur orig.mozilla/gfx/src/gtk/nsDeviceContextGTK.cpp work.mozilla/gfx/src/gtk/nsDeviceContextGTK.cpp
+--- orig.mozilla/gfx/src/gtk/nsDeviceContextGTK.cpp	2006-02-28 22:55:35.000000000 +0800
++++ work.mozilla/gfx/src/gtk/nsDeviceContextGTK.cpp	2008-06-07 16:15:46.000000000 +0800
+@@ -59,7 +59,7 @@
+ #include "nsFontMetricsUtils.h"
+ 
+ #include <gdk/gdk.h>
+-#include <gdk/gdkx.h>
++//Leo #include <gdk/gdkx.h>
+ 
+ #ifdef MOZ_WIDGET_GTK
+ #include "gdksuperwin.h"
+@@ -67,19 +67,19 @@
+ 
+ #ifdef MOZ_WIDGET_GTK2
+ #include <pango/pango.h>
+-#include <pango/pangox.h>
++//Leo #include <pango/pangox.h>
+ #include <pango/pango-fontmap.h>
+ #endif
+ 
+ #ifdef MOZ_ENABLE_XFT
+ #include "nsFontMetricsUtils.h"
+-#include <X11/Xlib.h>
+-#include <X11/Xft/Xft.h>
++//Leo #include <X11/Xlib.h>
++//Leo #include <X11/Xft/Xft.h>
+ 
+ static PRInt32 GetXftDPI(void);
+ #endif
+ 
+-#include <X11/Xatom.h>
++//Leo #include <X11/Xatom.h>
+ 
+ #include "nsDeviceContextSpecG.h"
+ 
+diff -Nur orig.mozilla/gfx/src/gtk/nsDeviceContextSpecG.cpp work.mozilla/gfx/src/gtk/nsDeviceContextSpecG.cpp
+--- orig.mozilla/gfx/src/gtk/nsDeviceContextSpecG.cpp	2004-10-25 02:34:37.000000000 +0800
++++ work.mozilla/gfx/src/gtk/nsDeviceContextSpecG.cpp	2008-06-07 16:16:54.000000000 +0800
+@@ -60,7 +60,7 @@
+ #include "nsIServiceManager.h" 
+ 
+ #ifdef USE_XPRINT
+-#include "xprintutil.h"
++//Leo #include "xprintutil.h"
+ #endif /* USE_XPRINT */
+ 
+ #ifdef USE_POSTSCRIPT
+diff -Nur orig.mozilla/gfx/src/gtk/nsDrawingSurfaceGTK.cpp work.mozilla/gfx/src/gtk/nsDrawingSurfaceGTK.cpp
+--- orig.mozilla/gfx/src/gtk/nsDrawingSurfaceGTK.cpp	2004-04-18 05:52:29.000000000 +0800
++++ work.mozilla/gfx/src/gtk/nsDrawingSurfaceGTK.cpp	2008-06-07 16:22:28.000000000 +0800
+@@ -36,7 +36,7 @@
+  * ***** END LICENSE BLOCK ***** */
+ 
+ 
+-#include <gdk/gdkx.h>
++//Leo #include <gdk/gdkx.h>
+ #include <gdk/gdkprivate.h>
+ #include "nsDrawingSurfaceGTK.h"
+ 
+@@ -49,7 +49,7 @@
+ #endif
+ 
+ #ifdef MOZ_ENABLE_XFT
+-#include <X11/Xft/Xft.h>
++//Leo #include <X11/Xft/Xft.h>
+ #endif
+ 
+ nsDrawingSurfaceGTK :: nsDrawingSurfaceGTK()
+@@ -171,13 +171,19 @@
+     return NS_ERROR_FAILURE;
+   }
+ 
+-  *aBits = GDK_IMAGE_XIMAGE(mImage)->data;
++/*  Leo *aBits = GDK_IMAGE_XIMAGE(mImage)->data;
+ 
+   // Use GDK_IMAGE_XIMAGE(mImage)->bits_per_pixel instead of mImage->bpp
+   // since, although bpp is documented as *bytes* per pixel, GDK1 sometimes
+   // set it as *bits* per pixel.
+   *aWidthBytes = aWidth * ((GDK_IMAGE_XIMAGE(mImage)->bits_per_pixel + 7) / 8);
+   *aStride = GDK_IMAGE_XIMAGE(mImage)->bytes_per_line;
++*/
++   *aBits = mImage->mem;
++   *aWidthBytes = aWidth * ((mImage->bpp + 7) / 8);
++   *aStride = (mImage)->bpl;
++   
++   g_print ("\n nsDrawingSurfaceGTK.cpp: Lock:ENDS");
+ 
+ #ifdef CHEAP_PERFORMANCE_MEASUREMENT
+   //  MOZ_TIMER_STOP(mLockTime);
+diff -Nur orig.mozilla/gfx/src/gtk/nsFontMetricsPango.cpp work.mozilla/gfx/src/gtk/nsFontMetricsPango.cpp
+--- orig.mozilla/gfx/src/gtk/nsFontMetricsPango.cpp	2008-01-13 11:57:12.000000000 +0800
++++ work.mozilla/gfx/src/gtk/nsFontMetricsPango.cpp	2008-06-09 20:20:28.000000000 +0800
+@@ -57,7 +57,7 @@
+ 
+ #include <fontconfig/fontconfig.h>
+ #include <gdk/gdk.h>
+-#include <gdk/gdkx.h>
++//Leo #include <gdk/gdkx.h>
+ #include <freetype/tttables.h>
+ 
+ #include "mozilla-decoder.h"
+@@ -1204,7 +1204,8 @@
+ 
+         nsCOMPtr<nsIPref> pref;
+         pref = do_GetService(NS_PREF_CONTRACTID);
+-        if (pref) {
++printf("---- reach nsFontMetricsPango.cpp 1207 \n" );
++        /*Leo        if (pref) {
+             nsresult rv;
+             nsXPIDLCString value;
+             rv = pref->GetCharPref(name.get(), getter_Copies(value));
+@@ -1219,6 +1220,7 @@
+                 familyList.Append(',');
+             }
+         }
++Leo */
+     }
+ 
+     // Add the generic if there is one.
+@@ -1545,6 +1547,8 @@
+ 
+     // see if the lang group needs to be translated from mozilla's
+     // internal mapping into fontconfig's
++printf("---- reach nsFontMetricsPango.cpp 1550 \n" );
++/* Leo may be not fix
+     const MozGtkLangGroup *langGroup;
+     langGroup = NS_FindFCLangGroup(cname);
+ 
+@@ -1557,7 +1561,7 @@
+         return pango_language_from_string(cname.get());
+     else if (langGroup->Lang) 
+         return pango_language_from_string((char *) langGroup->Lang);
+-
++*/
+     return pango_language_from_string("en");
+ }
+ 
+@@ -1661,7 +1665,8 @@
+ 
+     // take the pattern and add the lang group to it
+     if (aLangGroup)
+-        NS_AddLangGroup(pat, aLangGroup);
++printf("---- reach nsFontMetricsPango.cpp 1668 \n" ); //Leo
++//Leo        NS_AddLangGroup(pat, aLangGroup);
+ 
+     // get the font list
+     fs = FcFontList(0, pat, os);
+diff -Nur orig.mozilla/gfx/src/gtk/nsGCCache.cpp work.mozilla/gfx/src/gtk/nsGCCache.cpp
+--- orig.mozilla/gfx/src/gtk/nsGCCache.cpp	2005-05-03 05:51:15.000000000 +0800
++++ work.mozilla/gfx/src/gtk/nsGCCache.cpp	2008-06-13 14:39:28.000000000 +0800
+@@ -42,9 +42,9 @@
+ #include <stdio.h>
+ #include "nsGCCache.h"
+ #include "nsISupportsUtils.h"
+-#include <gdk/gdkx.h>
++//Leo #include <gdk/gdkx.h>
+ #include <gdk/gdkprivate.h>
+-#include <X11/Xlib.h>
++//Leo #include <X11/Xlib.h>
+ /* The GC cache is shared among all windows, since it doesn't hog
+    any scarce resources (like colormap entries.) */
+ 
+@@ -256,12 +256,14 @@
+   if (entry->clipRegion) {
+     // set it to none here and then set the clip region with
+     // gdk_gc_set_clip_region in GetGC()
+-    xvalues.clip_mask = None;
++    //Leo xvalues.clip_mask = None;
++    xvalues.clip_mask = NULL;
+     xvalues_mask |= GDK_GC_CLIP_MASK;
+     gdk_region_destroy(entry->clipRegion);
+     entry->clipRegion = NULL;
+   }
+ 
++#if 0 //Leo 2008.6.13
+   if (entry->gcv.foreground.pixel != gcv->foreground.pixel) {
+     xvalues.foreground.pixel = gcv->foreground.pixel;
+     xvalues_mask |= GDK_GC_FOREGROUND;
+@@ -271,6 +273,18 @@
+     xvalues.function = gcv->function;
+     xvalues_mask |= GDK_GC_FUNCTION;
+   }
++#endif
++
++//Leo 2008.6.13
++  if ((entry->gcv.foreground.red != gcv->foreground.red) &&  
++      (entry->gcv.foreground.green != gcv->foreground.green) &&  
++      (entry->gcv.foreground.blue != gcv->foreground.blue)) {  
++printf("++++++++++++++++++++ Leo Reach here \n ");
++      xvalues.foreground.red = gcv->foreground.red;  
++      xvalues.foreground.green = gcv->foreground.green;  
++      xvalues.foreground.blue = gcv->foreground.blue;  
++     xvalues_mask |= GDK_GC_FOREGROUND;  
++  }  
+ 
+   if(entry->gcv.font != gcv->font && flags & GDK_GC_FONT) {
+     xvalues.font = gcv->font;
+diff -Nur orig.mozilla/gfx/src/gtk/nsGdkUtils.cpp work.mozilla/gfx/src/gtk/nsGdkUtils.cpp
+--- orig.mozilla/gfx/src/gtk/nsGdkUtils.cpp	2004-04-18 05:52:29.000000000 +0800
++++ work.mozilla/gfx/src/gtk/nsGdkUtils.cpp	2008-06-07 21:25:22.000000000 +0800
+@@ -38,7 +38,7 @@
+ 
+ #include "nsGdkUtils.h"
+ #include <gdk/gdkprivate.h>
+-#include <gdk/gdkx.h>
++//Leo #include <gdk/gdkx.h>
+ 
+ void
+ my_gdk_draw_text(GdkDrawable *drawable,
+diff -Nur orig.mozilla/gfx/src/gtk/nsImageGTK.cpp work.mozilla/gfx/src/gtk/nsImageGTK.cpp
+--- orig.mozilla/gfx/src/gtk/nsImageGTK.cpp	2005-09-17 05:02:46.000000000 +0800
++++ work.mozilla/gfx/src/gtk/nsImageGTK.cpp	2008-06-13 14:17:42.000000000 +0800
+@@ -38,7 +38,7 @@
+  *
+  * ***** END LICENSE BLOCK ***** */
+ #include <gtk/gtk.h>
+-#include <gdk/gdkx.h>
++//Leo #include <gdk/gdkx.h>
+ 
+ #include "imgScaler.h"
+ 
+@@ -104,6 +104,7 @@
+   , mDepth(0)
+   , mOptimized(PR_FALSE)
+ {
++  printf("--- Leo nsImageGTK::nsImageGTK(this=%p)\n",this);
+ #ifdef TRACE_IMAGE_ALLOCATION
+   printf("nsImageGTK::nsImageGTK(this=%p)\n",
+          this);
+@@ -138,8 +139,13 @@
+   }
+ 
+   if (mAlphaXImage) {
+-    mAlphaXImage->data = 0;
+-    XDestroyImage(mAlphaXImage);
++//Leo    mAlphaXImage->data = 0;
++//Leo    XDestroyImage(mAlphaXImage);
++//    XDestroyImage(mAlphaXImage);//TEL
++   g_print("\n nsImage::~nsImageGTK calls gdk_image_destroy:STARTS");
++   // gdk_image_destroy(mAlphaXImage);
++  g_print("\n nsImage::~nsImageGTK calls gdk_image_destroy:ENDS");
++       
+   }
+ 
+ #ifdef TRACE_IMAGE_ALLOCATION
+@@ -151,9 +157,9 @@
+ /* static */ void
+ nsImageGTK::Startup()
+ {
+-  Display *dpy = GDK_DISPLAY();
++//Leo  Display *dpy = GDK_DISPLAY();
+ 
+-  if (strstr(ServerVendor(dpy), "XFree86") && VendorRelease(dpy) < 40400000)
++//Leo  if (strstr(ServerVendor(dpy), "XFree86") && VendorRelease(dpy) < 40400000)
+     sNeedSlowTile = PR_TRUE;
+ }
+ 
+@@ -362,12 +368,25 @@
+               // we need to create/clear the alpha pixmap
+               CreateOffscreenPixmap(mWidth, mHeight);
+ 
+-              XFillRectangle(GDK_WINDOW_XDISPLAY(mAlphaPixmap),
++/* Leo              XFillRectangle(GDK_WINDOW_XDISPLAY(mAlphaPixmap),
+                              GDK_WINDOW_XWINDOW(mAlphaPixmap),
+                              GDK_GC_XGC(s1bitGC),
+                              mDecodedX1, mDecodedY1,
+                              mDecodedX2 - mDecodedX1 + 1,
+                              mDecodedY2 - mDecodedY1 + 1);
++*/
++//Leo
++g_print("\n nsImageGTK::UpdateCachedImage calls gdk_draw_polygon:STARTS");
++	      GdkPoint points[4];
++	      points[0].x = mDecodedX1; points[0].y = mDecodedY1;
++	      points[1].x = mDecodedX2; points[1].y = mDecodedY2;
++	      points[2].x = mDecodedX2 + 1; points[2].y = mDecodedY1;
++	      points[3].x = mDecodedX1; points[3].y = mDecodedY2 + 1;
++	      gdk_draw_polygon(mAlphaPixmap,s1bitGC, TRUE, points, 4);
++g_print("\n nsImageGTK::UpdateCachedImage calls gdk_draw_polygon:ENDS");
++
++//END Leo CODE
++ 
+             }
+             break;
+           default:
+@@ -465,14 +484,24 @@
+     }
+ 
+     if (mAlphaDepth==1) {
+-      XPutImage(GDK_WINDOW_XDISPLAY(mAlphaPixmap),
+-                GDK_WINDOW_XWINDOW(mAlphaPixmap),
+-                GDK_GC_XGC(s1bitGC),
+-                mAlphaXImage,
+-                rect->x, rect->y, 
+-                rect->x, rect->y,
+-                rect->width, rect->height);
+-    }
++//Leo      XPutImage(GDK_WINDOW_XDISPLAY(mAlphaPixmap),
++//                GDK_WINDOW_XWINDOW(mAlphaPixmap),
++//                GDK_GC_XGC(s1bitGC),
++//                mAlphaXImage,
++//                rect->x, rect->y, 
++//                rect->x, rect->y,
++//                rect->width, rect->height);
++//Leo start
++	g_print("\n  nsImageGTK::UpdateCachedImage calls gdk_draw_image:STARTS");
++ 	gdk_draw_image(mAlphaPixmap,
++		      s1bitGC,
++		      mAlphaXImage,
++                      rect->x, rect->y,
++	              rect->x, rect->y,
++     	              rect->width, rect->height);
++        g_print("\n nsImageGTK::UpdateCachedImage calls gdk_draw_image:ENDS");
++//Leo end
++     }
+   }
+   
+   mUpdateRegion.SetEmpty();
+@@ -1028,7 +1057,9 @@
+                              PRUint8 *imageOrigin, PRUint32 imageStride,
+                              PRUint8 *alphaOrigin, PRUint32 alphaStride,
+                              unsigned width, unsigned height,
+-                             XImage *ximage, unsigned char *readData, unsigned char *srcData)
++//Leo                             XImage *ximage, unsigned char *readData, unsigned char *srcData)
++                             GdkImage *ximage, unsigned char *readData, unsigned char *srcData)
++ 
+ {
+   GdkVisual *visual   = gdk_rgb_get_visual();
+   unsigned redIndex   = findIndex32(visual->red_mask);
+@@ -1046,7 +1077,9 @@
+ //  fprintf(stderr, "width=%u height=%u\n", ximage->width, ximage->height);
+ 
+   for (unsigned y=0; y<height; y++) {
+-    unsigned char *baseRow   = srcData     + y*ximage->bytes_per_line;
++//Leo    unsigned char *baseRow   = srcData     + y*ximage->bytes_per_line;
++    unsigned char *baseRow   = srcData     + y*ximage->bpl;
++ 
+     unsigned char *targetRow = readData    + 3*(y*ximage->width);
+     unsigned char *imageRow  = imageOrigin + y*imageStride;
+     unsigned char *alphaRow  = alphaOrigin + y*alphaStride;
+@@ -1067,7 +1100,8 @@
+                              PRUint8 *imageOrigin, PRUint32 imageStride,
+                              PRUint8 *alphaOrigin, PRUint32 alphaStride,
+                              unsigned width, unsigned height,
+-                             XImage *ximage, unsigned char *readData, unsigned char *srcData)
++//Leo                             XImage *ximage, unsigned char *readData, unsigned char *srcData)
++                             GdkImage *ximage, unsigned char *readData, unsigned char *srcData)
+ {
+   GdkVisual *visual   = gdk_rgb_get_visual();
+   unsigned redIndex   = findIndex24(visual->red_mask);
+@@ -1081,8 +1115,9 @@
+   }
+ 
+   for (unsigned y=0; y<height; y++) {
+-    unsigned char *baseRow   = srcData     + y*ximage->bytes_per_line;
+-    unsigned char *targetRow = readData    + 3*(y*ximage->width);
++//Leo    unsigned char *baseRow   = srcData     + y*ximage->bytes_per_line;
++    unsigned char *baseRow   = srcData     + y*ximage->bpl;
++     unsigned char *targetRow = readData    + 3*(y*ximage->width);
+     unsigned char *imageRow  = imageOrigin + y*imageStride;
+     unsigned char *alphaRow  = alphaOrigin + y*alphaStride;
+ 
+@@ -1114,8 +1149,9 @@
+                              PRUint8 *imageOrigin, PRUint32 imageStride,
+                              PRUint8 *alphaOrigin, PRUint32 alphaStride,
+                              unsigned width, unsigned height,
+-                             XImage *ximage, unsigned char *readData, unsigned char *srcData)
+-{
++//Leo                             XImage *ximage, unsigned char *readData, unsigned char *srcData)
++                             GdkImage *ximage, unsigned char *readData, unsigned char *srcData)
++ {
+   GdkVisual *visual   = gdk_rgb_get_visual();
+ 
+   unsigned *redScale   = (visual->red_prec   == 5) ? scaled5 : scaled6;
+@@ -1123,8 +1159,9 @@
+   unsigned *blueScale  = (visual->blue_prec  == 5) ? scaled5 : scaled6;
+ 
+   for (unsigned y=0; y<height; y++) {
+-    unsigned char *baseRow   = srcData     + y*ximage->bytes_per_line;
+-    unsigned char *targetRow = readData    + 3*(y*ximage->width);
++//Leo    unsigned char *baseRow   = srcData     + y*ximage->bytes_per_line;
++    unsigned char *baseRow   = srcData     + y*ximage->bpl;
++     unsigned char *targetRow = readData    + 3*(y*ximage->width);
+     unsigned char *imageRow  = imageOrigin + y*imageStride;
+     unsigned char *alphaRow  = alphaOrigin + y*alphaStride;
+ 
+@@ -1158,7 +1195,8 @@
+                                   PRUint8 *imageOrigin, PRUint32 imageStride,
+                                   PRUint8 *alphaOrigin, PRUint32 alphaStride,
+                                   unsigned width, unsigned height,
+-                                  XImage *ximage, unsigned char *readData, unsigned char *srcData)
++//                                  XImage *ximage, unsigned char *readData, unsigned char *srcData)
++                                 GdkImage *ximage, unsigned char *readData, unsigned char *srcData)
+ {
+   GdkVisual *visual     = gdk_rgb_get_visual();
+   GdkColormap *colormap = gdk_rgb_get_cmap();
+@@ -1166,10 +1204,11 @@
+   // flip bytes
+   if (flipBytes && (ximage->bits_per_pixel>=16)) {
+     for (int row=0; row<ximage->height; row++) {
+-      unsigned char *ptr = srcData + row*ximage->bytes_per_line;
+-      if (ximage->bits_per_pixel==24) {  // Aurgh....
++//Leo      unsigned char *ptr = srcData + row*ximage->bytes_per_line;
++      unsigned char *ptr = srcData + row*ximage->bpl;
++       if (ximage->bits_per_pixel==24) {  // Aurgh....
+         for (int col=0;
+-             col<ximage->bytes_per_line;
++             col<ximage->bpl; //Leo
+              col+=(ximage->bits_per_pixel/8)) {
+           unsigned char tmp;
+           tmp = *ptr;
+@@ -1181,7 +1220,7 @@
+       }
+       
+       for (int col=0; 
+-               col<ximage->bytes_per_line;
++               col<ximage->bpl; //Leo
+                col+=(ximage->bits_per_pixel/8)) {
+         unsigned char tmp;
+         switch (ximage->bits_per_pixel) {
+@@ -1214,8 +1253,9 @@
+   blueFill =  0xff>>visual->blue_prec;
+ 
+   for (unsigned row=0; row<height; row++) {
+-    unsigned char *ptr = srcData + row*ximage->bytes_per_line;
+-    unsigned char *target = readData+3*row*ximage->width;
++//Leo    unsigned char *ptr = srcData + row*ximage->bytes_per_line;
++    unsigned char *ptr = srcData + row*ximage->bpl;
++     unsigned char *target = readData+3*row*ximage->width;
+     for (unsigned col=0; col<width; col++) {
+       unsigned pix;
+       switch (ximage->bits_per_pixel) {
+@@ -1281,7 +1321,7 @@
+ 
+   // now composite
+   for (unsigned y=0; y<height; y++) {
+-    unsigned char *targetRow = readData+3*y*ximage->width;
++    unsigned char *targetRow = readData+3*y*(ximage->width);
+     unsigned char *imageRow  = imageOrigin + y*imageStride;
+     unsigned char *alphaRow  = alphaOrigin + y*alphaStride;
+     
+@@ -1306,8 +1346,8 @@
+   nsDrawingSurfaceGTK* drawing = (nsDrawingSurfaceGTK*) aSurface;
+   GdkVisual *visual = gdk_rgb_get_visual();
+     
+-  Display *dpy = GDK_WINDOW_XDISPLAY(drawing->GetDrawable());
+-  Drawable drawable = GDK_WINDOW_XWINDOW(drawing->GetDrawable());
++//Leo  Display *dpy = GDK_WINDOW_XDISPLAY(drawing->GetDrawable());
++//Leo  Drawable drawable = GDK_WINDOW_XWINDOW(drawing->GetDrawable());
+ 
+   int readX, readY;
+   unsigned readWidth, readHeight, destX, destY;
+@@ -1323,19 +1363,29 @@
+ //  fprintf(stderr, "srcWidth=%u srcHeight=%u\n", srcWidth, srcHeight);
+ //  fprintf(stderr, "readX=%u readY=%u readWidth=%u readHeight=%u destX=%u destY=%u\n\n",
+ //          readX, readY, readWidth, readHeight, destX, destY);
++//Leo
++//  XImage *ximage = XGetImage(dpy, drawable,
++//                             readX, readY, readWidth, readHeight, 
++//                             AllPlanes, ZPixmap);
++//Leo
++
++//Leo start
++   g_print ("\n nsImageGTK::DrawComposited calls gdk_image_get () : STARTS");	
++   GdkImage *image = gdk_image_get(drawing->GetDrawable(), readX, readY, readWidth, readHeight);
++   g_print ("\n nsImageGTK::DrawComposited calls gdk_image_get () : ENDS");
++
++//Leo  XImage *ximage = XGetImage(dpy, drawable,
++ //Leo                             readX, readY, readWidth, readHeight, 
++ //Leo                             AllPlanes, ZPixmap);
+ 
+-  XImage *ximage = XGetImage(dpy, drawable,
+-                             readX, readY, readWidth, readHeight, 
+-                             AllPlanes, ZPixmap);
+-
+-  NS_ASSERTION((ximage!=NULL), "XGetImage() failed");
+-  if (!ximage)
++  NS_ASSERTION((image!=NULL), "gdk_image_get() failed"); //Leo
++  if (!image) //Leo
+     return;
+ 
+   unsigned char *readData = 
+     (unsigned char *)nsMemory::Alloc(3*readWidth*readHeight);
+   if (!readData) {
+-    XDestroyImage(ximage);
++//Leo    XDestroyImage(ximage);
+     return;
+   }
+ 
+@@ -1353,7 +1403,7 @@
+     scaledImage = (PRUint8 *)nsMemory::Alloc(3*aDWidth*aDHeight);
+     scaledAlpha = (PRUint8 *)nsMemory::Alloc(aDWidth*aDHeight);
+     if (!scaledImage || !scaledAlpha) {
+-      XDestroyImage(ximage);
++//Leo      XDestroyImage(ximage);
+       nsMemory::Free(readData);
+       if (scaledImage)
+         nsMemory::Free(scaledImage);
+@@ -1386,39 +1436,57 @@
+   unsigned test = 1;
+   isLSB = (((char *)&test)[0]) ? 1 : 0;
+ 
++  g_print ("\n ++++++++++++++++++++++++++++++++++++++ \
++        image->bits_per_pixel=%d \n",  image->bits_per_pixel
++);
++
++
+   PRBool flipBytes = 
+-    ( isLSB && ximage->byte_order != LSBFirst) ||
+-    (!isLSB && ximage->byte_order == LSBFirst);
++    ( isLSB && image->byte_order != GDK_LSB_FIRST) ||
++    (!isLSB && image->byte_order == GDK_LSB_FIRST);
++//Leo     ( isLSB && ximage->byte_order != LSBFirst) ||
++//Leo    (!isLSB && ximage->byte_order == LSBFirst);
+ 
+-  if ((ximage->bits_per_pixel==32) &&
++//Leo  if ((ximage->bits_per_pixel==32) &&
++  if ((image->bits_per_pixel==32) &&
+       (visual->red_prec == 8) &&
+       (visual->green_prec == 8) &&
+       (visual->blue_prec == 8))
+     DrawComposited32(isLSB, flipBytes, 
+                      imageOrigin, imageStride,
+                      alphaOrigin, alphaStride, 
+-                     readWidth, readHeight, ximage, readData, (unsigned char *)ximage->data);
+-  else if ((ximage->bits_per_pixel==24) &&
+-           (visual->red_prec == 8) && 
++//Leo                     readWidth, readHeight, ximage, readData, (unsigned char *)ximage->data);
++//Leo  else if ((ximage->bits_per_pixel==24) &&
++//Leo 2008.06.13                     readWidth, readHeight, image, readData, (unsigned char *)image->windowing_data);
++                     readWidth, readHeight, image, readData, (unsigned char *)image->mem);
++  else if ((image->bits_per_pixel==24) &&
++            (visual->red_prec == 8) && 
+            (visual->green_prec == 8) &&
+            (visual->blue_prec == 8))
+     DrawComposited24(isLSB, flipBytes, 
+                      imageOrigin, imageStride,
+                      alphaOrigin, alphaStride, 
+-                     readWidth, readHeight, ximage, readData, (unsigned char *)ximage->data);
+-  else if ((ximage->bits_per_pixel==16) &&
++//Leo                     readWidth, readHeight, ximage, readData, (unsigned char *)ximage->data);
++//Leo  else if ((ximage->bits_per_pixel==16) &&
++//Leo 2008.06.03                     readWidth, readHeight, image, readData, (unsigned char *)image->windowing_data);
++                      readWidth, readHeight, image, readData, (unsigned char *)image->mem);
++ else if ((image->bits_per_pixel==16) &&
+            ((visual->red_prec == 5)   || (visual->red_prec == 6)) &&
+            ((visual->green_prec == 5) || (visual->green_prec == 6)) &&
+            ((visual->blue_prec == 5)  || (visual->blue_prec == 6)))
+     DrawComposited16(isLSB, flipBytes,
+                      imageOrigin, imageStride,
+                      alphaOrigin, alphaStride, 
+-                     readWidth, readHeight, ximage, readData, (unsigned char *)ximage->data);
+-  else
++//Leo                     readWidth, readHeight, ximage, readData, (unsigned char *)ximage->data);
++//Leo 2008.06.13                     readWidth, readHeight, image, readData, (unsigned char *)image->windowing_data);
++                     readWidth, readHeight, image, readData, (unsigned char *)image->mem);
++   else
+     DrawCompositedGeneral(isLSB, flipBytes,
+                      imageOrigin, imageStride,
+                      alphaOrigin, alphaStride, 
+-                     readWidth, readHeight, ximage, readData, (unsigned char *)ximage->data);
++//Leo                     readWidth, readHeight, ximage, readData, (unsigned char *)ximage->data);
++//Leo 2008.06.13                     readWidth, readHeight, image, readData, (unsigned char *)image->windowing_data);
++                      readWidth, readHeight, image, readData, (unsigned char *)image->mem);
+ 
+   GdkGC *imageGC = ((nsRenderingContextGTK&)aContext).GetGC();
+   gdk_draw_rgb_image(drawing->GetDrawable(), imageGC,
+@@ -1427,7 +1495,7 @@
+                      readData, 3*readWidth);
+   gdk_gc_unref(imageGC);
+ 
+-  XDestroyImage(ximage);
++//Leo  XDestroyImage(ximage);
+   nsMemory::Free(readData);
+   if (scaledImage)
+     nsMemory::Free(scaledImage);
+@@ -1451,8 +1519,8 @@
+   nsDrawingSurfaceGTK* drawing = (nsDrawingSurfaceGTK*) aSurface;
+   GdkVisual *visual = gdk_rgb_get_visual();
+     
+-  Display *dpy = GDK_WINDOW_XDISPLAY(drawing->GetDrawable());
+-  Drawable drawable = GDK_WINDOW_XWINDOW(drawing->GetDrawable());
++//Leo  Display *dpy = GDK_WINDOW_XDISPLAY(drawing->GetDrawable());
++//Leo  Drawable drawable = GDK_WINDOW_XWINDOW(drawing->GetDrawable());
+ 
+   // I hate clipping...
+   PRUint32 surfaceWidth, surfaceHeight;
+@@ -1489,18 +1557,21 @@
+   if ((readHeight <= 0) || (readWidth <= 0))
+     return;
+ 
+-  XImage *ximage = XGetImage(dpy, drawable,
+-                             readX, readY, readWidth, readHeight, 
++/*Leo  XImage *ximage = XGetImage(dpy, drawable,
++                            readX, readY, readWidth, readHeight, 
+                              AllPlanes, ZPixmap);
+-
+-  NS_ASSERTION((ximage!=NULL), "XGetImage() failed");
+-  if (!ximage)
+-    return;
+-
++*/
++ g_print ("\n nsImageGTK::DrawCompositeTile calls gdk_image_get (): STARTS");
++GdkImage *ximage = gdk_image_get(drawing->GetDrawable(), readX, readY, readWidth, readHeight);
++g_print ("\n nsImageGTK::DrawCompositeTile calls gdk_image_get (): ENDS");
++     NS_ASSERTION((ximage!=NULL), "gdk_image_get() failed");
++     if (!ximage)
++     return;
++ 
+   unsigned char *readData = 
+     (unsigned char *)nsMemory::Alloc(3*readWidth*readHeight);
+   if (!readData) {
+-    XDestroyImage(ximage);
++//Leo    XDestroyImage(ximage);
+     return;
+   }
+ 
+@@ -1509,8 +1580,10 @@
+   isLSB = (((char *)&test)[0]) ? 1 : 0;
+ 
+   PRBool flipBytes = 
+-    ( isLSB && ximage->byte_order != LSBFirst) ||
+-    (!isLSB && ximage->byte_order == LSBFirst);
++    ( isLSB && ximage->byte_order != GDK_LSB_FIRST) ||
++    (!isLSB && ximage->byte_order == GDK_LSB_FIRST);
++//Leo    ( isLSB && ximage->byte_order != LSBFirst) ||
++//Leo    (!isLSB && ximage->byte_order == LSBFirst);
+ 
+ 
+   PRUint8 *imageOrigin, *alphaOrigin;
+@@ -1535,7 +1608,10 @@
+     }
+ 
+     compTarget = readData + 3*y*ximage->width;
+-    compSource = (unsigned char *)ximage->data + y*ximage->bytes_per_line;
++//Leo    compSource = (unsigned char *)ximage->data + y*ximage->bytes_per_line;
++//Leo 2008.06.03    compSource = (unsigned char *)ximage->windowing_data + y*ximage->bpl;
++     compSource = (unsigned char *)ximage->mem + y*ximage->bpl;
++ 
+ 
+     for (unsigned x=0; x<readWidth; x+=compX) {
+       if (x==0) {
+@@ -1590,7 +1666,7 @@
+                      readData, 3*readWidth);
+   gdk_gc_unref(imageGC);
+ 
+-  XDestroyImage(ximage);
++//Leo  XDestroyImage(ximage);
+   nsMemory::Free(readData);
+   mFlags = 0;
+ }
+@@ -1622,32 +1698,41 @@
+     mAlphaPixmap = gdk_pixmap_new(nsnull, aWidth, aHeight, 1);
+ 
+     // Need an XImage for clipmask updates (XPutImage)
+-    mAlphaXImage = XCreateImage(GDK_WINDOW_XDISPLAY(mAlphaPixmap),
+-                                GDK_VISUAL_XVISUAL(gdk_rgb_get_visual()),
+-                                1, /* visual depth...1 for bitmaps */
+-                                XYPixmap,
+-                                0, /* x offset, XXX fix this */
+-                                (char *)mAlphaBits,  /* cast away our sign. */
+-                                aWidth,
+-                                aHeight,
+-                                32,/* bitmap pad */
+-                                mAlphaRowBytes); /* bytes per line */
++//Leo    mAlphaXImage = XCreateImage(GDK_WINDOW_XDISPLAY(mAlphaPixmap),
++ //Leo                                GDK_VISUAL_XVISUAL(gdk_rgb_get_visual()),
++ //Leo                                1, /* visual depth...1 for bitmaps */
++ //Leo                                XYPixmap,
++ //Leo                                0, /* x offset, XXX fix this */
++ //Leo                                (char *)mAlphaBits,  /* cast away our sign. */
++  //Leo                                 aWidth,
++  //Leo                                 aHeight,
++  //Leo                                 32,/* bitmap pad */
++  //Leo                                 mAlphaRowBytes); /* bytes per line */
++//Leo - added and commented
++/*  mAlphaXImage = gdk_image_new(GDK_IMAGE_FASTEST,
++                               gdk_rgb_get_visual(),
++                               aWidth,
++			       aHeight);*/ 
++//It sets the depth as 1
++//   mAlphaXImage = gdk_image_new_bitmap(gdk_rgb_get_visual(),(char*)mAlphaBits, aWidth, aHeight);
++ 
+ 
+-    mAlphaXImage->bits_per_pixel=1;
++//Leo    mAlphaXImage->bits_per_pixel=1;
+ 
+     /* Image library always places pixels left-to-right MSB to LSB */
+-    mAlphaXImage->bitmap_bit_order = MSBFirst;
++//Leo    mAlphaXImage->bitmap_bit_order = MSBFirst;
+ 
+     /* This definition doesn't depend on client byte ordering
+        because the image library ensures that the bytes in
+        bitmask data are arranged left to right on the screen,
+        low to high address in memory. */
+-    mAlphaXImage->byte_order = MSBFirst;
+-
++//Leo    mAlphaXImage->byte_order = MSBFirst;
++    //Leo  mAlphaXImage->byte_order = GDK_MSB_FIRST;//TEL-added and commented
++ 
+     if (!s1bitGC) {
+       GdkColor fg = { 1, 0, 0, 0 };
+-      s1bitGC = gdk_gc_new(mAlphaPixmap);
+-      gdk_gc_set_foreground(s1bitGC, &fg);
++//Leo      s1bitGC = gdk_gc_new(mAlphaPixmap);
++//Leo      gdk_gc_set_foreground(s1bitGC, &fg);
+     }
+   }
+ 
+@@ -1661,7 +1746,7 @@
+   // XXX should use (different?) GC cache here
+   if (mAlphaPixmap) {
+     // Setup gc to use the given alpha-pixmap for clipping
+-    XGCValues xvalues;
++/*Leo    XGCValues xvalues;
+     memset(&xvalues, 0, sizeof(XGCValues));
+     unsigned long xvalues_mask = 0;
+     xvalues.clip_x_origin = aX;
+@@ -1671,7 +1756,15 @@
+     xvalues.clip_mask = GDK_WINDOW_XWINDOW(mAlphaPixmap);
+     xvalues_mask |= GCClipMask;
+ 
+-    XChangeGC(GDK_DISPLAY(), GDK_GC_XGC(aGC), xvalues_mask, &xvalues);
++    XChangeGC(GDK_DISPLAY(), GDK_GC_XGC(aGC), xvalues_mask, &xvalues);*/
++    g_print("\n nsImageGTK::SetupGCForAlpha calls gdk_gc_set_clip_origin() :STARTS");
++    gdk_gc_set_clip_origin (aGC, aX, aY);
++    g_print("\n nsImageGTK::SetupGCForAlpha calls gdk_gc_set_clip_origin() :ENDS");
++
++    g_print("\n nsImageGTK::SetupGCForAlpha calls gdk_gc_set_clip_mask() :STARTS");
++    gdk_gc_set_clip_mask (aGC, mAlphaPixmap);
++    g_print("\n nsImageGTK::SetupGCForAlpha calls gdk_gc_set_clip_mask() :ENDS");
++
+   }
+ }
+ 
+@@ -1985,12 +2078,16 @@
+     if (mAlphaDepth != 1 || !mAlphaPixmap)
+       return NS_OK;
+ 
+-    XImage *xmask = XGetImage(GDK_WINDOW_XDISPLAY(mAlphaPixmap),
++/*Leo    XImage *xmask = XGetImage(GDK_WINDOW_XDISPLAY(mAlphaPixmap),
+                               GDK_WINDOW_XWINDOW(mAlphaPixmap),
+                               0, 0, mWidth, mHeight,
+                               AllPlanes, XYPixmap);
+-
+-    mAlphaBits = (PRUint8*)calloc(mAlphaRowBytes * mHeight, 1);
++*/
++g_print ("\n nsImageGTK::LockImagePixels calls gdk_image_get(): STARTS");
++GdkImage *xmask = gdk_image_get(mAlphaPixmap,0, 0, mWidth, mHeight);
++g_print ("\n nsImageGTK::LockImagePixels calls gdk_image_get(): STARTS");
++//Leo
++     mAlphaBits = (PRUint8*)calloc(mAlphaRowBytes * mHeight, 1);
+     if (!mAlphaBits)
+       return NS_ERROR_OUT_OF_MEMORY;
+ 
+@@ -1999,34 +2096,42 @@
+       PRUint32 alphaBitPos = 7;
+ 
+       for (PRInt32 x = 0; x < mWidth; ++x) {
+-        *alphaTarget |= (XGetPixel(xmask, x, y) << alphaBitPos);
+-        if (alphaBitPos-- == 0) {
++//        *alphaTarget |= (XGetPixel(xmask, x, y) << alphaBitPos);
++	g_print ("\n nsImageGTK::LockImagePixels calls gdk_image_get_pixel(): STARTS");
++          *alphaTarget |= (gdk_image_get_pixel(xmask, x, y) << alphaBitPos);
++	g_print ("\n nsImageGTK::LockImagePixels calls gdk_image_get_pixel(): ENDS");
++         if (alphaBitPos-- == 0) {
+           ++alphaTarget;
+           alphaBitPos = 7;
+         }
+       }
+     }
+ 
+-    XDestroyImage(xmask);
++ //Leo   XDestroyImage(xmask);
+     return NS_OK;
+   }
+ 
+   if (!mImagePixmap)
+     return NS_OK;
+ 
+-  XImage *ximage, *xmask=0;
++//Leo  XImage *ximage, *xmask=0;
++  GdkImage *ximage, *xmask=0;
+   unsigned pix;
+ 
+-  ximage = XGetImage(GDK_WINDOW_XDISPLAY(mImagePixmap),
++/*Leo  ximage = XGetImage(GDK_WINDOW_XDISPLAY(mImagePixmap),
+                      GDK_WINDOW_XWINDOW(mImagePixmap),
+                      0, 0, mWidth, mHeight,
+                      AllPlanes, ZPixmap);
++*/
++ ximage = gdk_image_get(mImagePixmap, 0, 0, mWidth, mHeight);
+ 
+   if ((mAlphaDepth==1) && mAlphaPixmap)
+-    xmask = XGetImage(GDK_WINDOW_XDISPLAY(mAlphaPixmap),
++/*Leo    xmask = XGetImage(GDK_WINDOW_XDISPLAY(mAlphaPixmap),
+                       GDK_WINDOW_XWINDOW(mAlphaPixmap),
+                       0, 0, mWidth, mHeight,
+                       AllPlanes, XYPixmap);
++*/
++	xmask = gdk_image_get(mAlphaPixmap, 0, 0, mWidth, mHeight);
+ 
+   mImageBits = (PRUint8*)malloc(mSizeImage);
+   if (!mImageBits)
+@@ -2047,12 +2152,14 @@
+   for (PRInt32 y=0; y<mHeight; y++) {
+     PRUint8 *target = mImageBits + y*mRowBytes;
+     for (PRInt32 x=0; x<mWidth; x++) {
+-      if (xmask && !XGetPixel(xmask, x, y)) {
++//Leo      if (xmask && !XGetPixel(xmask, x, y)) {
++	if (xmask && !gdk_image_get_pixel(xmask, x, y)){
+         *target++ = 0xFF;
+         *target++ = 0xFF;
+         *target++ = 0xFF;
+       } else {
+-        pix = XGetPixel(ximage, x, y);
++//Leo        pix = XGetPixel(ximage, x, y);
++	  pix = gdk_image_get_pixel (ximage, x, y);	
+         switch (visual->type) {
+         case GDK_VISUAL_STATIC_GRAY:
+         case GDK_VISUAL_GRAYSCALE:
+@@ -2085,10 +2192,10 @@
+     }
+   }
+ 
+-  XDestroyImage(ximage);
++/*Leo  XDestroyImage(ximage);
+   if (xmask)
+     XDestroyImage(xmask);
+-
++*/
+   return NS_OK;
+ }
+ 
+diff -Nur orig.mozilla/gfx/src/gtk/nsImageGTK.h work.mozilla/gfx/src/gtk/nsImageGTK.h
+--- orig.mozilla/gfx/src/gtk/nsImageGTK.h	2005-04-26 12:53:40.000000000 +0800
++++ work.mozilla/gfx/src/gtk/nsImageGTK.h	2008-06-08 13:30:21.000000000 +0800
+@@ -40,8 +40,8 @@
+ 
+ #include "nsIImage.h"
+ 
+-#include <X11/Xlib.h>
+-#include <X11/Xutil.h>
++//Leo #include <X11/Xlib.h>
++//Leo #include <X11/Xutil.h>
+ #include <gdk/gdk.h>
+ #include "nsRegion.h"
+ #ifdef MOZ_WIDGET_GTK2
+@@ -154,23 +154,27 @@
+                         PRUint8 *imageOrigin, PRUint32 imageStride,
+                         PRUint8 *alphaOrigin, PRUint32 alphaStride,
+                         unsigned width, unsigned height,
+-                        XImage *ximage, unsigned char *readData, unsigned char *srcData);
+-  void DrawComposited24(PRBool isLSB, PRBool flipBytes,
++//Leo                        XImage *ximage, unsigned char *readData, unsigned char *srcData);
++                        GdkImage *ximage, unsigned char *readData, unsigned char *srcData);
++   void DrawComposited24(PRBool isLSB, PRBool flipBytes,
+                         PRUint8 *imageOrigin, PRUint32 imageStride,
+                         PRUint8 *alphaOrigin, PRUint32 alphaStride,
+                         unsigned width, unsigned height,
+-                        XImage *ximage, unsigned char *readData, unsigned char *srcData);
+-  void DrawComposited16(PRBool isLSB, PRBool flipBytes,
++//Leo                        XImage *ximage, unsigned char *readData, unsigned char *srcData);
++                         GdkImage *ximage, unsigned char *readData, unsigned char *srcData);
++   void DrawComposited16(PRBool isLSB, PRBool flipBytes,
+                         PRUint8 *imageOrigin, PRUint32 imageStride,
+                         PRUint8 *alphaOrigin, PRUint32 alphaStride,
+                         unsigned width, unsigned height,
+-                        XImage *ximage, unsigned char *readData, unsigned char *srcData);
+-  void DrawCompositedGeneral(PRBool isLSB, PRBool flipBytes,
++//Leo                        XImage *ximage, unsigned char *readData, unsigned char *srcData);
++                        GdkImage *ximage, unsigned char *readData, unsigned char *srcData);
++   void DrawCompositedGeneral(PRBool isLSB, PRBool flipBytes,
+                              PRUint8 *imageOrigin, PRUint32 imageStride,
+                              PRUint8 *alphaOrigin, PRUint32 alphaStride,
+                              unsigned width, unsigned height,
+-                             XImage *ximage, unsigned char *readData, unsigned char *srcData);
+-  inline void DrawComposited(nsIRenderingContext &aContext,
++//Leo                             XImage *ximage, unsigned char *readData, unsigned char *srcData);
++                        GdkImage *ximage, unsigned char *readData, unsigned char *srcData);
++   inline void DrawComposited(nsIRenderingContext &aContext,
+                              nsIDrawingSurface* aSurface,
+                              PRInt32 srcWidth, PRInt32 srcHeight,
+                              PRInt32 dstWidth, PRInt32 dstHeight,
+@@ -197,8 +201,9 @@
+   PRUint8      *mTrueAlphaBits;
+   PRUint8      *mAlphaBits;
+   GdkPixmap    *mAlphaPixmap;
+-  XImage       *mAlphaXImage;
+-
++//Leo XImage       *mAlphaXImage;
++  GdkImage     *mAlphaXImage;
++ 
+   PRInt32       mWidth;
+   PRInt32       mHeight;
+   PRInt32       mRowBytes;
+diff -Nur orig.mozilla/gfx/src/gtk/nsNativeThemeGTK.cpp work.mozilla/gfx/src/gtk/nsNativeThemeGTK.cpp
+--- orig.mozilla/gfx/src/gtk/nsNativeThemeGTK.cpp	2006-07-14 12:22:40.000000000 +0800
++++ work.mozilla/gfx/src/gtk/nsNativeThemeGTK.cpp	2008-06-08 13:57:58.000000000 +0800
+@@ -60,7 +60,7 @@
+ 
+ #include <gdk/gdkprivate.h>
+ 
+-#include <gdk/gdkx.h>
++//Leo #include <gdk/gdkx.h>
+ 
+ NS_IMPL_ISUPPORTS2(nsNativeThemeGTK, nsITheme, nsIObserver)
+ 
+@@ -412,12 +412,13 @@
+ 
+   return PR_TRUE;
+ }
+-
++/*Leo
+ static int
+ NativeThemeErrorHandler(Display* dpy, XErrorEvent* error) {
+   gLastXError = error->error_code;
+   return 0;
+ }
++Leo */
+ 
+ NS_IMETHODIMP
+ nsNativeThemeGTK::DrawWidgetBackground(nsIRenderingContext* aContext,
+@@ -454,10 +455,10 @@
+                "Trying to render an unsafe widget!");
+ 
+   PRBool safeState = IsWidgetStateSafe(mSafeWidgetStates, aWidgetType, &state);
+-  XErrorHandler oldHandler = nsnull;
++  //Leo XErrorHandler oldHandler = nsnull;
+   if (!safeState) {
+     gLastXError = 0;
+-    oldHandler = XSetErrorHandler(NativeThemeErrorHandler);
++//Leo    oldHandler = XSetErrorHandler(NativeThemeErrorHandler);
+   }
+ 
+   moz_gtk_widget_paint(gtkWidgetType, window, &gdk_rect, &gdk_clip, &state,
+@@ -465,7 +466,7 @@
+ 
+   if (!safeState) {
+     gdk_flush();
+-    XSetErrorHandler(oldHandler);
++//Leo    XSetErrorHandler(oldHandler);
+ 
+     if (gLastXError) {
+ #ifdef DEBUG
+diff -Nur orig.mozilla/gfx/src/gtk/nsRenderingContextGTK.cpp work.mozilla/gfx/src/gtk/nsRenderingContextGTK.cpp
+--- orig.mozilla/gfx/src/gtk/nsRenderingContextGTK.cpp	2006-06-30 07:18:34.000000000 +0800
++++ work.mozilla/gfx/src/gtk/nsRenderingContextGTK.cpp	2008-06-08 09:42:03.000000000 +0800
+@@ -46,7 +46,7 @@
+ #include <math.h>
+ #include "nsGCCache.h"
+ #include <gtk/gtk.h>
+-#include <gdk/gdkx.h>
++//Leo #include <gdk/gdkx.h>
+ #include "prmem.h"
+ #include "prenv.h"
+ 
+@@ -77,7 +77,8 @@
+   mContext = nsnull;
+   mSurface = nsnull;
+   mOffscreenSurface = nsnull;
+-  mCurrentColor = NS_RGB(255, 255, 255);  // set it to white
++//Leo  mCurrentColor = NS_RGB(255, 255, 255);  // set it to white
++  mCurrentColor = NS_RGB(255,0,0);//NS_RGB(255, 255, 255);  // set it to white
+   mCurrentLineStyle = nsLineStyle_kSolid;
+   mTranMatrix = nsnull;
+   mP2T = 1.0f;
+@@ -563,7 +564,8 @@
+   memset(&values, 0, sizeof(GdkGCValues));
+ 
+   values.foreground.pixel =
+-    gdk_rgb_xpixel_from_rgb(NS_TO_GDK_RGB(mCurrentColor));
++//Leo    gdk_rgb_xpixel_from_rgb(NS_TO_GDK_RGB(mCurrentColor));
++  values.foreground.pixel = NS_TO_GDK_RGB(mCurrentColor);
+   values.foreground.red = (NS_GET_R(mCurrentColor) << 8) | NS_GET_R(mCurrentColor);
+   values.foreground.green = (NS_GET_G(mCurrentColor) << 8) | NS_GET_G(mCurrentColor);
+   values.foreground.blue = (NS_GET_B(mCurrentColor) << 8) | NS_GET_B(mCurrentColor);
+@@ -601,8 +603,9 @@
+                        rgn);
+ 
+   if (mDashes)
+-    ::XSetDashes(GDK_DISPLAY(), GDK_GC_XGC(mGC),
+-                 0, mDashList, mDashes);
++//Leo    ::XSetDashes(GDK_DISPLAY(), GDK_GC_XGC(mGC),
++//Leo                 0, mDashList, mDashes);
++      gdk_gc_set_dashes(mGC, 0,(gint8*)mDashList, sizeof(mDashList));
+ }
+ 
+ NS_IMETHODIMP nsRenderingContextGTK::SetClipRegion(const nsIRegion& aRegion,
+diff -Nur orig.mozilla/gfx/src/gtk/nsScreenGtk.cpp work.mozilla/gfx/src/gtk/nsScreenGtk.cpp
+--- orig.mozilla/gfx/src/gtk/nsScreenGtk.cpp	2005-07-04 05:09:32.000000000 +0800
++++ work.mozilla/gfx/src/gtk/nsScreenGtk.cpp	2008-06-08 09:45:39.000000000 +0800
+@@ -39,9 +39,9 @@
+ #include "nsScreenGtk.h"
+ 
+ #include <gdk/gdk.h>
+-#include <gdk/gdkx.h>
++//Leo #include <gdk/gdkx.h>
+ #include <gtk/gtk.h>
+-#include <X11/Xatom.h>
++//Leo #include <X11/Xatom.h>
+ 
+ nsScreenGtk :: nsScreenGtk (  )
+   : mScreenNum(0),
+@@ -130,9 +130,11 @@
+   GdkAtom type_returned;
+   int format_returned;
+   int length_returned;
++  GdkAtom cardinal_atom;//Leo
+ 
+ #if GTK_CHECK_VERSION(2,0,0)
+-  GdkAtom cardinal_atom = gdk_x11_xatom_to_atom(XA_CARDINAL);
++//Leo  GdkAtom cardinal_atom = gdk_x11_xatom_to_atom(XA_CARDINAL);
++ cardinal_atom = gdk_atom_intern("CARDINAL", 1);
+ #else
+   GdkAtom cardinal_atom = (GdkAtom) XA_CARDINAL;
+ #endif
+diff -Nur orig.mozilla/gfx/src/gtk/nsScreenGtk.h work.mozilla/gfx/src/gtk/nsScreenGtk.h
+--- orig.mozilla/gfx/src/gtk/nsScreenGtk.h	2004-04-20 04:41:20.000000000 +0800
++++ work.mozilla/gfx/src/gtk/nsScreenGtk.h	2008-06-08 09:47:07.000000000 +0800
+@@ -42,8 +42,8 @@
+ #include "nsRect.h"
+ 
+ #ifdef MOZ_ENABLE_XINERAMA
+-#include <X11/Xlib.h>
+-#include <X11/extensions/Xinerama.h>
++//Leo #include <X11/Xlib.h>
++//Leo #include <X11/extensions/Xinerama.h>
+ #endif // MOZ_ENABLE_XINERAMA
+ 
+ //------------------------------------------------------------------------
+diff -Nur orig.mozilla/gfx/src/gtk/nsScreenManagerGtk.cpp work.mozilla/gfx/src/gtk/nsScreenManagerGtk.cpp
+--- orig.mozilla/gfx/src/gtk/nsScreenManagerGtk.cpp	2004-04-19 23:34:12.000000000 +0800
++++ work.mozilla/gfx/src/gtk/nsScreenManagerGtk.cpp	2008-06-08 09:48:10.000000000 +0800
+@@ -41,14 +41,15 @@
+ #include "nsRect.h"
+ #include "nsAutoPtr.h"
+ 
+-#include <gdk/gdkx.h>
++//Leo #include <gdk/gdkx.h>
+ 
+ #ifdef MOZ_ENABLE_XINERAMA
+ // this header rocks!
+-extern "C"
++/*Leo extern "C"
+ {
+ #include <X11/extensions/Xinerama.h>
+ }
++*/
+ #endif /* MOZ_ENABLE_XINERAMA */
+ 
+ nsScreenManagerGtk :: nsScreenManagerGtk ( )
+diff -Nur orig.mozilla/gfx/thebes/src/Makefile.in work.mozilla/gfx/thebes/src/Makefile.in
+--- orig.mozilla/gfx/thebes/src/Makefile.in	2005-06-30 12:58:27.000000000 +0800
++++ work.mozilla/gfx/thebes/src/Makefile.in	2008-06-08 13:08:16.000000000 +0800
+@@ -28,8 +28,10 @@
+ endif
+ 
+ ifeq ($(MOZ_GFX_TOOLKIT),gtk2)
+-CPPSRCS	+= 	gfxXlibSurface.cpp
+-endif
++#Leo CPPSRCS	+= 	gfxXlibSurface.cpp
++CPPSRCS +=  gfxGdkCairoSurface.cpp gfxPlatformGtk.cpp gfxGdkNativeRenderer.cpp
++CPPSRCS +=	gfxPangoFonts.cpp
++ endif
+ 
+ FORCE_STATIC_LIB = 1
+ # This library is used by other shared libs in a static build
+diff -Nur orig.mozilla/Makefile.in work.mozilla/Makefile.in
+--- orig.mozilla/Makefile.in	2007-08-03 22:31:17.000000000 +0800
++++ work.mozilla/Makefile.in	2008-06-08 15:23:56.000000000 +0800
+@@ -154,7 +154,7 @@
+ endif
+ 
+ ifdef MOZ_ENABLE_GTK2
+-tier_9_dirs     += widget/src/gtkxtbin
++#Leo tier_9_dirs     += widget/src/gtkxtbin
+ endif
+ 
+ ifdef MOZ_IPCD
+@@ -240,7 +240,7 @@
+ endif
+ 
+ ifdef MOZ_ENABLE_XREMOTE
+-tier_50_dirs += widget/src/xremoteclient
++#Leo tier_50_dirs += widget/src/xremoteclient
+ endif
+ 
+ ifdef MOZ_XUL_APP
+diff -Nur orig.mozilla/modules/plugin/base/src/ns4xPlugin.cpp work.mozilla/modules/plugin/base/src/ns4xPlugin.cpp
+--- orig.mozilla/modules/plugin/base/src/ns4xPlugin.cpp	2007-01-29 03:44:05.000000000 +0800
++++ work.mozilla/modules/plugin/base/src/ns4xPlugin.cpp	2008-06-08 14:10:35.000000000 +0800
+@@ -74,14 +74,14 @@
+ //needed for nppdf plugin
+ #ifdef MOZ_WIDGET_GTK
+ #include <gdk/gdk.h>
+-#include <gdk/gdkx.h>
+-#include "gtkxtbin.h"
++//Leo #include <gdk/gdkx.h>
++//Leo #include "gtkxtbin.h"
+ #endif
+ 
+ #ifdef MOZ_WIDGET_GTK2
+ #include <gdk/gdk.h>
+-#include <gdk/gdkx.h>
+-#include "gtk2xtbin.h"
++//Leo #include <gdk/gdkx.h>
++//Leo #include "gtk2xtbin.h"
+ #endif
+ 
+ #include "nsJSNPRuntime.h"
+@@ -1946,7 +1946,7 @@
+       NPBool rtv = PR_FALSE;
+       inst->GetValue((nsPluginInstanceVariable)NPPVpluginNeedsXEmbed, &rtv);
+       if (rtv) {
+-        (*(Display **)result) = GDK_DISPLAY();
++//Leo        (*(Display **)result) = GDK_DISPLAY();
+         return NPERR_NO_ERROR;
+       }
+     }
+@@ -1957,11 +1957,11 @@
+     // XtDisplay just call gtk_xtbin_new(w,0) once
+     static GtkWidget *gtkXtBinHolder = 0;
+     if (!gtkXtBinHolder) {
+-      gtkXtBinHolder = gtk_xtbin_new(GDK_ROOT_PARENT(),0);
++  //Leo    gtkXtBinHolder = gtk_xtbin_new(GDK_ROOT_PARENT(),0);
+       // it crashes on destroy, let it leak
+       // gtk_widget_destroy(gtkXtBinHolder);
+     }
+-    (*(Display **)result) =  GTK_XTBIN(gtkXtBinHolder)->xtdisplay;
++//Leo    (*(Display **)result) =  GTK_XTBIN(gtkXtBinHolder)->xtdisplay;
+     return NPERR_NO_ERROR;
+ #endif
+     return NPERR_GENERIC_ERROR;
+diff -Nur orig.mozilla/modules/plugin/base/src/ns4xPluginInstance.cpp work.mozilla/modules/plugin/base/src/ns4xPluginInstance.cpp
+--- orig.mozilla/modules/plugin/base/src/ns4xPluginInstance.cpp	2007-07-07 02:21:30.000000000 +0800
++++ work.mozilla/modules/plugin/base/src/ns4xPluginInstance.cpp	2008-06-09 19:35:16.000000000 +0800
+@@ -63,14 +63,14 @@
+ 
+ #ifdef MOZ_WIDGET_GTK
+ #include <gdk/gdk.h>
+-#include <gdk/gdkx.h>
+-#include "gtkxtbin.h"
++//Leo #include <gdk/gdkx.h>
++//Leo #include "gtkxtbin.h"
+ #endif
+ 
+ #ifdef MOZ_WIDGET_GTK2
+ #include <gdk/gdk.h>
+-#include <gdk/gdkx.h>
+-#include "gtk2xtbin.h"
++//Leo #include <gdk/gdkx.h>
++//Leo #include "gtk2xtbin.h"
+ #endif
+ 
+ #ifdef MOZ_WIDGET_XLIB
+@@ -1236,7 +1236,9 @@
+   // We need to test if this is an xembed window before doing checks
+   // below, as they might be used on the first pass or on later passes
+   // when we resize the plugin window.
+-  GdkWindow *win = gdk_window_lookup((XID)window->window);
++  //Leo GdkWindow *win = gdk_window_lookup((XID)window->window);
++GdkWindow *win = gdk_window_lookup((GdkNativeWindow)window->window);//Leo
++
+   if (!win)
+     return NS_ERROR_FAILURE;
+ 
+@@ -1290,7 +1292,9 @@
+ 
+ 
+       if (!mXtBin) {
+-        mXtBin = gtk_xtbin_new(win, 0);
++printf("--- reach ns4xPluginInstance !mXtbin \n");
++          //Leo fixme        mXtBin = gtk_xtbin_new(win, 0);
++mXtBin = 0; //Leo fix me
+         // Check to see if creating mXtBin failed for some reason.
+         // if it did, we can't go any further.
+         if (!mXtBin)
+@@ -1315,9 +1319,10 @@
+     if (!isXembed)
+       ws->display = GTK_XTBIN(mXtBin)->xtdisplay;
+     else
+-      ws->display = GDK_WINDOW_XDISPLAY(win);
+-    ws->visual = GDK_VISUAL_XVISUAL(gdk_window_get_visual(win));
+-    ws->colormap = GDK_COLORMAP_XCOLORMAP(gdk_window_get_colormap(win));
++//Leo      ws->display = GDK_WINDOW_XDISPLAY(win);
++//Leo    ws->visual = GDK_VISUAL_XVISUAL(gdk_window_get_visual(win));
++//Leo    ws->colormap = GDK_COLORMAP_XCOLORMAP(gdk_window_get_colormap(win));
++      (GdkDisplay*)ws->display = GDK_WINDOW_XDISPLAY(win); //TEL typecast
+ 
+     XFlush(ws->display);
+ #endif
+@@ -1327,11 +1332,12 @@
+     return NS_ERROR_FAILURE;
+ 
+   if (!isXembed) {
+-    // And now point the NPWindow structures window 
++     printf("--- reach ns4xPluginInstance.cpp isXembeded \n");
++      // And now point the NPWindow structures window 
+     // to the actual X window
+-    window->window = (nsPluginPort *)GTK_XTBIN(mXtBin)->xtwindow;
++//Leo fixme    window->window = (nsPluginPort *)GTK_XTBIN(mXtBin)->xtwindow;
+     
+-    gtk_xtbin_resize(mXtBin, window->width, window->height);
++//Leo fixme   gtk_xtbin_resize(mXtBin, window->width, window->height);
+   }
+   
+ #elif defined(MOZ_WIDGET_XLIB)
+diff -Nur orig.mozilla/modules/plugin/base/src/nsPluginHostImpl.cpp work.mozilla/modules/plugin/base/src/nsPluginHostImpl.cpp
+--- orig.mozilla/modules/plugin/base/src/nsPluginHostImpl.cpp	2007-04-18 05:25:25.000000000 +0800
++++ work.mozilla/modules/plugin/base/src/nsPluginHostImpl.cpp	2008-06-08 14:24:53.000000000 +0800
+@@ -175,11 +175,11 @@
+ 
+ #ifdef XP_UNIX
+ #if defined(MOZ_WIDGET_GTK) || defined (MOZ_WIDGET_GTK2)
+-#include <gdk/gdkx.h> // for GDK_DISPLAY()
++//Leo #include <gdk/gdkx.h> // for GDK_DISPLAY()
+ #elif defined(MOZ_WIDGET_QT)
+ #include <qwindowdefs.h> // for qt_xdisplay()
+ #elif defined(MOZ_WIDGET_XLIB)
+-#include "xlibrgb.h" // for xlib_rgb_get_display()
++//Leo #include "xlibrgb.h" // for xlib_rgb_get_display()
+ #endif
+ #endif
+ 
+@@ -2675,8 +2675,9 @@
+   if (nsPluginManagerVariable_XDisplay == aVariable) {
+     Display** value = NS_REINTERPRET_CAST(Display**, aValue);
+ #if defined(MOZ_WIDGET_GTK) || defined (MOZ_WIDGET_GTK2)
+-    *value = GDK_DISPLAY();
+-#elif defined(MOZ_WIDGET_QT)
++//Leo    *value = GDK_DISPLAY();
++    (GdkDisplayDFB*)*value = GDK_DISPLAY();//Leo
++ #elif defined(MOZ_WIDGET_QT)
+     *value = qt_xdisplay();
+ #elif defined(MOZ_WIDGET_XLIB)
+     *value = xxlib_rgb_get_display(xxlib_find_handle(XXLIBRGB_DEFAULT_HANDLE));
+diff -Nur orig.mozilla/modules/plugin/base/src/nsPluginNativeWindowGtk2.cpp work.mozilla/modules/plugin/base/src/nsPluginNativeWindowGtk2.cpp
+--- orig.mozilla/modules/plugin/base/src/nsPluginNativeWindowGtk2.cpp	2003-12-18 03:49:44.000000000 +0800
++++ work.mozilla/modules/plugin/base/src/nsPluginNativeWindowGtk2.cpp	2008-06-09 20:26:30.000000000 +0800
+@@ -46,7 +46,7 @@
+ #include "nsPluginNativeWindow.h"
+ #include "npapi.h"
+ #include <gtk/gtk.h>
+-#include <gdk/gdkx.h>
++//Leo #include <gdk/gdkx.h>
+ #include <gdk/gdk.h>
+ #ifdef OJI
+ #include "plstr.h"
+@@ -144,7 +144,9 @@
+ 
+ nsresult nsPluginNativeWindowGtk2::CreateXEmbedWindow() {
+   if(!mGtkSocket) {
+-    GdkWindow *win = gdk_window_lookup((XID)window);
++//Leo    GdkWindow *win = gdk_window_lookup((XID)window);
++printf("---- reach nsPluginNativeWindowGtk2.cpp 148 \n");
++    GdkWindow *win = NULL;//Leo
+     mGtkSocket = gtk_socket_new();
+ 
+     //attach the socket to the container widget
+diff -Nur orig.mozilla/modules/plugin/samples/default/unix/nullplugin.c work.mozilla/modules/plugin/samples/default/unix/nullplugin.c
+--- orig.mozilla/modules/plugin/samples/default/unix/nullplugin.c	2005-09-13 21:32:33.000000000 +0800
++++ work.mozilla/modules/plugin/samples/default/unix/nullplugin.c	2008-06-08 14:28:31.000000000 +0800
+@@ -50,7 +50,7 @@
+ 
+ #include <stdio.h>
+ #include <gtk/gtk.h>
+-#include <gdk/gdkx.h>
++//Leo #include <gdk/gdkx.h>
+ #include <gdk/gdkkeysyms.h>
+ 
+ /* Xlib/Xt stuff */
+diff -Nur orig.mozilla/.mozconfig.mk work.mozilla/.mozconfig.mk
+--- orig.mozilla/.mozconfig.mk	2008-06-13 16:43:11.000000000 +0800
++++ work.mozilla/.mozconfig.mk	2008-06-09 20:29:57.000000000 +0800
+@@ -1,6 +1,6 @@
+ # gmake
+ # This file is automatically generated for client.mk.
+-# Do not edit. Edit /home/leo/workspace/neouzabox/build.arm.glibc/mozilla/.mozconfig instead.
++# Do not edit. Edit /home/leo/workspace/qemu/arm/export/mozilla/.mozconfig instead.
+ # To create a new .mozconfig file, you can visit,
+ #   http://webtools.mozilla.org/build/config.cgi
+ 
+@@ -40,9 +40,6 @@
+ # --disable-feeds is used by configure (not client.mk)
+ # --without-x is used by configure (not client.mk)
+ # --enable-directfb is used by configure (not client.mk)
+-# --enable-extensions=default,spatialnavigation is used by configure (not client.mk)
+-# --disable-xinerama is used by configure (not client.mk)
+-# --without-system-nspr is used by configure (not client.mk)
+ # --disable-oji is used by configure (not client.mk)
+ # --disable-javaxpcom is used by configure (not client.mk)
+ # --without-java is used by configure (not client.mk)
+diff -Nur orig.mozilla/.mozconfig.out work.mozilla/.mozconfig.out
+--- orig.mozilla/.mozconfig.out	2008-06-13 16:43:12.000000000 +0800
++++ work.mozilla/.mozconfig.out	2008-06-09 20:29:58.000000000 +0800
+@@ -1,4 +1,4 @@
+-Adding client.mk options from /home/leo/workspace/neouzabox/build.arm.glibc/mozilla/.mozconfig:
++Adding client.mk options from /home/leo/workspace/qemu/arm/export/mozilla/.mozconfig:
+     MOZ_CO_PROJECT=browser
+     MOZ_BUILD_PROJECTS=browser
+     MOZ_OBJDIR=$(TOPSRCDIR)/objdir-firefox
+diff -Nur orig.mozilla/nsprpub/pr/src/misc/prenv.c work.mozilla/nsprpub/pr/src/misc/prenv.c
+--- orig.mozilla/nsprpub/pr/src/misc/prenv.c	2004-04-25 23:01:01.000000000 +0800
++++ work.mozilla/nsprpub/pr/src/misc/prenv.c	2008-06-11 09:59:13.000000000 +0800
+@@ -81,6 +81,7 @@
+     _PR_LOCK_ENV();
+     ev = _PR_MD_GET_ENV(var);
+     _PR_UNLOCK_ENV();
++  //printf("---  Leo  reach %s  %d  ev=%s var=%s\n",__FILE__,__LINE__,ev,var);
+     return ev;
+ }
+ 
+diff -Nur orig.mozilla/toolkit/components/remote/Makefile.in work.mozilla/toolkit/components/remote/Makefile.in
+--- orig.mozilla/toolkit/components/remote/Makefile.in	2007-12-22 04:04:18.000000000 +0800
++++ work.mozilla/toolkit/components/remote/Makefile.in	2008-06-08 10:02:29.000000000 +0800
+@@ -67,7 +67,7 @@
+ XPIDLSRCS = nsIRemoteService.idl
+ 
+ ifneq (,$(filter gtk gtk2,$(MOZ_WIDGET_TOOLKIT)))
+-CPPSRCS += nsGTKRemoteService.cpp
++#Leo CPPSRCS += nsGTKRemoteService.cpp
+ endif
+ 
+ ifeq (photon,$(MOZ_WIDGET_TOOLKIT))
+diff -Nur orig.mozilla/toolkit/components/remote/nsGTKRemoteService.cpp work.mozilla/toolkit/components/remote/nsGTKRemoteService.cpp
+--- orig.mozilla/toolkit/components/remote/nsGTKRemoteService.cpp	2006-01-06 11:19:20.000000000 +0800
++++ work.mozilla/toolkit/components/remote/nsGTKRemoteService.cpp	2008-06-08 10:08:56.000000000 +0800
+@@ -40,8 +40,9 @@
+  * ***** END LICENSE BLOCK ***** */
+ 
+ #include "nsGTKRemoteService.h"
+-
+-#include <X11/Xatom.h> // for XA_STRING
++//TEL
++//#include <X11/Xatom.h> // for XA_STRING
++//TEL
+ #include <stdlib.h>
+ #include <gtk/gtkinvisible.h> // For some reason GTK+ doesn't include this file
+                               // automatically from gtk.h
+@@ -237,16 +238,25 @@
+   MOZILLA_PROGRAM_PROP,
+   MOZILLA_COMMANDLINE_PROP
+ };
+-static Atom XAtoms[ARRAY_LENGTH(XAtomNames)];
++//static Atom XAtoms[ARRAY_LENGTH(XAtomNames)];
++  static GdkAtom XAtoms[ARRAY_LENGTH(XAtomNames)];//TEL
+ 
+ void
+ nsGTKRemoteService::EnsureAtoms(void)
+ {
+   if (sMozVersionAtom)
+     return;
++//TEL
++/*  XInternAtoms(GDK_DISPLAY(), XAtomNames, ARRAY_LENGTH(XAtomNames),
++               False, XAtoms);*/
++    for (int j = 0; j<ARRAY_LENGTH(XAtomNames); j++)
++    {
++        g_print ("\n nsGTKRemoteService::EnsureAtoms calls gdk_atom_intern_static_string: STARTS");
++        XAtoms[j] = gdk_atom_intern_static_string (XAtomNames[j]);
++        g_print ("\n nsGTKRemoteService::EnsureAtoms calls gdk_atom_intern_static_string: ENDS");
++    }
+ 
+-  XInternAtoms(GDK_DISPLAY(), XAtomNames, ARRAY_LENGTH(XAtomNames),
+-               False, XAtoms);
++//TEL
+   int i = 0;
+   sMozVersionAtom     = XAtoms[i++];
+   sMozLockAtom        = XAtoms[i++];
+@@ -401,6 +411,7 @@
+ nsGTKRemoteService::HandleCommandsFor(GtkWidget* widget,
+                                       nsIWeakReference* aWindow)
+ {
++   GdkAtom property_change;
+ #ifdef MOZ_WIDGET_GTK2
+   g_signal_connect(G_OBJECT(widget), "property_notify_event",
+                    G_CALLBACK(HandlePropertyChange), aWindow);
+@@ -411,32 +422,98 @@
+ 
+   gtk_widget_add_events(widget, GDK_PROPERTY_CHANGE_MASK);
+ 
+-  Window window = GDK_WINDOW_XWINDOW(widget->window);
++//  Window window = GDK_WINDOW_XWINDOW(widget->window);//TEL
+ 
+   // set our version
+-  XChangeProperty(GDK_DISPLAY(), window, sMozVersionAtom, XA_STRING,
+-                  8, PropModeReplace, kRemoteVersion, sizeof(kRemoteVersion) - 1);
++
++//TEL  
++/*  XChangeProperty(GDK_DISPLAY(), window, sMozVersionAtom, XA_STRING,
++                  8, PropModeReplace, kRemoteVersion, sizeof(kRemoteVersion) - 1);*/
++//TEL
++//TEL start
++  property_change = gdk_atom_intern("STRING",1);/*defined in gdkproperty-directfb.c*/
++
++   g_print ("\n nsGTKRemoteService::HandleCommandsFor calls gdk_property_change(): STARTS");
++   gdk_property_change (widget->window,  /*GdkWindow*/
++                       sMozVersionAtom, 
++                       property_change, /*new type for the property*/
++                       8,              /*new format of property */
++                       GDK_PROP_MODE_REPLACE,
++                       kRemoteVersion,
++                       sizeof(kRemoteVersion) - 1);
++  g_print ("\n nsGTKRemoteService::HandleCommandsFor calls gdk_property_change(): ENDS");
++//TEL end
+ 
+   // get our username
+   unsigned char *logname;
+   logname = (unsigned char*) PR_GetEnv("LOGNAME");
+   if (logname) {
+     // set the property on the window if it's available
+-    XChangeProperty(GDK_DISPLAY(), window, sMozUserAtom, XA_STRING,
+-                    8, PropModeReplace, logname, strlen((char*) logname));
++//TEL
++/*    XChangeProperty(GDK_DISPLAY(), window, sMozUserAtom, XA_STRING,
++                    8, PropModeReplace, logname, strlen((char*) logname));*/
++//TEL
++
++//TEL start
++  property_change = gdk_atom_intern("STRING",1);/*defined in gdkproperty-directfb.c*/
++                                                                                                                              
++  g_print ("\n nsGTKRemoteService::HandleCommandsFor calls gdk_property_change(): STARTS");
++   gdk_property_change (widget->window,  /*GdkWindow*/
++                       sMozUserAtom,
++                       property_change, /*new type for the property*/
++                       8,              /*new format of property */
++                       GDK_PROP_MODE_REPLACE,
++                       logname,
++                       strlen((char*) logname));
++  g_print ("\n nsGTKRemoteService::HandleCommandsFor calls gdk_property_change(): ENDS");
++//TEL end
++
+   }
+ 
+-  XChangeProperty(GDK_DISPLAY(), window, sMozProgramAtom, XA_STRING,
+-                  8, PropModeReplace, (unsigned char*) mAppName.get(), mAppName.Length());
++//TEL
++/*  XChangeProperty(GDK_DISPLAY(), window, sMozProgramAtom, XA_STRING,
++                  8, PropModeReplace, (unsigned char*) mAppName.get(), mAppName.Length());*/
++//TEL
++
++//TEL start
++  property_change = gdk_atom_intern("STRING",1);/*defined in gdkproperty-directfb.c*/
++                                                                                                                              
++  g_print ("\n nsGTKRemoteService::HandleCommandsFor calls gdk_property_change(): STARTS");
++  gdk_property_change (widget->window,  /*GdkWindow*/
++                       sMozProgramAtom,
++                       property_change, /*new type for the property*/
++                       8,              /*new format of property */
++                       GDK_PROP_MODE_REPLACE,
++                       (unsigned char*) mAppName.get(),
++                       mAppName.Length());
++ g_print ("\n nsGTKRemoteService::HandleCommandsFor calls gdk_property_change(): ENDS");
++//TEL end
++
+ 
+   if (!mProfileName.IsEmpty()) {
+-    XChangeProperty(GDK_DISPLAY(), window, sMozProfileAtom, XA_STRING,
+-                    8, PropModeReplace, (unsigned char*) mProfileName.get(), mProfileName.Length());
++//TEL
++   /* XChangeProperty(GDK_DISPLAY(), window, sMozProfileAtom, XA_STRING,
++                    8, PropModeReplace, (unsigned char*) mProfileName.get(), mProfileName.Length());*/
++//TEL
++//TEL start
++  property_change = gdk_atom_intern("STRING",1);/*defined in gdkproperty-directfb.c*/
++                                                                                                                              
++  g_print ("\n nsGTKRemoteService::HandleCommandsFor calls gdk_property_change(): STARTS");
++  gdk_property_change (widget->window,  /*GdkWindow*/
++                       sMozProgramAtom,
++                       property_change, /*new type for the property*/
++                       8,              /*new format of property */
++                       GDK_PROP_MODE_REPLACE,
++                       (unsigned char*) mProfileName.get(),
++                       mProfileName.Length());
++g_print ("\n nsGTKRemoteService::HandleCommandsFor calls gdk_property_change(): ENDS");
++//TEL 
++
+   }
+ }
+ 
+ #ifdef MOZ_WIDGET_GTK2
+-#define CMP_GATOM_XATOM(gatom,xatom) (gatom == gdk_x11_xatom_to_atom(xatom))
++#define CMP_GATOM_XATOM(gatom,xatom) (gatom == xatom/*gdk_x11_xatom_to_atom(xatom)*/)
+ #else
+ #define CMP_GATOM_XATOM(gatom,xatom) (gatom == xatom)
+ #endif
+@@ -447,31 +524,53 @@
+                                          nsIWeakReference* aThis)
+ {
+   nsCOMPtr<nsIDOMWindow> window (do_QueryReferent(aThis));
+-
++  
+   if (pevent->state == GDK_PROPERTY_NEW_VALUE &&
+       CMP_GATOM_XATOM(pevent->atom, sMozCommandAtom)) {
+-
++  
+     // We got a new command atom.
+     int result;
+-    Atom actual_type;
++    
++    //Atom actual_type;//TEL
++//TEL start
++    GdkAtom actual_type;
++//TEL end
+     int actual_format;
+     unsigned long nitems, bytes_after;
+     char *data = 0;
+ 
+-    result = XGetWindowProperty (GDK_DISPLAY(),
++/*    result = XGetWindowProperty (GDK_DISPLAY(),
+                                  GDK_WINDOW_XWINDOW(pevent->window),
+                                  sMozCommandAtom,
+-                                 0,                        /* long_offset */
+-                                 (65536 / sizeof (long)),  /* long_length */
+-                                 True,                     /* atomic delete after */
+-                                 XA_STRING,                /* req_type */
+-                                 &actual_type,             /* actual_type return */
+-                                 &actual_format,           /* actual_format_return */
+-                                 &nitems,                  /* nitems_return */
+-                                 &bytes_after,             /* bytes_after_return */
+-                                 (unsigned char **)&data); /* prop_return
++                                 0,                        // long_offset 
++                                 (65536 / sizeof (long)),  // long_length 
++                                 True,                     // atomic delete after 
++                                 XA_STRING,                // req_type 
++                                 &actual_type,             // actual_type return 
++                                 &actual_format,           // actual_format_return 
++                                 &nitems,                  // nitems_return 
++                                 &bytes_after,             // bytes_after_return 
++                                 (unsigned char **)&data); // prop_return
+                                                               (we only care
+-                                                              about the first ) */
++                                                              about the first ) 
++*/
++//TEL start
++   int actual_length;/* location to store the length of the retrieved data, in bytes.*/
++
++   GdkAtom req_type = gdk_atom_intern("STRING",1);/*defined in gdkproperty-directfb.c*/
++   g_print ("\n nsGTKRemoteService::HandlePropertyChange calls gdk_property_get(): STARTS");
++   result = gdk_property_get(pevent->window,
++                             sMozCommandAtom,
++                             req_type,                     
++                             0,                        /*offset*/
++                             (65536 / sizeof (long)),  /*length*/
++                             1,                        /*if true delete the property after return*/
++                             &actual_type,
++                             &actual_format,
++                             &actual_length,
++                             (unsigned char **)&data);                      
++  g_print ("\n nsGTKRemoteService::HandlePropertyChange calls gdk_property_get(): ENDS");
++//TEL end
+ 
+ #ifdef DEBUG_bsmedberg
+     printf("Handling command: %s\n", data);
+@@ -489,10 +588,27 @@
+     const char *response = HandleCommand(data, window);
+ 
+     // put the property onto the window as the response
+-    XChangeProperty (GDK_DISPLAY(), GDK_WINDOW_XWINDOW(pevent->window),
++//TEL
++/*    XChangeProperty (GDK_DISPLAY(), GDK_WINDOW_XWINDOW(pevent->window),
+                      sMozResponseAtom, XA_STRING,
+-                     8, PropModeReplace, (const unsigned char *)response, strlen (response));
+-    XFree(data);
++                     8, PropModeReplace, (const unsigned char *)response, strlen (response));*/
++//TEL
++    //TEL start
++    GdkAtom property_change = gdk_atom_intern("STRING",1);/*defined in gdkproperty-directfb.c*/
++                                                                                                                              
++     g_print ("\n nsGTKRemoteService::HandlePropertyChange calls gdk_property_change(): STARTS");
++     gdk_property_change(pevent->window,  /*GdkWindow*/
++                      sMozResponseAtom,
++                      property_change, /*new type for the property*/
++                      8,              /*new format of property */
++                      GDK_PROP_MODE_REPLACE,
++                      (const unsigned char *)response,
++                      strlen(response));
++    g_print ("\n nsGTKRemoteService::HandlePropertyChange calls gdk_property_change(): ENDS");    
++   //TEL
++
++//    XFree(data);//TEL
++      free(data);
+     return TRUE;
+   }
+ 
+@@ -502,25 +618,49 @@
+ 
+     // We got a new commandline atom.
+     int result;
+-    Atom actual_type;
++//TEL START
++   GdkAtom actual_type;
++//TEL END
++
++//    Atom actual_type; //TEL
+     int actual_format;
+     unsigned long nitems, bytes_after;
+     char *data = 0;
+ 
+-    result = XGetWindowProperty (GDK_DISPLAY(),
++/*    result = XGetWindowProperty (GDK_DISPLAY(),
+                                  GDK_WINDOW_XWINDOW(pevent->window),
+                                  sMozCommandLineAtom,
+-                                 0,                        /* long_offset */
+-                                 (65536 / sizeof (long)),  /* long_length */
+-                                 True,                     /* atomic delete after */
+-                                 XA_STRING,                /* req_type */
+-                                 &actual_type,             /* actual_type return */
+-                                 &actual_format,           /* actual_format_return */
+-                                 &nitems,                  /* nitems_return */
+-                                 &bytes_after,             /* bytes_after_return */
+-                                 (unsigned char **)&data); /* prop_return
++                                 0,                        // long_offset 
++                                 (65536 / sizeof (long)),  // long_length 
++                                 True,                     // atomic delete after 
++                                 XA_STRING,                // req_type 
++                                 &actual_type,             // actual_type return 
++                                 &actual_format,           // actual_format_return 
++                                 &nitems,                  // nitems_return 
++                                 &bytes_after,             // bytes_after_return 
++                                 (unsigned char **)&data); // prop_return
+                                                               (we only care
+-                                                              about the first ) */
++                                                                about the first ) 
++*/
++
++//TEL start
++   int actual_length;/* location to store the length of the retrieved data, in bytes.*/
++                                                                                                                              
++   GdkAtom req_type = gdk_atom_intern("STRING",1);/*defined in gdkproperty-directfb.c*/
++   g_print ("\n nsGTKRemoteService::HandlePropertyChange calls gdk_property_get(): STARTS");
++   result = gdk_property_get(pevent->window,
++                              sMozCommandLineAtom,
++                              req_type,
++                              0,                        /*offset*/
++                              (65536 / sizeof (long)),  /*length*/
++                              1,                        /*if true delete the property after return*/
++                              &actual_type,
++                              &actual_format,
++                              &actual_length,
++                              (unsigned char **)&data);
++   g_print ("\n nsGTKRemoteService::HandlePropertyChange calls gdk_property_get(): ENDS");
++//TEL end
++                                                         
+ 
+     // Failed to get property off the window?
+     if (result != Success)
+@@ -534,10 +674,30 @@
+     const char *response = HandleCommandLine(data, window);
+ 
+     // put the property onto the window as the response
+-    XChangeProperty (GDK_DISPLAY(), GDK_WINDOW_XWINDOW(pevent->window),
++
++//TEL
++/*    XChangeProperty (GDK_DISPLAY(), GDK_WINDOW_XWINDOW(pevent->window),
+                      sMozResponseAtom, XA_STRING,
+-                     8, PropModeReplace, (const unsigned char *)response, strlen (response));
+-    XFree(data);
++                     8, PropModeReplace, (const unsigned char *)response, strlen (response));*/
++//TEL
++
++    //TEL start
++    GdkAtom property_change = gdk_atom_intern("STRING",1);/*defined in gdkproperty-directfb.c*/
++                                                                                                                              
++     g_print ("\n nsGTKRemoteService::HandlePropertyChange calls gdk_property_change(): STARTS");
++     gdk_property_change(pevent->window,  /*GdkWindow*/
++                      sMozResponseAtom,
++                      property_change, /*new type for the property*/
++                      8,              /*new format of property */
++                      GDK_PROP_MODE_REPLACE,
++                      (const unsigned char *)response,
++                       strlen(response));
++     g_print ("\n nsGTKRemoteService::HandlePropertyChange calls gdk_property_change(): ENDS");                         
++
++   //TEL end
++
++//    XFree(data); //TEL
++      free(data); //TEL
+     return TRUE;
+   }
+ #endif //MOZ_XUL_APP
+@@ -557,14 +717,25 @@
+   return FALSE;
+ }
+ 
+-Atom nsGTKRemoteService::sMozVersionAtom;
++//TEL
++/*Atom nsGTKRemoteService::sMozVersionAtom;
+ Atom nsGTKRemoteService::sMozLockAtom;
+ Atom nsGTKRemoteService::sMozCommandAtom;
+ Atom nsGTKRemoteService::sMozResponseAtom;
+ Atom nsGTKRemoteService::sMozUserAtom;
+ Atom nsGTKRemoteService::sMozProfileAtom;
+ Atom nsGTKRemoteService::sMozProgramAtom;
+-Atom nsGTKRemoteService::sMozCommandLineAtom;
++Atom nsGTKRemoteService::sMozCommandLineAtom;*/
++
++GdkAtom nsGTKRemoteService::sMozVersionAtom;
++GdkAtom nsGTKRemoteService::sMozLockAtom;
++GdkAtom nsGTKRemoteService::sMozCommandAtom;
++GdkAtom nsGTKRemoteService::sMozResponseAtom;
++GdkAtom nsGTKRemoteService::sMozUserAtom;
++GdkAtom nsGTKRemoteService::sMozProfileAtom;
++GdkAtom nsGTKRemoteService::sMozProgramAtom;
++GdkAtom nsGTKRemoteService::sMozCommandLineAtom;
++//TEL
+ 
+ // {C0773E90-5799-4eff-AD03-3EBCD85624AC}
+ #define NS_REMOTESERVICE_CID \
+diff -Nur orig.mozilla/toolkit/components/remote/nsGTKRemoteService.h work.mozilla/toolkit/components/remote/nsGTKRemoteService.h
+--- orig.mozilla/toolkit/components/remote/nsGTKRemoteService.h	2005-04-05 07:11:42.000000000 +0800
++++ work.mozilla/toolkit/components/remote/nsGTKRemoteService.h	2008-06-08 10:13:01.000000000 +0800
+@@ -95,7 +95,7 @@
+   nsCString mProfileName;
+   nsInterfaceHashtable<nsVoidPtrHashKey, nsIWeakReference> mWindows;
+ 
+-  static Atom sMozVersionAtom;
++/*Leo  static Atom sMozVersionAtom;
+   static Atom sMozLockAtom;
+   static Atom sMozCommandAtom;
+   static Atom sMozResponseAtom;
+@@ -103,6 +103,16 @@
+   static Atom sMozProfileAtom;
+   static Atom sMozProgramAtom;
+   static Atom sMozCommandLineAtom;
++  */
++  static GdkAtom sMozVersionAtom;
++  static GdkAtom sMozLockAtom;
++  static GdkAtom sMozCommandAtom;
++  static GdkAtom sMozResponseAtom;
++  static GdkAtom sMozUserAtom;
++  static GdkAtom sMozProfileAtom;
++  static GdkAtom sMozProgramAtom;
++  static GdkAtom sMozCommandLineAtom;
++
+ };
+ 
+ #endif // __nsGTKRemoteService_h__
+diff -Nur orig.mozilla/toolkit/xre/nsAppRunner.cpp work.mozilla/toolkit/xre/nsAppRunner.cpp
+--- orig.mozilla/toolkit/xre/nsAppRunner.cpp	2007-11-08 19:56:25.000000000 +0800
++++ work.mozilla/toolkit/xre/nsAppRunner.cpp	2008-06-11 12:35:23.000000000 +0800
+@@ -1501,7 +1501,7 @@
+   rv = lf->GetNativePath(exePath);
+   if (NS_FAILED(rv))
+     return rv;
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+ #if defined(XP_WIN)
+   if (!WinLaunchChild(exePath.get(), gRestartArgc, gRestartArgv, needElevation))
+     return NS_ERROR_FAILURE;
+@@ -1513,26 +1513,31 @@
+   if (_execv(exePath.get(), gRestartArgv) == -1)
+     return NS_ERROR_FAILURE;
+ #elif defined(XP_UNIX)
+-  if (execv(exePath.get(), gRestartArgv) == -1)
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
++  if (execv(exePath.get(), gRestartArgv) == -1){
++  printf("---  Leo  reach %s  %d  exePath=%s, argv[0]=%s\n",__FILE__,__LINE__,exePath.get(),gRestartArgv[0]);
+     return NS_ERROR_FAILURE;
++  }
+ #elif defined(XP_BEOS)
+   extern char **environ;
+   status_t res;
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   res = resume_thread(load_image(gRestartArgc,(const char **)gRestartArgv,(const char **)environ));
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   if (res != B_OK)
+     return NS_ERROR_FAILURE;
+ #else
+   PRProcess* process = PR_CreateProcess(exePath.get(), gRestartArgv,
+                                         nsnull, nsnull);
+   if (!process) return NS_ERROR_FAILURE;
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   PRInt32 exitCode;
+   PRStatus failed = PR_WaitProcess(process, &exitCode);
+   if (failed || exitCode)
+     return NS_ERROR_FAILURE;
+ #endif
+ #endif
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   return NS_ERROR_LAUNCHED_CHILD_PROCESS;
+ }
+ 
+@@ -1628,13 +1633,18 @@
+ 
+   {
+     ScopedXPCOMStartup xpcom;
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+     rv = xpcom.Initialize();
+     NS_ENSURE_SUCCESS(rv, rv);
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+     rv = xpcom.RegisterProfileService(aProfileSvc);
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+     rv |= xpcom.DoAutoreg();
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+     rv |= xpcom.InitEventQueue();
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+     rv |= xpcom.SetWindowCreator(aNative);
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+     NS_ENSURE_SUCCESS(rv, NS_ERROR_FAILURE);
+ 
+ #ifdef XP_MACOSX
+@@ -1652,7 +1662,7 @@
+         (do_CreateInstance(NS_DIALOGPARAMBLOCK_CONTRACTID));
+       nsCOMPtr<nsIMutableArray> dlgArray (do_CreateInstance(NS_ARRAY_CONTRACTID));
+       NS_ENSURE_TRUE(windowWatcher && ioParamBlock && dlgArray, NS_ERROR_FAILURE);
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+       ioParamBlock->SetObjects(dlgArray);
+ 
+       nsCOMPtr<nsIAppStartup> appStartup
+@@ -1660,7 +1670,7 @@
+       NS_ENSURE_TRUE(appStartup, NS_ERROR_FAILURE);
+ 
+       appStartup->EnterLastWindowClosingSurvivalArea();
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+       nsCOMPtr<nsIDOMWindow> newWindow;
+       rv = windowWatcher->OpenWindow(nsnull,
+                                      kProfileManagerURL,
+@@ -1668,7 +1678,7 @@
+                                      "centerscreen,chrome,modal,titlebar",
+                                      ioParamBlock,
+                                      getter_AddRefs(newWindow));
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+       appStartup->ExitLastWindowClosingSurvivalArea();
+ 
+       NS_ENSURE_SUCCESS_LOG(rv, rv);
+@@ -1717,7 +1727,9 @@
+   // try to import old-style profiles
+   { // scope XPCOM
+     ScopedXPCOMStartup xpcom;
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+     rv = xpcom.Initialize();
++
+     if (NS_SUCCEEDED(rv)) {
+       xpcom.DoAutoreg();
+       xpcom.RegisterProfileService(aPService);
+@@ -1733,7 +1745,7 @@
+       }
+     }
+   }
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   aPService->Flush();
+   return LaunchChild(aNative);
+ }
+@@ -1758,44 +1770,48 @@
+   const char* arg;
+   *aResult = nsnull;
+   *aStartOffline = PR_FALSE;
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   ar = CheckArg("offline", PR_TRUE);
+   if (ar == ARG_BAD) {
+     PR_fprintf(PR_STDERR, "Error: argument -offline is invalid when argument -osint is specified\n");
+     return NS_ERROR_FAILURE;
+   }
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   arg = PR_GetEnv("XRE_START_OFFLINE");
+   if ((arg && *arg) || ar)
+     *aStartOffline = PR_TRUE;
+ 
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+ 
+-  arg = PR_GetEnv("XRE_PROFILE_PATH");
++ arg = PR_GetEnv("XRE_PROFILE_PATH");
++  printf("---  Leo  reach %s  %d  arg=%s \n",__FILE__,__LINE__,arg);
+   if (arg && *arg) {
+     nsCOMPtr<nsILocalFile> lf;
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+     rv = NS_NewNativeLocalFile(nsDependentCString(arg), PR_TRUE,
+                                getter_AddRefs(lf));
+     NS_ENSURE_SUCCESS(rv, rv);
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+     nsCOMPtr<nsILocalFile> localDir;
+     arg = PR_GetEnv("XRE_PROFILE_LOCAL_PATH");
+     if (arg && *arg) {
+       rv = NS_NewNativeLocalFile(nsDependentCString(arg), PR_TRUE,
+                                  getter_AddRefs(localDir));
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+       NS_ENSURE_SUCCESS(rv, rv);
+     } else {
+       localDir = lf;
+     }
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+     // Clear out flags that we handled (or should have handled!) last startup.
+     const char *dummy;
+     CheckArg("p", PR_FALSE, &dummy);
+     CheckArg("profile", PR_FALSE, &dummy);
+     CheckArg("profilemanager");
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+     return NS_LockProfilePath(lf, localDir, nsnull, aResult);
+   }
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   ar = CheckArg("migration", PR_TRUE);
+   if (ar == ARG_BAD) {
+     PR_fprintf(PR_STDERR, "Error: argument -migration is invalid when argument -osint is specified\n");
+@@ -1803,7 +1819,7 @@
+   } else if (ar == ARG_FOUND) {
+     gDoMigration = PR_TRUE;
+   }
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   ar = CheckArg("profile", PR_TRUE, &arg);
+   if (ar == ARG_BAD) {
+     PR_fprintf(PR_STDERR, "Error: argument -profile requires a path\n");
+@@ -1815,7 +1831,7 @@
+     NS_ENSURE_SUCCESS(rv, rv);
+ 
+     nsCOMPtr<nsIProfileUnlocker> unlocker;
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+     // If a profile path is specified directory on the command line, then
+     // assume that the temp directory is the same as the given directory.
+     rv = NS_LockProfilePath(lf, lf, getter_AddRefs(unlocker), aResult);
+@@ -1874,9 +1890,10 @@
+ 
+     return rv;
+   }
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   PRUint32 count;
+   rv = profileSvc->GetProfileCount(&count);
++  printf("---  Leo  reach %s  %d profileCount=%d \n",__FILE__,__LINE__,count);
+   NS_ENSURE_SUCCESS(rv, rv);
+ 
+   if (gAppData->flags & NS_XRE_ENABLE_PROFILE_MIGRATOR) {
+@@ -1885,7 +1902,7 @@
+       return ImportProfiles(profileSvc, aNative);
+     }
+   }
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   ar = CheckArg("p", PR_FALSE, &arg);
+   if (ar == ARG_BAD) {
+     ar = CheckArg("osint");
+@@ -1924,7 +1941,7 @@
+ 
+     return ShowProfileManager(profileSvc, aNative);
+   }
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   ar = CheckArg("profilemanager", PR_TRUE);
+   if (ar == ARG_BAD) {
+     PR_fprintf(PR_STDERR, "Error: argument -profilemanager is invalid when argument -osint is specified\n");
+@@ -1932,7 +1949,7 @@
+   } else if (ar == ARG_FOUND) {
+     return ShowProfileManager(profileSvc, aNative);
+   }
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   if (!count) {
+     gDoMigration = PR_TRUE;
+ 
+@@ -1949,7 +1966,7 @@
+         return NS_OK;
+     }
+   }
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   PRBool useDefault = PR_TRUE;
+   if (count > 1)
+     profileSvc->GetStartWithLastProfile(&useDefault);
+@@ -1963,11 +1980,11 @@
+       rv = profile->Lock(getter_AddRefs(unlocker), aResult);
+       if (NS_SUCCEEDED(rv))
+         return NS_OK;
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+       nsCOMPtr<nsILocalFile> profileDir;
+       rv = profile->GetRootDir(getter_AddRefs(profileDir));
+       NS_ENSURE_SUCCESS(rv, rv);
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+       nsCOMPtr<nsILocalFile> profileLocalDir;
+       rv = profile->GetRootDir(getter_AddRefs(profileLocalDir));
+       NS_ENSURE_SUCCESS(rv, rv);
+@@ -1976,7 +1993,7 @@
+                                  aNative, aResult);
+     }
+   }
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   return ShowProfileManager(profileSvc, aNative);
+ }
+ 
+@@ -2206,7 +2223,7 @@
+   nsresult rv;
+   ArgResult ar;
+   NS_TIMELINE_MARK("enter main");
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+ #ifdef DEBUG
+   if (PR_GetEnv("XRE_MAIN_BREAK"))
+     NS_BREAK();
+@@ -2381,7 +2398,7 @@
+     }
+     return 0;
+   }
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+ #if defined(MOZ_WIDGET_GTK) || defined(MOZ_WIDGET_GTK2)
+   // setup for private colormap.  Ideally we'd like to do this
+   // in nsAppShell::Create, but we need to get in before gtk
+@@ -2392,12 +2409,15 @@
+ #endif
+   if (CheckArg("install"))
+     gdk_rgb_set_install(TRUE);
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   // Initialize GTK+1/2 here for splash
+ #if defined(MOZ_WIDGET_GTK)
+   gtk_set_locale();
+ #endif
++  printf("---  Leo  reach %s  %d  gArgc=%d gArgv[0]=%s\n",__FILE__,__LINE__,gArgc,gArgv[0]);
++ gArgc=0;
+   gtk_init(&gArgc, &gArgv);
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+ 
+ #if defined(MOZ_WIDGET_GTK2)
+   // g_set_application_name () is only defined in glib2.2 and higher.
+@@ -2411,7 +2431,7 @@
+     PR_UnloadLibrary(glib2);
+   }
+ #endif
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   gtk_widget_set_default_visual(gdk_rgb_get_visual());
+   gtk_widget_set_default_colormap(gdk_rgb_get_cmap());
+ #endif /* MOZ_WIDGET_GTK || MOZ_WIDGET_GTK2 */
+@@ -2419,7 +2439,7 @@
+ #if defined(MOZ_WIDGET_QT)
+   QApplication qapp(argc, argv);
+ #endif
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+ // #if defined(MOZ_WIDGET_XLIB)
+ // XXXtimeless fix me! How do we get a Display from here to nsAppShell.cpp ?
+ // #endif
+@@ -2434,13 +2454,13 @@
+   rv = NS_CreateNativeAppSupport(getter_AddRefs(nativeApp));
+   if (NS_FAILED(rv))
+     return 1;
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   PRBool canRun = PR_FALSE;
+   rv = nativeApp->Start(&canRun);
+   if (NS_FAILED(rv) || !canRun) {
+     return 1;
+   }
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   //----------------------------------------------------------------
+   // We need to check if a previous installation occured and
+   // if so, make sure it finished and cleaned up correctly.
+@@ -2456,7 +2476,7 @@
+   rv = dirProvider.GetAppDir()->Clone(getter_AddRefs(registryFile));
+   if (NS_SUCCEEDED(rv)) {
+     registryFile->AppendNative(CLEANUP_REGISTRY);
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+     PRBool exists;
+     rv = registryFile->Exists(&exists);
+     if (NS_SUCCEEDED(rv) && exists) {
+@@ -2476,7 +2496,7 @@
+   if (ar) {
+     return HandleRemoteArgument(xremotearg);
+   }
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   if (!PR_GetEnv("MOZ_NO_REMOTE")) {
+     // Try to remote the entire command line. If this fails, start up normally.
+     RemoteResult rr = RemoteCommandLine();
+@@ -2522,26 +2542,33 @@
+                  gRestartArgc,
+                  gRestartArgv);
+ #endif
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   nsCOMPtr<nsIProfileLock> profileLock;
+   PRBool startOffline = PR_FALSE;
+ 
+   rv = SelectProfile(getter_AddRefs(profileLock), nativeApp, &startOffline);
+-  if (rv == NS_ERROR_LAUNCHED_CHILD_PROCESS ||
+-      rv == NS_ERROR_ABORT) return 0;
+-  if (NS_FAILED(rv)) return 1;
+ 
++  if (rv == NS_ERROR_LAUNCHED_CHILD_PROCESS ||
++      rv == NS_ERROR_ABORT) {
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
++	 return 0;
++ }
++  if (NS_FAILED(rv)){
++       return 1;
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
++}
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   nsCOMPtr<nsILocalFile> profD;
+   rv = profileLock->GetDirectory(getter_AddRefs(profD));
+   NS_ENSURE_SUCCESS(rv, 1);
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   nsCOMPtr<nsILocalFile> profLD;
+   rv = profileLock->GetLocalDirectory(getter_AddRefs(profLD));
+   NS_ENSURE_SUCCESS(rv, 1);
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   rv = dirProvider.SetProfile(profD, profLD);
+   NS_ENSURE_SUCCESS(rv, 1);
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   //////////////////////// NOW WE HAVE A PROFILE ////////////////////////
+ 
+   PRBool upgraded = PR_FALSE;
+@@ -2562,7 +2589,7 @@
+   PRBool versionOK = CheckCompatibility(profD, version, osABI,
+                                         dirProvider.GetAppDir(),
+                                         gAppData->directory);
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   // Every time a profile is loaded by a build with a different version,
+   // it updates the compatibility.ini file saying what version last wrote
+   // the compreg.dat.  On subsequent launches if the version matches, 
+@@ -2600,7 +2627,7 @@
+     WriteVersion(profD, version, osABI,
+                  dirProvider.GetAppDir(), gAppData->directory);
+   }
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   PRBool needsRestart = PR_FALSE;
+   PRBool appInitiatedRestart = PR_FALSE;
+ 
+@@ -2753,7 +2780,7 @@
+         PR_SetEnv("NO_EM_RESTART=");
+         PR_SetEnv("XUL_APP_FILE=");
+         PR_SetEnv("XRE_BINARY_PATH=");
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+ #ifdef XP_MACOSX
+         // we re-initialize the command-line service and do appleevents munging
+         // after we are sure that we're not restarting
+@@ -2857,7 +2884,7 @@
+ #endif
+       }
+     }
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+     profileLock->Unlock();
+   }
+ 
+@@ -2887,7 +2914,7 @@
+       PR_SetEnv(kEnvVar);
+     }
+ #endif
+-
++    printf("--- Leo  nsAppRunner.cpp 2390 \n");
+     rv = LaunchChild(nativeApp, appInitiatedRestart, upgraded ? -1 : 0);
+     return rv == NS_ERROR_LAUNCHED_CHILD_PROCESS ? 0 : 1;
+   }
+diff -Nur orig.mozilla/view/src/nsViewManager.cpp work.mozilla/view/src/nsViewManager.cpp
+--- orig.mozilla/view/src/nsViewManager.cpp	2007-05-01 09:45:14.000000000 +0800
++++ work.mozilla/view/src/nsViewManager.cpp	2008-06-08 10:16:43.000000000 +0800
+@@ -455,7 +455,10 @@
+   , mDelayedResize(NSCOORD_NONE, NSCOORD_NONE)
+   , mRootViewManager(this)
+ {
+-  if (gViewManagers == nsnull) {
++//TEL
++	printf("\nnsViewManager::nsViewManager() Constructor Entry....");
++//END
++	if (gViewManagers == nsnull) {
+     NS_ASSERTION(mVMCount == 0, "View Manager count is incorrect");
+     // Create an array to hold a list of view managers
+     gViewManagers = new nsVoidArray;
+@@ -984,6 +987,10 @@
+ 
+ void nsViewManager::DefaultRefresh(nsView* aView, const nsRect* aRect)
+ {
++//TEL
++	printf("\nvoid nsViewManager::DefaultRefresh() ENTRY...\n");
++//END
++
+   NS_PRECONDITION(aView, "Must have a view to work with!");
+   nsIWidget* widget = aView->GetNearestWidget(nsnull);
+   if (! widget)
+@@ -994,6 +1001,10 @@
+   if (! context)
+     return;
+ 
++//TEL
++        printf("\nnsViewManager::DefaultRefresh() setting BackGroundColor...\n");
++//END
++
+   nscolor bgcolor = mDefaultBackgroundColor;
+ 
+   if (NS_GET_A(mDefaultBackgroundColor) == 0) {
+@@ -3523,6 +3534,10 @@
+                                              nscolor aBackgroundColor,
+                                              nsIRenderingContext** aRenderedContext)
+ {
++//TEL
++	printf("\n in  nsViewManager::RenderOffscreen(....aBackgroundColor,aRenderedContext..FillRect\n");
++//END
++
+   nsView* view = NS_STATIC_CAST(nsView*, aView);
+ 
+   *aRenderedContext = nsnull;
+@@ -3554,7 +3569,13 @@
+   // clipping and translation is set by NewOffscreenContext
+ 
+   localcx->SetColor(aBackgroundColor);
++//TEL
++	printf("\nin nsViewManager::RenderOffscreen(), Calling FillRect()..\n");
++//END
+   localcx->FillRect(aRect);
++//TEL
++        printf("\nin nsViewManager::RenderOffscreen(), Called FillRect()..\n");
++//END
+ 
+   nsRect r = aRect;
+   nsIView* suppressScrolling = nsnull;
+@@ -3578,6 +3599,9 @@
+   PL_FinishArenaPool(&displayArena);
+ 
+   localcx.swap(*aRenderedContext);
++//TEL
++	printf("\nViewManager::RenderOffScreen() Exit....!");
++//END
+   return NS_OK;
+ }
+ 
+@@ -4455,13 +4479,25 @@
+ NS_IMETHODIMP
+ nsViewManager::SetDefaultBackgroundColor(nscolor aColor)
+ {
+-  mDefaultBackgroundColor = aColor;
++//TEL
++	printf("\nnsViewManager::SetDefaultBackgroundColor(nscolor aColor)...");
++//	printf("\nRed: %x, Green: %x, Blue: %x", NS_GET_R(aColor), NS_GET_G(aColor), NS_GET_B(aColor));
++	printf("\nnsViewManager::SetDefaultBackgroundColor: Color : %x", aColor);
++//END
++	mDefaultBackgroundColor = aColor;
+   return NS_OK;
+ }
+ 
+ NS_IMETHODIMP
+ nsViewManager::GetDefaultBackgroundColor(nscolor* aColor)
+ {
++
++//TEL
++        printf("\nnsViewManager::GetDefaultBackgroundColor(nscolor aColor)...");
++      //  printf("\nRed: %x, Green: %x, Blue: %x", NS_GET_R(aColor), NS_GET_G(aColor), NS_GET_B(aColor));
++	printf("\nnsViewManager::GetDefaultBackgroundColor: Color : %x", aColor);
++//END
++
+   *aColor = mDefaultBackgroundColor;
+   return NS_OK;
+ }
+diff -Nur orig.mozilla/widget/src/gtk2/keysym2ucs.h work.mozilla/widget/src/gtk2/keysym2ucs.h
+--- orig.mozilla/widget/src/gtk2/keysym2ucs.h	2006-03-30 16:01:14.000000000 +0800
++++ work.mozilla/widget/src/gtk2/keysym2ucs.h	2008-06-08 10:22:23.000000000 +0800
+@@ -45,7 +45,8 @@
+  * (UCS, Unicode) values.
+  */
+ 
+-#include <X11/X.h>
++//Leo #include <X11/X.h>
++#define KeySym unsigned int //Leo
+ 
+ #ifdef __cplusplus
+ extern "C" { 
+diff -Nur orig.mozilla/widget/src/gtk2/Makefile.in work.mozilla/widget/src/gtk2/Makefile.in
+--- orig.mozilla/widget/src/gtk2/Makefile.in	2006-06-17 23:16:14.000000000 +0800
++++ work.mozilla/widget/src/gtk2/Makefile.in	2008-06-08 10:21:06.000000000 +0800
+@@ -60,7 +60,6 @@
+ 		  necko \
+ 		  uconv \
+ 		  intl \
+-		  gtkxtbin \
+ 		  imglib2 \
+ 		  $(NULL)
+ 
+@@ -96,7 +95,6 @@
+ EXTRA_DSO_LDOPTS += \
+ 		$(MOZ_COMPONENT_LIBS) \
+ 		-lgkgfx \
+-		-lgtkxtbin \
+ 		$(XLDFLAGS) \
+ 		$(XLIBS) \
+ 		$(MOZ_GTK2_LIBS)
+diff -Nur orig.mozilla/widget/src/gtk2/nsAppShell.cpp work.mozilla/widget/src/gtk2/nsAppShell.cpp
+--- orig.mozilla/widget/src/gtk2/nsAppShell.cpp	2004-12-21 05:53:32.000000000 +0800
++++ work.mozilla/widget/src/gtk2/nsAppShell.cpp	2008-06-09 21:10:49.000000000 +0800
+@@ -80,6 +80,7 @@
+ 
+ nsAppShell::nsAppShell(void)
+ {
++    printf("--- nsAppShell construct \n");
+ #ifdef PR_LOGGING
+     if (!gWidgetLog)
+         gWidgetLog = PR_NewLogModule("Widget");
+diff -Nur orig.mozilla/widget/src/gtk2/nsClipboard.cpp work.mozilla/widget/src/gtk2/nsClipboard.cpp
+--- orig.mozilla/widget/src/gtk2/nsClipboard.cpp	2007-10-09 04:02:13.000000000 +0800
++++ work.mozilla/widget/src/gtk2/nsClipboard.cpp	2008-06-08 10:30:37.000000000 +0800
+@@ -49,8 +49,11 @@
+ #include <gtk/gtkinvisible.h>
+ 
+ // For manipulation of the X event queue
+-#include <X11/Xlib.h>
+-#include <gdk/gdkx.h>
++//TEL
++//#include <X11/Xlib.h>
++//#include <gdk/gdkx.h>
++//#include <gdk/gdkprivate-directfb.h>
++//TEL
+ #include <gtk/gtkmain.h>
+ #include <sys/time.h>
+ #include <sys/types.h>
+@@ -94,9 +97,29 @@
+ static gchar *
+ wait_for_text              (GtkClipboard *clipboard);
+ 
+-static Bool
+-checkEventProc(Display *display, XEvent *event, XPointer arg);
++//TEL
++/*struct checkEventContext
++{
++    GtkWidget *cbWidget;
++    Atom       selAtom;
++};*/
++                                                                                                                              
++struct checkEventContext
++{
++    GtkWidget *cbWidget;
++    GdkAtom       selAtom;
++};
++                                                                                                                              
++//TEL
+ 
++//TEL
++/*
++static Bool
++checkEventProc(Display *display, XEvent *event, XPointer arg);*/
++//SIDDHARTH
++/*static int
++checkEventProc(GdkDisplay *display, GdkEvent *event, checkEventContext *arg);*/
++//TEL
+ struct retrieval_context
+ {
+     PRBool   completed;
+@@ -729,7 +752,8 @@
+     str.AssignLiteral("UNKNOWN");
+ }
+ 
+-static void
++//TEL
++/*static void
+ DispatchSelectionNotifyEvent(GtkWidget *widget, XEvent *xevent)
+ {
+     GdkEvent event;
+@@ -756,14 +780,25 @@
+ 
+         gtk_widget_event(widget, &event);
+     }
+-}
++}*/
+ 
+-struct checkEventContext
++static void
++DispatchSelectionNotifyEvent(GtkWidget *widget, GdkEvent *xevent)
+ {
+-    GtkWidget *cbWidget;
+-    Atom       selAtom;
+-};
++    gtk_widget_event(widget, xevent);
++}
++                                                                                                                              
++static void
++DispatchPropertyNotifyEvent(GtkWidget *widget, GdkEvent *xevent)
++{
++    if (((GdkWindowObject *) widget->window)->event_mask & GDK_PROPERTY_CHANGE_MASK) {
++        gtk_widget_event(widget, xevent);
++    }
++}
++//TEL
+ 
++//TEL
++/*
+ static Bool
+ checkEventProc(Display *display, XEvent *event, XPointer arg)
+ {
+@@ -785,7 +820,37 @@
+     }
+ 
+     return False;
++}*/
++//SIDDHARTH //TEL
++/*static int 
++checkEventProc(GdkDisplay *display, GdkEvent *event, checkEventContext *arg)
++{
++    checkEventContext *context = arg;
++    GdkWindowObject *temp = (GdkWindowObject*)event->any.window;
++    GdkWindowImplDirectFB *impl;
++
++    impl = GDK_WINDOW_IMPL_DIRECTFB (temp->impl);                                                                             
++    impl->window->GetID (impl->window, &impl->dfb_id);
++
++    if (event->type == GDK_SELECTION_NOTIFY ||
++        (event->type == GDK_PROPERTY_NOTIFY &&
++         event->property.atom == context->selAtom)) {
++                                                                                      
++        GdkWindow *cbWindow = gdk_window_lookup(impl->dfb_id);
++        if (cbWindow) {
++            GtkWidget *cbWidget = NULL;
++            gdk_window_get_user_data(cbWindow, (gpointer *)&cbWidget);
++            if (cbWidget && GTK_IS_WIDGET(cbWidget)) {
++                context->cbWidget = cbWidget;
++                return 1;
++            }
++        }
++    }
++                                                                                                                              
++    return 0;
+ }
++*/
++//TEL
+ 
+ // Idle timeout for receiving selection and property notify events (microsec)
+ static const int kClipboardTimeout = 500000;
+@@ -796,11 +861,16 @@
+     if (r_context->completed)  // the request completed synchronously
+         return;
+ 
+-    Display *xDisplay = GDK_DISPLAY();
++    GdkDisplay *xDisplay = gdk_display_get_default();
+     checkEventContext context;
+     context.cbWidget = NULL;
+-    context.selAtom = gdk_x11_atom_to_xatom(gdk_atom_intern("GDK_SELECTION",
+-                                                            FALSE));
++//TEL
++/*    context.selAtom = gdk_x11_atom_to_xatom(gdk_atom_intern("GDK_SELECTION",
++                                                            FALSE));*/
++
++    context.selAtom = gdk_atom_intern("GDK_SELECTION", FALSE);
++
++//TEL
+ 
+     // Send X events which are relevant to the ongoing selection retrieval
+     // to the clipboard widget.  Wait until either the operation completes, or
+@@ -813,16 +883,20 @@
+     fds[0].fd = XConnectionNumber(xDisplay);
+     fds[0].events = POLLIN;
+ #else
+-    int cnumber = ConnectionNumber(xDisplay);
++//TEL
++   // int cnumber = ConnectionNumber(xDisplay);
++      int cnumber = 3;
++//TEL
+     fd_set select_set;
+     FD_ZERO(&select_set);
+     FD_SET(cnumber, &select_set);
+     ++cnumber;
+     struct timeval tv;
+ #endif
+-
+-    do {
+-        XEvent xevent;
++//TEL
++/*    do {
++    //TEL
++    /*    XEvent xevent;
+ 
+         while (XCheckIfEvent(xDisplay, &xevent, checkEventProc,
+                              (XPointer) &context)) {
+@@ -834,7 +908,23 @@
+ 
+             if (r_context->completed)
+                 return;
+-        }
++         }*/
++//TEL
++/*
++         GdkEvent *xevent;
++
++         while((xevent = gdk_event_get()) && 
++                (checkEventProc(gdk_display_get_default(), xevent, &context))) {
++            if (xevent->type == GDK_SELECTION_NOTIFY)
++                DispatchSelectionNotifyEvent(context.cbWidget, xevent);
++            else
++                DispatchPropertyNotifyEvent(context.cbWidget, xevent);
++                                                                                                                              
++            if (r_context->completed)
++                return;*/
++    //TEL
++   //      }
++//END        
+ 
+ #ifdef POLL_WITH_XCONNECTIONNUMBER
+         select_result = poll(fds, 1, kClipboardTimeout / 1000);
+@@ -843,7 +933,8 @@
+         tv.tv_usec = kClipboardTimeout;
+         select_result = select(cnumber, &select_set, NULL, NULL, &tv);
+ #endif
+-    } while (select_result == 1);
++//TEL
++//    } while (select_result == 1);
+ 
+ #ifdef DEBUG_CLIPBOARD
+     printf("exceeded clipboard timeout\n");
+diff -Nur orig.mozilla/widget/src/gtk2/nsDragService.cpp work.mozilla/widget/src/gtk2/nsDragService.cpp
+--- orig.mozilla/widget/src/gtk2/nsDragService.cpp	2007-10-09 04:02:13.000000000 +0800
++++ work.mozilla/widget/src/gtk2/nsDragService.cpp	2008-06-08 10:32:47.000000000 +0800
+@@ -55,7 +55,7 @@
+ #include "prtime.h"
+ #include "prthread.h"
+ #include <gtk/gtkinvisible.h>
+-#include <gdk/gdkx.h>
++//Leo #include <gdk/gdkx.h>
+ #include "nsCRT.h"
+ 
+ 
+diff -Nur orig.mozilla/widget/src/gtk2/nsGtkKeyUtils.cpp work.mozilla/widget/src/gtk2/nsGtkKeyUtils.cpp
+--- orig.mozilla/widget/src/gtk2/nsGtkKeyUtils.cpp	2005-02-16 22:21:38.000000000 +0800
++++ work.mozilla/widget/src/gtk2/nsGtkKeyUtils.cpp	2008-06-08 10:35:40.000000000 +0800
+@@ -39,7 +39,7 @@
+ 
+ #include <gdk/gdkkeysyms.h>
+ #include <gdk/gdkevents.h>
+-#include <gdk/gdkx.h>
++//Leo #include <gdk/gdkx.h>
+ #include "nsGUIEvent.h"
+ #include "keysym2ucs.h"
+ 
+@@ -154,8 +154,9 @@
+     { NS_VK_EQUALS, GDK_plus }
+ };
+ 
+-#define IS_XSUN_XSERVER(dpy) \
++/*Leo #define IS_XSUN_XSERVER(dpy) \
+     (strstr(XServerVendor(dpy), "Sun Microsystems") != NULL)
++*/
+ 
+ // map Sun Keyboard special keysyms on to NS_VK keys
+ struct nsKeyConverter nsSunKeycodes[] = {
+@@ -194,14 +195,14 @@
+         return aKeysym - GDK_KP_0 + NS_VK_NUMPAD0;
+ 
+     // map Sun Keyboard special keysyms
+-    if (IS_XSUN_XSERVER(GDK_DISPLAY())) {
++/*Leo    if (IS_XSUN_XSERVER(GDK_DISPLAY())) {
+         length = sizeof(nsSunKeycodes) / sizeof(struct nsKeyConverter);
+         for (i = 0; i < length; i++) {
+             if (nsSunKeycodes[i].keysym == aKeysym)
+                 return(nsSunKeycodes[i].vkCode);
+         }
+     }
+-
++*/
+     // misc other things
+     length = sizeof(nsKeycodes) / sizeof(struct nsKeyConverter);
+     for (i = 0; i < length; i++) {
+diff -Nur orig.mozilla/widget/src/gtk2/nsWindow.cpp work.mozilla/widget/src/gtk2/nsWindow.cpp
+--- orig.mozilla/widget/src/gtk2/nsWindow.cpp	2007-11-08 11:22:32.000000000 +0800
++++ work.mozilla/widget/src/gtk2/nsWindow.cpp	2008-06-13 14:32:44.000000000 +0800
+@@ -36,9 +36,9 @@
+  * the terms of any one of the MPL, the GPL or the LGPL.
+  *
+  * ***** END LICENSE BLOCK ***** */
+-
+ #include "prlink.h"
+ 
++
+ #include "nsWindow.h"
+ #include "nsToolkit.h"
+ #include "nsIRenderingContext.h"
+@@ -55,11 +55,13 @@
+ #include "nsGtkCursors.h"
+ 
+ #include <gtk/gtkwindow.h>
+-#include <gdk/gdkx.h>
++//TEL
++//#include <gdk/gdkx.h>
++//#include <gdk/gdkprivate-directfb.h>
++//#include "gtk2xtbin.h"
++//TEL
+ #include <gdk/gdkkeysyms.h>
+ 
+-#include "gtk2xtbin.h"
+-
+ #include "nsIPrefService.h"
+ #include "nsIPrefBranch.h"
+ #include "nsIServiceManager.h"
+@@ -283,9 +285,11 @@
+     mTransientParent     = nsnull;
+     mWindowType          = eWindowType_child;
+     mSizeState           = nsSizeMode_Normal;
+-    mOldFocusWindow      = 0;
++//TEL   
++    mOldFocusWindow      = nsnull;
++//TEL
+     mPluginType          = PluginType_NONE;
+-
++printf("--- Leo nsWindow construct \n ");
+     if (!gGlobalsInitialized) {
+         gGlobalsInitialized = PR_TRUE;
+ 
+@@ -821,7 +825,8 @@
+ 
+             gdk_window_set_cursor(GTK_WIDGET(mContainer)->window, newCursor);
+ 
+-            XFlush(GDK_DISPLAY());
++//Leo            XFlush(GDK_DISPLAY());
++                 gdk_flush();
+         }
+     }
+ 
+@@ -990,7 +995,8 @@
+     if (cursor) {
+         if (mContainer) {
+             gdk_window_set_cursor(GTK_WIDGET(mContainer)->window, cursor);
+-            XFlush(GDK_DISPLAY());
++            //Leo XFlush(GDK_DISPLAY());
++            gdk_flush();
+             rv = NS_OK;
+         }
+         gdk_cursor_unref(cursor);
+@@ -1153,6 +1159,7 @@
+ void*
+ nsWindow::GetNativeData(PRUint32 aDataType)
+ {
++    g_print("nsWindow::Inside GetNativeData \n");
+     switch (aDataType) {
+     case NS_NATIVE_WINDOW:
+     case NS_NATIVE_WIDGET: {
+@@ -1167,12 +1174,19 @@
+         return SetupPluginPort();
+         break;
+ 
+-    case NS_NATIVE_DISPLAY:
+-        return GDK_DISPLAY();
++    case NS_NATIVE_DISPLAY:       
++        //TEL
++        g_print("\nin nsWindow::GetNativeData(NS_NATIVE_DISPLAY) returns nsnull...");
++//        return GDK_DISPLAY();
++        return nsnull;//_gdk_display;//TEL SID
++        //TEL
+         break;
+ 
+     case NS_NATIVE_GRAPHIC: {
+         NS_ASSERTION(nsnull != mToolkit, "NULL toolkit, unable to get a GC");
++//TEL
++    g_print("\nin nsWindow::GetNativeData(NS_NATIVE_GRAPHIC) returns mToolkit->GetSharedGC(Depth may be 24)..");
++//END
+         return (void *)NS_STATIC_CAST(nsToolkit *, mToolkit)->GetSharedGC();
+         break;
+     }
+@@ -1447,7 +1461,7 @@
+     gdk_region_get_rectangles(aEvent->region, &rects, &nrects);
+     LOGDRAW(("sending expose event [%p] %p 0x%lx (rects follow):\n",
+              (void *)this, (void *)aEvent->window,
+-             GDK_WINDOW_XWINDOW(aEvent->window)));
++             aEvent->window/* GDK_WINDOW_XWINDOW(aEvent->window)*/));// aEvent->windowby TEL
+ 
+     for (GdkRectangle *r = rects, *r_end = rects + nrects; r < r_end; ++r) {
+         updateRegion->Union(r->x, r->y, r->width, r->height);
+@@ -1586,23 +1600,25 @@
+     sIsDraggingOutOf = PR_FALSE;
+ 
+     // see if we can compress this event
+-    XEvent xevent;
++//    XEvent xevent;//TEL
+     PRPackedBool synthEvent = PR_FALSE;
+-    while (XCheckWindowEvent(GDK_WINDOW_XDISPLAY(aEvent->window),
+-                             GDK_WINDOW_XWINDOW(aEvent->window),
++//TEL
++/*    while (XCheckWindowEvent(GDK_WINDOW_XDISPLAY(aEvent->window),
++                             NULLGDK_WINDOW_XWINDOW(aEvent->window),
+                              ButtonMotionMask, &xevent)) {
+         synthEvent = PR_TRUE;
+     }
+-
++*/
++//TEL
+     // if plugins still keeps the focus, get it back
+     if (gPluginFocusWindow && gPluginFocusWindow != this) {
+         gPluginFocusWindow->LoseNonXEmbedPluginFocus();
+     }
+ 
+     nsMouseEvent event(PR_TRUE, NS_MOUSE_MOVE, this, nsMouseEvent::eReal);
+-
+-    if (synthEvent) {
+-        event.point.x = nscoord(xevent.xmotion.x);
++//TEL
++/*    if (synthEvent) {
++        event.point.x = nscoord(xevent->xmotion.x);
+         event.point.y = nscoord(xevent.xmotion.y);
+ 
+         event.isShift   = (xevent.xmotion.state & GDK_SHIFT_MASK)
+@@ -1622,8 +1638,31 @@
+             ? PR_TRUE : PR_FALSE;
+         event.isAlt     = (aEvent->state & GDK_MOD1_MASK)
+             ? PR_TRUE : PR_FALSE;
+-    }
++    }*/
+ 
++  if (synthEvent) {
++        event.point.x = nscoord(aEvent->x);
++        event.point.y = nscoord(aEvent->y);
++                                                                                                                              
++        event.isShift   = (aEvent->state & GDK_SHIFT_MASK)
++            ? PR_TRUE : PR_FALSE;
++        event.isControl = (aEvent->state & GDK_CONTROL_MASK)
++            ? PR_TRUE : PR_FALSE;
++        event.isAlt     = (aEvent->state & GDK_MOD1_MASK)
++            ? PR_TRUE : PR_FALSE;
++    }
++    else {
++        event.point.x = nscoord(aEvent->x);
++        event.point.y = nscoord(aEvent->y);
++                                                                                                                              
++        event.isShift   = (aEvent->state & GDK_SHIFT_MASK)
++            ? PR_TRUE : PR_FALSE;
++        event.isControl = (aEvent->state & GDK_CONTROL_MASK)
++            ? PR_TRUE : PR_FALSE;
++        event.isAlt     = (aEvent->state & GDK_MOD1_MASK)
++            ? PR_TRUE : PR_FALSE;
++    }
++//TEL
+     nsEventStatus status;
+     DispatchEvent(&event, status);
+ }
+@@ -2666,21 +2705,21 @@
+     LOG(("nsWindow [%p]\n", (void *)this));
+     if (mShell) {
+         LOG(("\tmShell %p %p %lx\n", (void *)mShell, (void *)mShell->window,
+-             GDK_WINDOW_XWINDOW(mShell->window)));
++             mShell->window/*GDK_WINDOW_XWINDOW(mShell->window)*/));//TEL
+     }
+ 
+     if (mContainer) {
+         LOG(("\tmContainer %p %p %lx\n", (void *)mContainer,
+              (void *)GTK_WIDGET(mContainer)->window,
+-             GDK_WINDOW_XWINDOW(GTK_WIDGET(mContainer)->window)));
++             mShell->window/*GDK_WINDOW_XWINDOW(GTK_WIDGET(mContainer)->window)*/));//TEL
+     }
+ 
+     if (mDrawingarea) {
+         LOG(("\tmDrawingarea %p %p %p %lx %lx\n", (void *)mDrawingarea,
+              (void *)mDrawingarea->clip_window,
+              (void *)mDrawingarea->inner_window,
+-             GDK_WINDOW_XWINDOW(mDrawingarea->clip_window),
+-             GDK_WINDOW_XWINDOW(mDrawingarea->inner_window)));
++             mDrawingarea->clip_window/*GDK_WINDOW_XWINDOW(mDrawingarea->clip_window)*/,
++             mDrawingarea->inner_window/*GDK_WINDOW_XWINDOW(mDrawingarea->inner_window)*/));
+     }
+ 
+     // resize so that everything is set to the right dimensions
+@@ -3217,22 +3256,48 @@
+     // we have to flush the X queue here so that any plugins that
+     // might be running on separate X connections will be able to use
+     // this window in case it was just created
+-    XWindowAttributes xattrs;
+-    XGetWindowAttributes(GDK_DISPLAY (),
++
++//    XWindowAttributes xattrs; //TEL
++      GdkWindowAttr    gdk_attrs;
++//TEL
++/*    XGetWindowAttributes(GDK_DISPLAY (),
+                          GDK_WINDOW_XWINDOW(mDrawingarea->inner_window),
+-                         &xattrs);
+-    XSelectInput (GDK_DISPLAY (),
+-                  GDK_WINDOW_XWINDOW(mDrawingarea->inner_window),
++                         &xattrs);*/
++    int depth;
++    g_print("\nnsWindow::SetupPluginPort() calls gdk_window_get_geometry():START\n");
++
++    gdk_window_get_geometry (mDrawingarea->inner_window, 
++                            &(gdk_attrs.x),
++                            &(gdk_attrs.y),
++                            &(gdk_attrs.width), 
++                            &(gdk_attrs.height),
++                            &depth);
++    gdk_attrs.visual = gdk_visual_get_system();
++    gdk_attrs.colormap = gdk_colormap_get_system();
++    gdk_attrs.window_type = gdk_window_get_window_type(mDrawingarea->inner_window);
++    
++   g_print("\nnsWindow::SetupPluginPort() calls gdk_window_get_geometry():END\n");
++
++/*    XSelectInput (GDK_DISPLAY (),
++                  NULLGDK_WINDOW_XWINDOW(mDrawingarea->inner_window),
+                   xattrs.your_event_mask |
+-                  SubstructureNotifyMask);
++                  SubstructureNotifyMask);*/
++//TEL
+ 
+     gdk_window_add_filter(mDrawingarea->inner_window,
+                           plugin_window_filter_func,
+                           this);
+ 
+-    XSync(GDK_DISPLAY(), False);
++  //  XSync(GDK_DISPLAY(), False);
++   g_print("\nnsWindow::SetupPluginPort() calls gdk_flush():START\n");
+ 
+-    return (void *)GDK_WINDOW_XWINDOW(mDrawingarea->inner_window);
++      gdk_flush();//TEL
++  g_print("\nnsWindow::SetupPluginPort() calls gdk_window_get_geometry():END\n");
++
++//TEL
++   // return (void *)GDK_WINDOW_XWINDOW(mDrawingarea->inner_window);
++     return (void *)mDrawingarea->inner_window;
++//TEL
+ }
+ 
+ nsresult
+@@ -3303,18 +3368,24 @@
+ 
+     LOGFOCUS(("nsWindow::SetNonXEmbedPluginFocus\n"));
+ 
+-    Window curFocusWindow;
++//    Window curFocusWindow;//TEL
++      GdkWindow* curFocusWindow; //TEL
+     int focusState;
+-
+-    XGetInputFocus(GDK_WINDOW_XDISPLAY(mDrawingarea->inner_window),
++//TEL
++/*    XGetInputFocus(GDK_WINDOW_XDISPLAY(mDrawingarea->inner_window),
+                    &curFocusWindow,
+-                   &focusState);
++                   &focusState);*/
+ 
++//     curFocusWindow = gdk_directfb_window_find_focus();
++
++
++//TEL
+     LOGFOCUS(("\t curFocusWindow=%p\n", curFocusWindow));
+ 
+     GdkWindow* toplevel = gdk_window_get_toplevel
+                                 (mDrawingarea->inner_window);
+-    GdkWindow *gdkfocuswin = gdk_window_lookup(curFocusWindow);
++    GdkWindow *gdkfocuswin;
++//    GdkWindow *gdkfocuswin = gdk_window_lookup(curFocusWindow);//TEL
+ 
+     // lookup with the focus proxy window is supposed to get the
+     // same GdkWindow as toplevel. If the current focused window
+@@ -3324,22 +3395,39 @@
+     }
+ 
+     // switch the focus from the focus proxy to the plugin window
++   
+     mOldFocusWindow = curFocusWindow;
+-    XRaiseWindow(GDK_WINDOW_XDISPLAY(mDrawingarea->inner_window),
+-                 GDK_WINDOW_XWINDOW(mDrawingarea->inner_window));
++
++
++    /*XRaiseWindow(GDK_WINDOW_XDISPLAY(mDrawingarea->inner_window),
++                 GDK_WINDOW_XWINDOW(mDrawingarea->inner_window));*/
++    g_print("\nnsWindow::SetNonXEmbedPluginFocus() calls gdk_window_raise():START\n");
++
++    gdk_window_raise(mDrawingarea->inner_window);
++    g_print("\nnnsWindow::SetNonXEmbedPluginFocus() calls gdk_window_raise():END\n");
++
+     gdk_error_trap_push();
+-    XSetInputFocus(GDK_WINDOW_XDISPLAY(mDrawingarea->inner_window),
++//TEL
++/*    XSetInputFocus(GDK_WINDOW_XDISPLAY(mDrawingarea->inner_window),
+                    GDK_WINDOW_XWINDOW(mDrawingarea->inner_window),
+                    RevertToNone,
+-                   CurrentTime);
++                   CurrentTime);*/
++    g_print("\nnnsWindow::SetNonXEmbedPluginFocus() calls gdk_window_focus():START\n");
++
++    gdk_window_focus(mDrawingarea->inner_window, gtk_get_current_event_time()/*CurrentTime*/);
++    g_print("\nnnsWindow::SetNonXEmbedPluginFocus() calls gdk_window_focus():END\n");
++
++//TEL
+     gdk_flush();
+     gdk_error_trap_pop();
+     gPluginFocusWindow = this;
+     gdk_window_add_filter(NULL, plugin_client_message_filter, this);
+ 
+-    LOGFOCUS(("nsWindow::SetNonXEmbedPluginFocus oldfocus=%p new=%p\n",
++//TEL
++/*    LOGFOCUS(("nsWindow::SetNonXEmbedPluginFocus oldfocus=%p new=%p\n",
+                 mOldFocusWindow,
+-                GDK_WINDOW_XWINDOW(mDrawingarea->inner_window)));
++                GDK_WINDOW_XWINDOW(mDrawingarea->inner_window)));*/
++//TEL
+ }
+ 
+ void
+@@ -3353,27 +3441,47 @@
+         return;
+     }
+ 
+-    Window curFocusWindow;
++//TEL    
++//   Window curFocusWindow;
++     GdkWindow* curFocusWindow;
++//TEL
+     int focusState;
+-
+-    XGetInputFocus(GDK_WINDOW_XDISPLAY(mDrawingarea->inner_window),
++//TEL
++/*    XGetInputFocus(GDK_WINDOW_XDISPLAY(mDrawingarea->inner_window),
+                    &curFocusWindow,
+-                   &focusState);
++                   &focusState);*/
+ 
++     //curFocusWindow = gdk_directfb_window_find_focus();
++//TEL
+     // we only switch focus between plugin window and focus proxy. If the
+     // current focused window is not the plugin window, just removing the
+     // event filter that blocks the WM_TAKE_FOCUS is enough. WM and gtk2
+     // will take care of the focus later.
++//TEL
+     if (!curFocusWindow ||
+-        curFocusWindow == GDK_WINDOW_XWINDOW(mDrawingarea->inner_window)) {
+-
++        curFocusWindow == mDrawingarea->inner_window/*GDK_WINDOW_XWINDOW(mDrawingarea->inner_window)*/) {
++//TEL
+         gdk_error_trap_push();
+-        XRaiseWindow(GDK_WINDOW_XDISPLAY(mDrawingarea->inner_window),
+-                     mOldFocusWindow);
+-        XSetInputFocus(GDK_WINDOW_XDISPLAY(mDrawingarea->inner_window),
++//TEL 
++/*       XRaiseWindow(GDK_WINDOW_XDISPLAY(mDrawingarea->inner_window),
++                     mOldFocusWindow);*/
++      g_print("\nnnsWindow::LoseNonXEmbedPluginFocus() calls gdk_window_raise():START\n");
++
++       gdk_window_raise(mDrawingarea->inner_window);
++      g_print("\nnnsWindow:::LoseNonXEmbedPluginFocus() calls gdk_window_raise():END\n");
++
++    
++/*        XSetInputFocus(GDK_WINDOW_XDISPLAY(mDrawingarea->inner_window),
+                        mOldFocusWindow,
+                        RevertToParent,
+-                       CurrentTime);
++                       CurrentTime);*/
++     g_print("\nnnsWindow::LoseNonXEmbedPluginFocus() calls gdk_window_focus():START\n");
++
++     gdk_window_focus(mDrawingarea->inner_window, gtk_get_current_event_time()/*CurrentTime*/);
++     g_print("\nnnsWindow::LoseNonXEmbedPluginFocus() calls gdk_window_focus():END\n");
++
++//TEL
++
+         gdk_flush();
+         gdk_error_trap_pop();
+     }
+@@ -3461,8 +3569,14 @@
+     // and flush the queue here so that we don't end up with a BadWindow
+     // error later when this happens (when the persistence timer fires
+     // and GetWindowPos is called)
+-    XSync(GDK_DISPLAY(), False);
++//TEL    
++//XSync(GDK_DISPLAY(), False);
++  g_print("\nnnsWindow::HideWindowChrome() calls gdk_flush():start\n");
++
++  gdk_flush();
++  g_print("\nnnsWindow::HideWindowChrome() calls gdk_flush():end\n");
+ 
++//TEL
+     return NS_OK;
+ }
+ 
+@@ -3953,17 +4067,27 @@
+ GdkFilterReturn
+ plugin_window_filter_func (GdkXEvent *gdk_xevent, GdkEvent *event, gpointer data)
+ {
++
+     GtkWidget *widget;
+     GdkWindow *plugin_window;
+     gpointer  user_data;
+-    XEvent    *xevent;
+ 
++//TEL start
++    event = (GdkEvent *)gdk_xevent;
++//TEL end
++
++//TEL
++/*    XEvent    *xevent;*/
++//TEL
+     nsWindow  *nswindow = (nsWindow*)data;
+-    GdkFilterReturn return_val;
+ 
+-    xevent = (XEvent *)gdk_xevent;
++    GdkFilterReturn return_val;
+     return_val = GDK_FILTER_CONTINUE;
+ 
++//TEL: This function is fully commented because plugins are disabled
++//TEL
++/*  xevent = (XEvent *)gdk_xevent;
++
+     switch (xevent->type)
+     {
+         case CreateNotify:
+@@ -3980,19 +4104,21 @@
+                 user_data = nsnull;
+                 gdk_window_get_user_data(plugin_window, &user_data);
+                 widget = GTK_WIDGET(user_data);
+-
++//TEL
+                 if (GTK_IS_XTBIN(widget)) {
+                     nswindow->SetPluginType(nsWindow::PluginType_NONXEMBED);
+                     break;
+                 }
++
+                 else if(GTK_IS_SOCKET(widget)) {
+                     nswindow->SetPluginType(nsWindow::PluginType_XEMBED);
+                     break;
+                 }
++//TEL
+             }
+             nswindow->SetPluginType(nsWindow::PluginType_NONXEMBED);
+             return_val = GDK_FILTER_REMOVE;
+-            break;
++            break;*
+         case EnterNotify:
+             nswindow->SetNonXEmbedPluginFocus();
+             break;
+@@ -4007,7 +4133,28 @@
+             break;
+         default:
+             break;
++    }*/
++//TEL
++
++//TEL start
++ switch (event->type)
++    {
++         case GDK_ENTER_NOTIFY:
++            nswindow->SetNonXEmbedPluginFocus();
++            break;
++         case GDK_DESTROY:
++            gdk_window_remove_filter
++                ((GdkWindow*)(nswindow->GetNativeData(NS_NATIVE_WINDOW)),
++                 plugin_window_filter_func,
++                 nswindow);
++            // Currently we consider all plugins are non-xembed and calls
++            // LoseNonXEmbedPluginFocus without any checking.
++            nswindow->LoseNonXEmbedPluginFocus();
++            break;
++         default:
++            break;
+     }
++//TEL end
+     return return_val;
+ }
+ 
+@@ -4017,33 +4164,69 @@
+                               GdkEvent *event,
+                               gpointer data)
+ {
+-    XEvent    *xevent;
+-    xevent = (XEvent *)gdk_xevent;
++//TEL
++    /*XEvent    *xevent;
++    xevent = (XEvent *)gdk_xevent;*/
++
++    event = (GdkEvent *)gdk_xevent;
++//TEL
+ 
+     GdkFilterReturn return_val;
+     return_val = GDK_FILTER_CONTINUE;
+ 
+-    if (!gPluginFocusWindow || xevent->type!=ClientMessage) {
++//TEL
++/*    if (!gPluginFocusWindow || xevent->type!=ClientMessage) {
++        return return_val;
++    }*/
++//TEL
++
++   if (!gPluginFocusWindow || event->type!=GDK_CLIENT_EVENT) {
+         return return_val;
+     }
+ 
++
+     // When WM sends out WM_TAKE_FOCUS, gtk2 will use XSetInputFocus
+     // to set the focus to the focus proxy. To prevent this happen
+     // while the focus is on the plugin, we filter the WM_TAKE_FOCUS
+     // out.
+-    Display *dpy ;
++//TEL
++    /*Display *dpy ;
+     dpy = GDK_WINDOW_XDISPLAY((GdkWindow*)(gPluginFocusWindow->
+-                GetNativeData(NS_NATIVE_WINDOW)));
+-    if (gdk_x11_get_xatom_by_name("WM_PROTOCOLS")
++                GetNativeData(NS_NATIVE_WINDOW)));*/
++
++/*    if (gdk_x11_get_xatom_by_name("WM_PROTOCOLS")
+             != xevent->xclient.message_type) {
+         return return_val;
++    }*/
++
++    g_print ("\n nsWindow.cpp: plugin_client_message_filter() calls gdk_atom_intern_static_string:START");
++
++     if (gdk_atom_intern_static_string("WM_PROTOCOLS")
++            != event->client.message_type) {
++                                                                                                        
++    g_print ("\n nsWindow.cpp: plugin_client_message_filter() calls gdk_atom_intern_static_string:END");
++
++        return return_val;
+     }
+ 
+-    if ((Atom) xevent->xclient.data.l[0] ==
++
++/*    if ((Atom) xevent->xclient.data.l[0] ==
+             gdk_x11_get_xatom_by_name("WM_TAKE_FOCUS")) {
+         // block it from gtk2.0 focus proxy
+         return_val = GDK_FILTER_REMOVE;
++    }*/
++
++    g_print ("\n nsWindow.cpp: plugin_client_message_filter() calls gdk_atom_intern_static_string:START");
++                                                                                                                              
++      if ((GdkAtom)event->client.data.l[0] ==
++            gdk_atom_intern_static_string("WM_TAKE_FOCUS")) {
++        // block it from gtk2.0 focus proxy
++                                                                                           
++        g_print ("\n nsWindow.cpp: plugin_client_message_filter() calls gdk_atom_intern_static_string:END");
++                                                          
++       return_val = GDK_FILTER_REMOVE;
+     }
++//TEL
+ 
+     return return_val;
+ }
+diff -Nur orig.mozilla/widget/src/gtk2/nsWindow.h work.mozilla/widget/src/gtk2/nsWindow.h
+--- orig.mozilla/widget/src/gtk2/nsWindow.h	2007-01-17 01:50:30.000000000 +0800
++++ work.mozilla/widget/src/gtk2/nsWindow.h	2008-06-08 11:22:21.000000000 +0800
+@@ -49,7 +49,7 @@
+ 
+ #include <gtk/gtk.h>
+ 
+-#include <gdk/gdkx.h>
++//Leo #include <gdk/gdkx.h>
+ #include <gtk/gtkwindow.h>
+ 
+ #ifdef ACCESSIBILITY
+@@ -253,7 +253,8 @@
+ 
+     void               ThemeChanged(void);
+ 
+-    Window             mOldFocusWindow;
++//    Window             mOldFocusWindow;
++    GdkWindow*             mOldFocusWindow;//Leo
+ 
+     static guint32     mLastButtonPressTime;
+     static guint32     mLastButtonReleaseTime;
+diff -Nur orig.mozilla/widget/src/gtksuperwin/gtkmozarea.c work.mozilla/widget/src/gtksuperwin/gtkmozarea.c
+--- orig.mozilla/widget/src/gtksuperwin/gtkmozarea.c	2004-04-19 06:00:17.000000000 +0800
++++ work.mozilla/widget/src/gtksuperwin/gtkmozarea.c	2008-06-08 11:30:14.000000000 +0800
+@@ -55,8 +55,10 @@
+ static void
+ remove_toplevel_listener(GtkMozArea *mozarea);
+ 
+-static Window
+-get_real_toplevel(Window aWindow);
++//Leo static Window
++//Leo get_real_toplevel(Window aWindow);
++static GdkWindow
++get_real_toplevel(GdkWindow aWindow);
+ 
+ static GdkWindow *
+ get_real_gdk_toplevel(GtkMozArea *mozarea);
+@@ -284,19 +286,25 @@
+ }
+ 
+ /* this function will try to find the real toplevel for a gdk window. */
+-static Window
+-get_real_toplevel(Window aWindow)
+-{
+-  Window current = aWindow;
+-  Atom   atom;
+-
++/* Leo static Window
++get_real_toplevel(Window aWindow) */
++static GdkWindow
++get_real_toplevel(GdkWindow aWindow)
++ {
++//Leo  Window current = aWindow;
++//Leo  Atom   atom;
++  GdkWindow current = aWindow;
++  GdkAtom atom; //TEL
++ 
+   /* get the atom for the WM_STATE variable that you get on WM
+      managed windows. */
+ 
+-  atom = XInternAtom(GDK_DISPLAY(), "WM_STATE", FALSE);
+-
++//Leo  atom = XInternAtom(GDK_DISPLAY(), "WM_STATE", FALSE);
++  atom = gdk_atom_intern("WM_STATE", FALSE);//TEL
++ 
+   while (current) {
+-    Atom type = None;
++//Leo    Atom type = None;
++    GdkAtom type = None;
+     int format;
+     unsigned long nitems, after;
+     unsigned char *data;
+@@ -307,12 +315,27 @@
+     unsigned int nchildren_return;
+ 
+     /* check for the atom on this window */
+-    XGetWindowProperty(GDK_DISPLAY(), current, atom,
+-		       0, 0, /* offsets */
+-		       False, /* don't delete */
+-		       AnyPropertyType,
+-		       &type, &format, &nitems, &after, &data);
+-
++//Leo    XGetWindowProperty(GDK_DISPLAY(), current, atom,
++//Leo		       0, 0, /* offsets */
++//Leo		       False, /* don't delete */
++//Leo		       AnyPropertyType,
++//Leo		       &type, &format, &nitems, &after, &data);
++    //Leo start
++   int actual length;/* location to store the length of the retrieved data, in bytes.*/
++                                                                                                                              
++   GdkAtom req_type = gdk_atom_intern("STRING",1);/*defined in gdkproperty-directfb.c*/
++   result = gdk_property_get(current,
++                             atom,
++                             AnyPropertyType,
++                             0,                        /*offset*/
++                             0,  /*length*/
++                             0,                        /*if true delete the property after return*/
++                             &type,
++                             &format,
++                             &actual_length,
++                             (unsigned char **)&data);
++  //Leo end
++ 
+     /* did we get something? */
+     if (type != None) {
+       XFree(data);
+diff -Nur orig.mozilla/widget/src/Makefile.in work.mozilla/widget/src/Makefile.in
+--- orig.mozilla/widget/src/Makefile.in	2005-04-05 03:08:50.000000000 +0800
++++ work.mozilla/widget/src/Makefile.in	2008-06-08 15:21:08.000000000 +0800
+@@ -48,10 +48,10 @@
+ PACKAGE_VARS += \
+ 	MOZ_ENABLE_GTK \
+ 	MOZ_ENABLE_GTK2 \
+-	MOZ_ENABLE_XLIB \
+ 	MOZ_ENABLE_PHOTON \
+ 	MOZ_ENABLE_XREMOTE \
+ 	$(NULL)
++#Leo	MOZ_ENABLE_XLIB \
+ 
+ DIRS		= xpwidgets support
+ 
+@@ -72,13 +72,13 @@
+ #
+ ifdef MOZ_ENABLE_GTK
+ DIRS		+= gtksuperwin
+-DIRS            += gtkxtbin
++#Leo DIRS            += gtkxtbin
+ DIRS		+= gtk
+ endif
+ 
+ ifdef MOZ_ENABLE_GTK2
+ DIRS		+= gtk2
+-DIRS		+= gtkxtbin
++#Leo DIRS		+= gtkxtbin
+ endif
+ 
+ ifdef MOZ_ENABLE_XLIB
+diff -Nur orig.mozilla/widget/src/xremoteclient/XRemoteClient.cpp work.mozilla/widget/src/xremoteclient/XRemoteClient.cpp
+--- orig.mozilla/widget/src/xremoteclient/XRemoteClient.cpp	2006-03-30 16:01:13.000000000 +0800
++++ work.mozilla/widget/src/xremoteclient/XRemoteClient.cpp	2008-06-08 11:35:08.000000000 +0800
+@@ -129,13 +129,19 @@
+     return NS_OK;
+ 
+   // try to open the display
+-  mDisplay = XOpenDisplay(0);
++//Leo  mDisplay = XOpenDisplay(0);
++       mDisplay = gdk_display_open(0);
++
+   if (!mDisplay)
+     return NS_ERROR_FAILURE;
+ 
+   // get our atoms
+-  XInternAtoms(mDisplay, XAtomNames, ARRAY_LENGTH(XAtomNames), False, XAtoms);
+-
++//Leo  XInternAtoms(mDisplay, XAtomNames, ARRAY_LENGTH(XAtomNames), False, XAtoms);
++    for (int j = 0; j<ARRAY_LENGTH(XAtomNames); j++)
++    {
++      XAtoms[j] = gdk_atom_intern_static_string (XAtomNames[j]);
++    }
++//Leo ----
+   int i = 0;
+   mMozVersionAtom  = XAtoms[i++];
+   mMozLockAtom     = XAtoms[i++];
+@@ -161,7 +167,8 @@
+     return;
+ 
+   // shut everything down
+-  XCloseDisplay(mDisplay);
++//Leo  XCloseDisplay(mDisplay);
++  gdk_display_close(mDisplay);
+   mDisplay = 0;
+   mInitialized = PR_FALSE;
+   if (mLockData) {
+diff -Nur orig.mozilla/xpcom/build/nsXPComInit.cpp work.mozilla/xpcom/build/nsXPComInit.cpp
+--- orig.mozilla/xpcom/build/nsXPComInit.cpp	2006-08-05 01:50:52.000000000 +0800
++++ work.mozilla/xpcom/build/nsXPComInit.cpp	2008-06-11 12:32:13.000000000 +0800
+@@ -481,7 +481,7 @@
+                               PRUint32 componentCount)
+ {
+     nsresult rv = NS_OK;
+-
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+ #ifdef MOZ_ENABLE_LIBXUL
+     if (!staticComponents) {
+         staticComponents = kPStaticModules;
+@@ -496,6 +496,7 @@
+     nsTraceRefcntImpl::Startup();
+ #endif
+ 
++
+     // Establish the main thread here.
+     rv = nsIThread::SetMainThread();
+     if (NS_FAILED(rv)) return rv;
+@@ -558,12 +559,13 @@
+             xpcomLib->AppendNative(nsDependentCString(XPCOM_DLL));
+             nsDirectoryService::gService->Set(NS_XPCOM_LIBRARY_FILE, xpcomLib);
+         }
+-        
++
+         if (appFileLocationProvider) {
+             rv = nsDirectoryService::gService->RegisterProvider(appFileLocationProvider);
+             if (NS_FAILED(rv)) return rv;
+         }
+ 
++
+         rv = compMgr->Init(staticComponents, componentCount);
+         if (NS_FAILED(rv))
+         {
+@@ -571,6 +573,7 @@
+             return rv;
+         }
+ 
++
+         nsComponentManagerImpl::gComponentManager = compMgr;
+ 
+         if (result) {
+@@ -581,6 +584,7 @@
+         }
+     }
+ 
++
+     nsCOMPtr<nsIMemory> memory;
+     NS_GetMemoryManager(getter_AddRefs(memory));
+     // dougt - these calls will be moved into a new interface when nsIComponentManager is frozen.
+@@ -623,6 +627,7 @@
+             RegisterGenericFactory(registrar, &components[i]);
+     }
+     rv = nsComponentManagerImpl::gComponentManager->ReadPersistentRegistry();
++
+ #ifdef DEBUG    
+     if (NS_FAILED(rv)) {
+         printf("No Persistent Registry Found.\n");        
+@@ -659,6 +664,7 @@
+                     NS_ERROR("Could not get GRE components directory!");
+                     return rv;
+                 }
++ /////////////////-------------------
+ 
+                 // If the GRE contains any loaders, we want to know about it so that we can cause another
+                 // autoregistration of the applications component directory.
+@@ -703,7 +709,6 @@
+             }
+         }
+ 
+-
+         // Make sure the compreg file's mod time is current.
+         nsCOMPtr<nsIFile> compregFile;
+         rv = nsDirectoryService::gService->Get(NS_XPCOM_COMPONENT_REGISTRY_FILE,
+@@ -725,7 +730,7 @@
+     NS_CreateServicesFromCategory(NS_XPCOM_STARTUP_OBSERVER_ID, 
+                                   nsnull,
+                                   NS_XPCOM_STARTUP_OBSERVER_ID);
+-    
++      printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+     return NS_OK;
+ }
+ 
+diff -Nur orig.mozilla/xpcom/components/nsComponentManager.cpp work.mozilla/xpcom/components/nsComponentManager.cpp
+--- orig.mozilla/xpcom/components/nsComponentManager.cpp	2005-07-21 21:33:42.000000000 +0800
++++ work.mozilla/xpcom/components/nsComponentManager.cpp	2008-06-10 12:33:03.000000000 +0800
+@@ -199,6 +199,7 @@
+     if (!compMgr)
+         return NS_ERROR_FAILURE;
+     rv = compMgr->CreateInstanceByContractID(value, mOuter, aIID, aInstancePtr);
++   printf("--- Leo reach nsComponentManager 202 \n");
+     if (NS_FAILED(rv)) {
+     error:
+         *aInstancePtr = 0;
+diff -Nur orig.mozilla/xpcom/glue/nsDebug.cpp work.mozilla/xpcom/glue/nsDebug.cpp
+--- orig.mozilla/xpcom/glue/nsDebug.cpp	2005-09-01 21:05:58.000000000 +0800
++++ work.mozilla/xpcom/glue/nsDebug.cpp	2008-06-11 09:16:47.000000000 +0800
+@@ -41,6 +41,10 @@
+ #include "nsDebug.h"
+ #include "nsDebugImpl.h"
+ 
++#include <execinfo.h>
++ #include <stdio.h>
++ #include <stdlib.h>
++
+ static nsIDebug* gDebugObject = nsnull;
+ 
+ static NS_METHOD FreeDebugObject(void)
+@@ -52,6 +56,26 @@
+ #define ENSURE_DEBUGOBJECT \
+   (gDebugObject ? PR_TRUE : (PRBool)(SetupDebugObject() != nsnull))
+ 
++void   Leo_print_trace (void)
++     {
++       void *array[10];
++       size_t size;
++       char **strings;
++       size_t i;
++     
++       size = backtrace (array, 10);
++       strings = backtrace_symbols (array, size);
++     
++       printf ("Obtained %zd stack frames.\n", size);
++     
++       for (i = 0; i < size; i++)
++          printf ("%s\n", strings[i]);
++     
++       free (strings);
++     }
++
++
++
+ static nsIDebug* SetupDebugObject()
+ {
+   NS_GetDebug(&gDebugObject);
+diff -Nur orig.mozilla/xpcom/glue/nsDebug.h work.mozilla/xpcom/glue/nsDebug.h
+--- orig.mozilla/xpcom/glue/nsDebug.h	2006-03-01 07:11:47.000000000 +0800
++++ work.mozilla/xpcom/glue/nsDebug.h	2008-06-11 09:16:03.000000000 +0800
+@@ -58,6 +58,8 @@
+ 
+ PR_BEGIN_EXTERN_C
+ 
++void   Leo_print_trace (void);
++
+ /**
+  * Log a warning message to the debug log.
+  */
+diff -Nur orig.mozilla/xpcom/glue/standalone/nsXPCOMGlue.cpp work.mozilla/xpcom/glue/standalone/nsXPCOMGlue.cpp
+--- orig.mozilla/xpcom/glue/standalone/nsXPCOMGlue.cpp	2006-04-26 03:19:00.000000000 +0800
++++ work.mozilla/xpcom/glue/standalone/nsXPCOMGlue.cpp	2008-06-11 09:44:13.000000000 +0800
+@@ -159,6 +159,7 @@
+               nsStaticModuleInfo const *staticComponents,
+               PRUint32 componentCount)
+ {
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+     if (!xpcomFunctions.init3)
+         return NS_ERROR_NOT_INITIALIZED;
+     return xpcomFunctions.init3(result, binDirectory, appFileLocationProvider,
+diff -Nur orig.mozilla/xpcom/io/nsLocalFileUnix.cpp work.mozilla/xpcom/io/nsLocalFileUnix.cpp
+--- orig.mozilla/xpcom/io/nsLocalFileUnix.cpp	2006-12-28 13:19:57.000000000 +0800
++++ work.mozilla/xpcom/io/nsLocalFileUnix.cpp	2008-06-10 17:29:15.000000000 +0800
+@@ -1655,9 +1655,12 @@
+ nsresult
+ NS_NewNativeLocalFile(const nsACString &path, PRBool followSymlinks, nsILocalFile **result)
+ {
++ // printf("---  Leo  reach %s  %d  %s \n",__FILE__,__LINE__);
+     nsLocalFile *file = new nsLocalFile();
+-    if (!file)
++    if (!file){
++        // printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+         return NS_ERROR_OUT_OF_MEMORY;
++   }
+     NS_ADDREF(file);
+ 
+     if (!path.IsEmpty()) {
+@@ -1667,6 +1670,7 @@
+             return rv;
+         }
+     }
++     //printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+     *result = file;
+     return NS_OK;
+ }
+diff -Nur orig.mozilla/xpcom/reflect/xptinfo/src/xptiInterfaceInfoManager.cpp work.mozilla/xpcom/reflect/xptinfo/src/xptiInterfaceInfoManager.cpp
+--- orig.mozilla/xpcom/reflect/xptinfo/src/xptiInterfaceInfoManager.cpp	2004-05-07 08:50:53.000000000 +0800
++++ work.mozilla/xpcom/reflect/xptinfo/src/xptiInterfaceInfoManager.cpp	2008-06-11 09:13:40.000000000 +0800
+@@ -42,7 +42,6 @@
+ #include "xptiprivate.h"
+ #include "nsDependentString.h"
+ #include "nsString.h"
+-
+ #define NS_ZIPLOADER_CONTRACTID NS_XPTLOADER_CONTRACTID_PREFIX "zip"
+ 
+ NS_IMPL_THREADSAFE_ISUPPORTS2(xptiInterfaceInfoManager, 
+@@ -126,6 +125,8 @@
+         mSearchPath(aSearchPath)
+ {
+     const char* statsFilename = PR_GetEnv("MOZILLA_XPTI_STATS");
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
++    Leo_print_trace();
+     if(statsFilename)
+     {
+         mStatsLogFile = do_CreateInstance(NS_LOCAL_FILE_CONTRACTID);         
+diff -Nur orig.mozilla/xpcom/stub/nsXPComStub.cpp work.mozilla/xpcom/stub/nsXPComStub.cpp
+--- orig.mozilla/xpcom/stub/nsXPComStub.cpp	2005-07-21 21:33:43.000000000 +0800
++++ work.mozilla/xpcom/stub/nsXPComStub.cpp	2008-06-10 14:07:44.000000000 +0800
+@@ -40,6 +40,7 @@
+ #include "nsStringAPI.h"
+ 
+ #include <string.h>
++#include<stdio.h>
+ 
+ static const XPCOMFunctions kFrozenFunctions = {
+     XPCOM_GLUE_VERSION,
+@@ -183,6 +184,7 @@
+                       PRBool followLinks,
+                       nsILocalFile **result)
+ {
++  printf("---  Leo  reach %s  %d \n",__FILE__,__LINE__);
+   return NS_NewNativeLocalFile_P(path, followLinks, result);
+ }
+ 

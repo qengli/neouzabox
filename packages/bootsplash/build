@@ -1,0 +1,12 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+setup_toolchain host
+
+make -C $BUILD/$1*/Utilities \
+     CC=$CC \
+     CFLAGS="$CFLAGS" \
+     splash

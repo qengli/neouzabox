@@ -1,0 +1,34 @@
+#!/bin/sh
+
+. config/options
+
+#setup_toolchain --optimize target
+
+
+cd $BUILD/$1*
+autoconf
+PKG_CONFIG=$LIB_PREFIX/bin/pkg-config \
+CFLAGS="-mips32r2 -D_FILE_OFFSET_BITS=64"
+CXXFLAGS="-mips32r2 -D_FILE_OFFSET_BITS=64" \
+ac_cv_func_fopencookie=no \
+ac_cv_func_getaddrinfo=no \
+ac_cv_func_libiconv=yes \
+ac_cv_func_dlopen=no \
+./configure \
+--host=$TARGET_NAME \
+--prefix=$LIB_PREFIX \
+--with-zlib \
+--without-pcre \
+--without-bzip2 \
+--disable-zend-memory-manager \
+--without-peer \
+--enable-fast-install \
+--without-mysql \
+--disable-ipv6 \
+--with-xmlrpc \
+--disable-zend
+make
+exit 2
+#ac_cv_func_libiconv=yes LDFLAGS="-ldl " \
+#make install
+

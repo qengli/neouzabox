@@ -1,0 +1,11 @@
+--- mplayerplug-in/Source/plugin-support.orig	2007-01-04 21:45:55.000000000 +0800
++++ mplayerplug-in/Source/plugin-support.cpp	2007-08-03 17:33:21.000000000 +0800
+@@ -647,7 +647,7 @@
+ 	    if (item[0] != '/') {
+ 		strlcpy(tmpdir, item, 1024);	// reuse the buffer
+ 		if (instance->baseurl != NULL) {
+-		    strlcpy(localitem, instance->baseurl, 1024);
++    			strlcpy(localitem, "", 1024); //strlcpy(localitem, instance->baseurl, 1024); //modified by Leo 20070803
+ 		} else {
+ 		    strlcpy(localitem, "", 1024);
+ 		}

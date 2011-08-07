@@ -1,0 +1,31 @@
+#!/bin/sh
+
+. config/options
+
+if [ "$2" = toolchain ]; then
+  exit 0
+fi
+
+mkdir -p $INSTALL/lib
+
+cp $BUILD/$1*/objdir-$1/elf/ld*.so.* $INSTALL/lib
+cp $BUILD/$1*/objdir-$1/libc.so.6 $INSTALL/lib
+cp $BUILD/$1*/objdir-$1/dlfcn/libdl.so.2 $INSTALL/lib
+cp $BUILD/$1*/objdir-$1/nptl/libpthread.so.0 $INSTALL/lib
+[ "$GDB" = yes ] && cp $BUILD/$1*/objdir-$1/nptl_db/libthread_db.so.1 $INSTALL/lib
+cp $BUILD/$1*/objdir-$1/math/libm.so $INSTALL/lib/libm.so.6 
+cp $BUILD/$1*/objdir-$1/login/libutil.so $INSTALL/lib/libutil.so.1 
+[ "$NETWORK" = yes ] && cp $BUILD/$1*/objdir-$1/crypt/libcrypt.so $INSTALL/lib/libcrypt.so.1 
+[ "$NETWORK" = yes ] && cp $BUILD/$1*/objdir-$1/resolv/libresolv.so $INSTALL/lib/libresolv.so.2 
+
+#Leo added 2008-08-20 without this lib we can't resolve dns name
+[ "$NETWORK" = yes ] && cp $BUILD/$1*/objdir-$1/resolv/libnss_dns.so $INSTALL/lib/libnss_dns.so.2 
+
+#Added by Leo 2008-08-12
+#if [ "$DEBUG_TOOLS" = "yes" ]; then
+  #sed -i s/"set\ \-o\ pipefail\ 2>\ \/dev\/null"/"false"/ build.i386.glibc/glibc-2.5/objdir-glibc/elf/ldd
+  #cp $BUILD/$1*/objdir-$1/elf/ldd $INSTALL/usr/bin
+  #cp $BUILD/$1*/objdir-$1/elf/lddlibc4 $INSTALL/usr/bin
+#fi
+
+exit 0

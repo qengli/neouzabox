@@ -1,0 +1,27 @@
+--- glibc-2.5.orig/sysdeps/unix/sysv/linux/check_pf.c.jj	2007-09-02 19:09:33.000000000 +0200
++++ glibc-2.5/sysdeps/unix/sysv/linux/check_pf.c	2007-10-03 09:26:18.000000000 +0200
+@@ -54,10 +54,6 @@ make_request (int fd, pid_t pid, bool *s
+   {
+     struct nlmsghdr nlh;
+     struct rtgenmsg g;
+-    /* struct rtgenmsg consists of a single byte.  This means there
+-       are three bytes of padding included in the REQ definition.
+-       We make them explicit here.  */
+-    char pad[3];
+   } req;
+   struct sockaddr_nl nladdr;
+ 
+@@ -68,8 +64,11 @@ make_request (int fd, pid_t pid, bool *s
+   req.nlh.nlmsg_seq = time (NULL);
+   req.g.rtgen_family = AF_UNSPEC;
+ 
+-  assert (sizeof (req) - offsetof (struct req, pad) == 3);
+-  memset (req.pad, '\0', sizeof (req.pad));
++  assert (sizeof (req) - offsetof (struct req, g)
++	  - sizeof (req.g.rtgen_family) == 3);
++  memset (&req.g.rtgen_family + 1, '\0',
++	  sizeof (req) - offsetof (struct req, g)
++	  - sizeof (req.g.rtgen_family));
+ 
+   memset (&nladdr, '\0', sizeof (nladdr));
+   nladdr.nl_family = AF_NETLINK;

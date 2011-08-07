@@ -1,0 +1,50 @@
+#!/bin/sh
+
+. config/options
+
+mkdir -p $INSTALL/etc
+mkdir -p $INSTALL/usr/bin
+mkdir -p "`ls -d $INSTALL/lib/modules/*`/misc"
+
+cp $BUILD/$1*/daemons/lircd $INSTALL/usr/bin
+cp $BUILD/$1*/tools/irpty $INSTALL/usr/bin
+cp $BUILD/$1*/drivers/lirc_dev/lirc_dev.ko \
+   $BUILD/$1*/drivers/lirc_i2c/lirc_i2c.ko \
+   $BUILD/$1*/drivers/lirc_gpio/lirc_gpio.ko \
+   $BUILD/$1*/drivers/lirc_serial/lirc_serial.ko \
+   $BUILD/$1*/drivers/lirc_sir/lirc_sir.ko \
+   $BUILD/$1*/drivers/lirc_atiusb/lirc_atiusb.ko \
+   $BUILD/$1*/drivers/lirc_it87/lirc_it87.ko \
+   $BUILD/$1*/drivers/lirc_mceusb/lirc_mceusb.ko \
+   $BUILD/$1*/drivers/lirc_mceusb2/lirc_mceusb2.ko \
+   $BUILD/$1*/drivers/lirc_streamzap/lirc_streamzap.ko \
+   $BUILD/$1*/drivers/lirc_imon/lirc_imon.ko \
+   $INSTALL/lib/modules/*/misc
+
+case "$2" in
+  installator)
+    mkdir -p $INSTALL/etc/lirc
+    cp $PACKAGES/$1/config/lircrc_* $INSTALL/etc/lirc
+    cp $PACKAGES/$1/config/lircd_* $INSTALL/etc/lirc
+    echo "# Remote to use (pctv/logitech/hauppauge/realmagic/creative/leadtek/" > $INSTALL/etc/remote
+    echo "# leadtek-pvr2000/RM-S6/RX-V850/animax/askey/avermedia/packard_bell/atiusb/" >> $INSTALL/etc/remote
+    echo "# atiusb2/LG/D-10/digimatrix/mceusb/streamzap/cinergy1400/nova-s-plus/twinhan/" >> $INSTALL/etc/remote
+    echo "# tosh-vt76f/flytv-prime/Medion-X10/imonknob/ultrax)" >> $INSTALL/etc/remote
+    echo "REMOTE=$REMOTE" >> $INSTALL/etc/remote
+    echo "" >> $INSTALL/etc/remote
+    echo "# Remote receiver to use (animax/askey/avermedia/atiusb/atiusb2/creative/" >> $INSTALL/etc/remote
+    echo "# hauppauge/homemade/irman/leadtek/leadtek-pvr2000/logitech/pctv/realmagic/" >> $INSTALL/etc/remote
+    echo "# digimatrix/mceusb/mceusb2/streamzap/cx88/imonknob/ultrax)" >> $INSTALL/etc/remote
+    echo "RECEIVER=$RECEIVER" >> $INSTALL/etc/remote
+    ;;
+
+  *)
+    mkdir -p $INSTALL/etc/lirc
+    cp $PACKAGES/$1/config/lircrc_* $INSTALL/etc/lirc
+    cp $PACKAGES/$1/config/lircd_*.conf $INSTALL/etc/lirc
+    cp $PACKAGES/$1/config/lircd_* $INSTALL/etc/lirc
+    ;;
+esac
+
+#Leo added 2008-02-18
+cp -f $PACKAGES/$1*/init.d/* $INSTALL/etc/init.d/

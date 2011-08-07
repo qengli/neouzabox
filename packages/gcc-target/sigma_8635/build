@@ -1,0 +1,62 @@
+#!/bin/sh
+
+. config/options
+
+setup_toolchain host
+cd $BUILD/gcc*
+mkdir -p objdir-$1
+cd objdir-$1
+#if [ 0 = 1 ]; then
+../configure \
+    --prefix=/usr \
+		--build=$HOST_NAME \
+		--host=$TARGET_NAME \
+		--target=$TARGET_NAME \
+		--enable-languages=c,c++ \
+		--enable-shared \
+    --with-sysroot=$SYSROOT_PREFIX \
+    --with-local-prefix=/usr/local \
+ 		--with-gxx-include-dir=/usr/include/c++ \
+		--disable-__cxa_atexit \
+		--enable-target-optspace \
+		--with-gnu-ld \
+		--disable-nls \
+    --enable-sjlj-exceptions \
+    --enable-multilib \
+    --with-float=soft 
+#sed -i 's/"define _GLIBCXX_USE_WCHAR_T 1"//g' mipsel-unknown-linux-uclibc/libstdc++-v3/include/mipsel-unknown-linux-uclibc/bits/c++config.h 
+make cross-compiling=yes all
+
+GCC_VERSION=`sed -n '1 s/.*\([0-9]\.[0-9]\..*\)\.tar.*/\1/p' $ROOT/$PACKAGES/gcc/sigma_8635/url `
+#
+# gcc-lib dir changes names to gcc with 3.4.mumble
+#
+GCC_LIB_SUBDIR=lib/gcc/$TARGET_NAME/$GCC_VERSION
+
+TARGET_DIR=$ROOT/$TOOLCHAIN/target 
+make DESTDIR=$TARGET_DIR install
+
+# Remove broken specs file (cross compile flag is set).
+rm -f $TARGET_DIR/usr/$GCC_LIB_SUBDIR/specs
+
+	# Make sure gcc does not think we are cross compiling
+sed -i	 "s/^1/0/;" $TARGET_DIR/usr/lib/gcc/$TARGET_NAME/$GCC_VERSION/specs
+	
+  #
+	# Ok... that's enough of that.
+	#
+cd $(TARGET_DIR)/bin; find -type f | xargs $(STRIP) > /dev/null 2>&1)
+cd $(TARGET_DIR)/usr/bin; find -type f | xargs $(STRIP) > /dev/null 2>&1)
+cd $(TARGET_DIR)/usr/$(GCC_LIB_SUBDIR); $(STRIP) cc1 cc1plus collect2 > /dev/null 2>&1)
+cd $(TARGET_DIR)/usr/lib; $(STRIP) libstdc++.so.*.*.* > /dev/null 2>&1)
+cd $(TARGET_DIR)/lib; $(STRIP) libgcc_s.so.*.*.* > /dev/null 2>&1)
+	#
+rm -f $TARGET_DIR/usr/lib/*.la*
+	#rm -rf $(TARGET_DIR)/share/locale $(TARGET_DIR)/usr/info \
+	#	$(TARGET_DIR)/usr/man $(TARGET_DIR)/usr/share/doc
+	# Work around problem of missing syslimits.h
+if [ ! -f $TARGET_DIR/usr/$GCC_LIB_SUBDIR/include/syslimits.h ] ; then \
+	echo "warning: working around missing syslimits.h" ; \
+	cp -f $STAGING_DIR/$GCC_LIB_SUBDIR/include/syslimits.h \
+		$TARGET_DIR/usr/$GCC_LIB_SUBDIR/include/ ; \
+fi

@@ -1,0 +1,18 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/unpack uClibc
+
+rm -rf "$SYSROOT_PREFIX/usr/include"
+$SCRIPTS/install linux-libc-headers
+mkdir -p $SYSROOT_PREFIX/usr/lib
+mkdir -p $SYSROOT_PREFIX/lib
+
+make -C $BUILD/uClibc* \
+       PREFIX="$SYSROOT_PREFIX" \
+       DEVEL_PREFIX=/usr/ \
+       RUNTIME_PREFIX="$SYSROOT_PREFIX" \
+       pregen install_dev
+
+

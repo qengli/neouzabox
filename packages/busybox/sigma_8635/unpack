@@ -1,0 +1,19 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+BUSYBOX_VERSION=`sed -n 's/^.*-\([0-9]\.[0-9]*\)\.tar\..*$/\1/p' $ROOT/$PACKAGES/$VDIR/url`
+
+BUSYBOX=`ls -d $BUILD/$1-$BUSYBOX_VERSION`
+
+#cat <<EOF >$BUSYBOX/Makefile.custom
+#HOSTCC = $HOST_CC
+##CROSS_COMPILE = $TARGET_PREFIX
+#EOF
+
+cp $PACKAGES/$VDIR/config/$1.config-$BUSYBOX_VERSION $BUSYBOX/.config
+
+#[ "$DEVTOOLS" = yes ] && cat $PACKAGES/$VDIR/config/$1.devtools.conf >> $BUSYBOX/.config
+

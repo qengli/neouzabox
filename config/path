@@ -1,0 +1,264 @@
+set -e
+
+NEOUBOX_VERSION=`cat VERSION`
+CONFIG=config
+SCRIPTS=scripts
+PACKAGES=packages
+SOURCES=sources
+BUILD_BASE=build
+BUILD=$BUILD_BASE.$TARGET_CPU.$TARGET_LIBC #modified by Leo 20070804 to support basing on glibc
+STAMPS_NOARCH=.stamps
+STAMPS=$BUILD/$STAMPS_NOARCH
+DOCS=DOCS
+ROOT=`pwd`
+export ROOT #Leo
+
+#modified by Leo 20070804 
+if [ -z "$TARGET_CPU" ]; then
+  case $TARGET_ARCH in
+    i386)
+      TARGET_CPU=i586
+      ;;
+
+    powerpc)
+      TARGET_CPU=G3
+      ;;
+  esac
+fi
+
+#modified by Leo 20070804 to support basing on glibc
+case $TARGET_LIBC in
+  uClibc)
+    case $TARGET_ARCH in
+      i386)
+        TARGET_NAME=$TARGET_CPU-pc-linux-uclibc
+        ;;
+
+      mips)
+        TARGET_NAME=${TARGET_CPU}-unknown-linux-uclibc #important the suffix must be uclibc 
+        ;;
+
+      arm)
+        TARGET_NAME=${TARGET_CPU}-unknown-linux-uclibc
+        ;;
+
+
+      powerpc)
+        TARGET_NAME=$TARGET_ARCH-unknown-linux-uclibc
+        ;;
+    esac 
+    ;;
+  glibc)
+    case $TARGET_ARCH in
+      i386)
+        TARGET_NAME=$TARGET_CPU-pc-linux-gnu
+        ;;
+
+      mips)
+        TARGET_NAME=${TARGET_CPU}-unknown-linux-gnu
+        ;;
+
+      arm)
+        TARGET_NAME=${TARGET_CPU}-unknown-linux-gnu
+        ;;
+
+
+      powerpc)
+        TARGET_NAME=$TARGET_ARCH-unknown-linux-gnu
+        ;;
+    esac
+    ;;
+esac
+
+TOOLCHAIN=$BUILD/toolchain
+TOOLCHAIN_PREFIX=$ROOT/$TOOLCHAIN #added by Leo 2007-06-17
+SYSROOT_PREFIX=$ROOT/$TOOLCHAIN/$TARGET_NAME/sysroot
+LIB_PREFIX=$SYSROOT_PREFIX/usr/local
+TARGET_PREFIX=$ROOT/$TOOLCHAIN/bin/$TARGET_NAME-
+export TOOLCHAIN TOOLCHAIN_PREFIX
+export SYSROOT_PREFIX #Added by Leo 20060301
+export LIB_PREFIX  #Added by Leo 20060301
+#LD_LIBRARY_PATH="$LIB_PREFIX/lib:$LIB_PREFIX/lib/X11" #:$SYSROOT_PREFIX/lib" #Added by Leo 20060303
+#echo $LD_LIBRARY_PATH
+
+#modified by Leo 20070804 to support c++
+TOOLCHAIN_LANGUAGES=c
+[ "$TOOLCHAIN_CXX" = yes ] && TOOLCHAIN_LANGUAGES=${TOOLCHAIN_LANGUAGES},c++
+
+
+TARGET_CC=${TARGET_PREFIX}gcc
+#TARGET_CXX=
+TARGET_CXX="${TARGET_PREFIX}g++" #modified by leo 20060217
+export TARGET_CXX #Leo
+export TARGET_CC #Leo
+TARGET_LD=${TARGET_PREFIX}ld
+TARGET_AS=${TARGET_PREFIX}as
+TARGET_AR=${TARGET_PREFIX}ar
+export TARGET_AR #Leo
+TARGET_NM=${TARGET_PREFIX}nm
+TARGET_RANLIB=${TARGET_PREFIX}ranlib
+TARGET_OBJCOPY=${TARGET_PREFIX}objcopy
+TARGET_STRIP=${TARGET_PREFIX}strip
+#modified by Leo 2006-03-04
+TARGET_CPPFLAGS=
+case $TARGET_ARCH in
+      i386)
+        TARGET_CFLAGS="-O2 -Wall -pipe -mmmx -msse -mfpmath=sse "
+        ;;
+      powerpc)
+        TARGET_CFLAGS="-Os -Wall -pipe -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE"
+        TARGET_CXXFLAGS="-Os -Wall -pipe -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE"
+        ;;
+      mips)
+        TARGET_CFLAGS="-Os -mips32r2 -Wall -pipe -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -I$LIB_PREFIX/include"
+        TARGET_CXXFLAGS="-Os -mips32r2 -Wall -pipe -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -I$LIB_PREFIX/include"
+        ;;
+esac
+#Leo modified 2006-03-03
+#TARGET_LDFLAGS=
+
+#TARGET_LDFLAGS="-L$LD_LIBRARY_PATH " Leo modified 2008-04-25
+TARGET_LDFLAGS="-L$LIB_PREFIX/lib" #modified by Leo 2008.4.29 see documnts
+
+
+if [ "$DEBUG" = yes ]; then
+  TARGET_CFLAGS="$TARGET_CFLAGS -g3"
+  TARGET_STRIP=touch
+else
+#  TARGET_CFLAGS="$TARGET_CFLAGS -s -fomit-frame-pointer"
+#  TARGET_LDFLAGS="$TARGET_LDFLAGS -s "
+  TARGET_CFLAGS="$TARGET_CFLAGS -fomit-frame-pointer"
+  TARGET_LDFLAGS="$TARGET_LDFLAGS  "
+fi
+
+HOST_CC=$ROOT/$TOOLCHAIN/bin/host-gcc
+HOST_CXX=$ROOT/$TOOLCHAIN/bin/host-g++
+HOST_LD=ld
+HOST_AS=as
+HOST_AR=ar
+HOST_NM=nm
+HOST_RANLIB=ranlib
+HOST_OBJCOPY=objcopy
+HOST_STRIP=strip
+HOST_CPPFLAGS=""
+HOST_CFLAGS="-O2 -Wall -pipe"
+HOST_LDFLAGS=""
+
+export CCACHE_DIR=$ROOT/$BUILD/.ccache
+export MAKEFLAGS=-j$CONCURRENCY_MAKE_LEVEL
+export HAVE_PKG_CONFIG=no
+
+if [ -z "$PATH" -o "$PATH" = "${PATH#$ROOT/$TOOLCHAIN/bin:}" ]; then
+#  export PATH="$ROOT/$TOOLCHAIN/bin:$PATH"
+export PATH="$ROOT/hosttool:$ROOT/$TOOLCHAIN/bin:$SYSROOT_PREFIX/usr/local/bin:$PATH" #Leo added 2006-03-04 
+#hosttool must before $SYSROOT_PREFIX/usr/local/bin or build with glib-genmarshal and can't run .because 
+#sysroot/usr/local/bin/glib is depended on uclibc so we could get error when building atk
+
+fi
+
+setup_toolchain() {
+  if [ "$1" = "--optimize" ]; then
+    OPTIMIZE=yes
+    shift
+  fi
+
+  if [ "$1" = target ]; then
+    export CC=$TARGET_CC
+    export CXX=$TARGET_CXX
+    export LD=$TARGET_LD
+    export AS=$TARGET_AS
+    export AR=$TARGET_AR
+    export NM=$TARGET_NM
+    export RANLIB=$TARGET_RANLIB
+    export OBJCOPY=$TARGET_OBJCOPY
+    export STRIP=$TARGET_STRIP
+    export CPPFLAGS="$TARGET_CPPFLAGS"
+    export CFLAGS="$TARGET_CFLAGS"
+    export LDFLAGS="$TARGET_LDFLAGS"
+    if [ "$OPTIMIZE" = yes ]; then
+      case $TARGET_ARCH in
+        i386)
+          CFLAGS="$CFLAGS -march=$TARGET_CPU"
+          ;;
+        ppc)
+          CFLAGS="$CFLAGS -maltivec"
+          ;;
+      esac
+    fi
+  elif [ "$1" = host ]; then
+    export CC=$HOST_CC
+    export CXX=$HOST_CXX
+    export LD=$HOST_LD
+    export AS=$HOST_AS
+    export AR=$HOST_AR
+    export NM=$HOST_NM
+    export RANLIB=$HOST_RANLIB
+    export OBJCOPY=$HOST_OBJCOPY
+    export STRIP=$HOST_STRIP
+    export CPPFLAGS="$HOST_CPPFLAGS"
+    export CFLAGS="$HOST_CFLAGS"
+    export LDFLAGS="$HOST_LDFLAGS"
+  fi
+}
+setup_toolchain target
+
+set_version_dir(){
+if [ ! -z "$VERSION" ]; then
+
+  if [ -d $PACKAGES/$1/$VERSION/ ]; then
+     VDIR=$1/$VERSION
+  else
+
+    if [ -d $PACKAGES/$1/trunk ]; then
+       VDIR=$1/trunk
+    else
+       VDIR=$1
+    fi 
+
+  fi
+
+else
+   VDIR=$1
+fi
+export VDIR
+}
+
+
+SILENT_OUT=3
+VERBOSE_OUT=4
+if [ "$VERBOSE" = yes ]; then
+  exec 3>/dev/null
+  exec 4>&2
+else
+  exec 3>&2
+  exec 4>/dev/null
+fi
+INDENT_SIZE=4
+
+GEEXBOX_SRCS=http://www.geexbox.org/src/$NEOUBOX_VERSION
+[ "$NEOUBOX_VERSION" = devel ] && NEOUBOX_VERSION=devel-`date +%Y%m%d`
+ISO=NeouzaBox-$NEOUBOX_VERSION-$LANG.$TARGET_ARCH.$TARGET_LIBC.iso
+GENERATOR_NAME=neouzabox-generator-$NEOUBOX_VERSION.$TARGET_ARCH
+INSTALLATOR_NAME=neouzabox-installator-$NEOUBOX_VERSION.$TARGET_ARCH
+PXE_NAME=neouzabox-pxe/GEEXBOX.$TARGET_ARCH
+
+HOST_NAME_CACHE=$BUILD/configtools/host_name
+if [ -f $HOST_NAME_CACHE ]; then
+  HOST_NAME=`cat $HOST_NAME_CACHE`
+elif [ -x $BUILD/configtools/config.guess ]; then
+  HOST_NAME=`$BUILD/configtools/config.guess`
+fi
+
+kernel_path() {
+  ls -d $ROOT/$BUILD/linux*
+}
+
+#added by leo , 20070613
+#only effect when manual run "scripts/install xxxx manual" to resolve some packages/install scripts can't get $INSTALL variable problem
+#the enviroment move from scripts/iso
+if [ "$2" = manual ]; then
+  export INSTALL=$BUILD/iso/NEOUBOX #if export, mkiso will fail: mkisofs: Uh oh, I cant find the boot catalog directory 'NEOUBOX/boot
+fi
+
+#added by Leo 2008.05.04
+export TARGET_NAME HOST_NAME

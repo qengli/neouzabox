@@ -1,0 +1,32 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+setup_toolchain --optimize target
+
+cd $BUILD/$1*
+
+sed -i 's:REPLACE_STAGING_DIR:${LIB_PREFIX}:g' config/cf/cross.def
+sed -i 's:REPLACE_ARCH:mips:g' config/cf/cross.def
+sed -i 's:#define CcCmd.*:#define CcCmd ${TARGET_NAME}-gcc:g' config/cf/cross.def
+sed -i 's:#define RanlibCmd.*:#define RanlibCmd ${TARGET_NAME}-ranlib:g' config/cf/cross.def
+sed -i 's:#define LdCmd.*:#define LdCmd ${TARGET_NAME}-ld:g' config/cf/cross.def
+
+
+unset CC
+unset CXX
+unset LDFLAGS
+unset CFLAGS
+unset LD_LIBRARY_PATH
+unset CCACHE_DIR
+unset TARGET_CC
+unset TARGET_CXX
+unset RANLIB
+unset LIB_PREFIX
+unset CCFLAGS
+
+make World 
+#make install
+cp $ROOT/$BUILD/xc/lib/Xft/xft.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig 
+

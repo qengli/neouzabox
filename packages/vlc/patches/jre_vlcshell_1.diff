@@ -1,0 +1,16 @@
+--- vlc-0.8.6c/mozilla/support/npunix.c.orig	2007-06-16 22:25:19.000000000 +0800
++++ vlc-0.8.6c/mozilla/support/npunix.c	2008-01-09 17:05:32.000000000 +0800
+@@ -530,11 +530,12 @@
+ JRIGlobalRef
+ Private_GetJavaClass(void)
+ {
+-    jref clazz = NPP_GetJavaClass();
++   /* jref clazz = NPP_GetJavaClass();
+     if (clazz) {
+     JRIEnv* env = NPN_GetJavaEnv();
+     return JRI_NewGlobalRef(env, clazz);
+     }
++*/
+     return NULL;
+ }
+ 

@@ -1,0 +1,50 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build genext2fs
+
+export INSTALL=$BUILD/$1/mnt
+
+rm -rf $INSTALL
+mkdir -p $INSTALL
+rm -f $BUILD/$1/$1 $BUILD/$1/$1.gz
+
+mkdir $INSTALL/bin
+mkdir $INSTALL/etc
+mkdir $INSTALL/ramfs
+mkdir $INSTALL/sbin
+mkdir $INSTALL/usr
+mkdir $INSTALL/usr/bin
+
+$SCRIPTS/install $TARGET_LIBC #modified by Leo 20070804 to support basing on glibc
+$SCRIPTS/install busybox
+$SCRIPTS/install udev
+$SCRIPTS/install iscd
+
+if [ "installed" = "$2" ]; then
+  echo " cp linuxrc.hd "
+  cp $PACKAGES/$VDIR/scripts/linuxrc.installed $INSTALL/linuxrc
+  chmod 755 $INSTALL/linuxrc
+else
+  cp $PACKAGES/$VDIR/scripts/linuxrc $INSTALL
+  chmod 755 $INSTALL/linuxrc
+fi
+
+cp $PACKAGES/$VDIR/scripts/console $INSTALL/sbin
+cp $PACKAGES/$VDIR/scripts/nosystem $INSTALL/sbin
+cp $PACKAGES/$VDIR/scripts/r[ow] $INSTALL/usr/bin
+
+mv $INSTALL/lib $INSTALL/lib64
+
+ln -s /bin/busybox $INSTALL/bin/sh
+ln -s /bin/busybox $INSTALL/bin/init
+
+echo "|||||||| $BUILD/genext2fs*/genext2fs -d $INSTALL -b $RAMDISK_SIZE -i 1024 $BUILD/$1/$1 |||||||"
+$BUILD/genext2fs*/genext2fs -d $INSTALL -b $RAMDISK_SIZE -i 1024 $BUILD/$1/$1
+
+if [ "installed" = "$2" ]; then
+  gzip -9 -S .installed.gz $BUILD/$1/$1
+else
+  gzip -9 $BUILD/$1/$1
+fi

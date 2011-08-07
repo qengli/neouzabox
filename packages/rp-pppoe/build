@@ -1,0 +1,12 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+cd $BUILD/$1*/src
+echo ${LIB_PREFIX}
+./configure --prefix=${LIB_PREFIX}/rp-pppoe \
+  --host=$TARGET_NAME #--build=$HOST_NAME #added by Leo 2008.5.5
+make
+

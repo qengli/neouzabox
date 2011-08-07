@@ -1,0 +1,27 @@
+--- viafb-kernel-src_2.6.00.03/Makefile	2007-03-22 13:42:11.000000000 +0800
++++ viafb-kernel-src_2.6.00.03/Makefile.orig	2008-01-22 17:03:36.000000000 +0800
+@@ -14,10 +14,7 @@
+ 
+ INSTALL_PATH:=/lib/modules/$(shell uname -r)/kernel/drivers/video
+ 
+-KSP :=  /usr/src/linux-$(shell uname -r) \
+-        /usr/src/linux-$(shell uname -r | sed 's/-.*//') \
+-        /usr/src/linux-$(shell uname -r | sed 's/\([0-9]*\.[0-9]*\)\..*/\1/') \
+-        /usr/src/linux
++KSP :=  ../linux-*/
+ 
+ test_dir = $(shell [ -e $(dir)/include/linux ] && echo $(dir))
+ KSP := $(foreach dir, $(KSP), $(test_dir))
+@@ -123,11 +120,7 @@
+ 
+ INSTALL_PATH:=/lib/modules/$(shell uname -r)/kernel/drivers/video
+ 
+-KSP :=  /lib/modules/$(shell uname -r)/build \
+-				/usr/src/linux-$(shell uname -r) \
+-        /usr/src/linux-$(shell uname -r | sed 's/-.*//') \
+-        /usr/src/linux-$(shell uname -r | sed 's/\([0-9]*\.[0-9]*\)\..*/\1/') \
+-        /usr/src/linux
++KSP := ../linux-*/ 
+ 
+ test_dir = $(shell [ -e $(dir)/include/linux ] && echo $(dir))
+ KSP := $(foreach dir, $(KSP), $(test_dir))

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+if [ "$MOZ_APP" != "xulrunner" ]; then
+   echo "I must be with xulrunner"
+   exit	-1
+fi
+
+

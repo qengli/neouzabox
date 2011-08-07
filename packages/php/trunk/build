@@ -1,0 +1,60 @@
+#!/bin/sh
+
+. config/options
+
+#setup_toolchain --optimize target
+
+
+cd $BUILD/$1*
+autoconf
+PKG_CONFIG=$LIB_PREFIX/bin/pkg-config \
+CFLAGS="-mips32r2 -D_FILE_OFFSET_BITS=64"
+CXXFLAGS="-mips32r2 -D_FILE_OFFSET_BITS=64" \
+LDFLAGS="-L$LIB_PREFIX/lib" \
+ac_cv_func_fopencookie=no \
+ac_cv_func_getaddrinfo=no \
+ac_cv_func_dlopen=no \
+ac_cv_func_iconv=yes \
+./configure \
+--host=$TARGET_NAME \
+--target=$TARGET_NAME \
+--build=$HOST_NAME \
+--prefix=$LIB_PREFIX \
+--without-pcre \
+--with-xmlrpc=shared \
+--without-bzip2 \
+--disable-zend-memory-manager \
+--without-peer \
+--enable-fast-install \
+--without-mysql \
+--disable-ipv6 \
+--with-xmlrpc \
+--disable-zend \
+--with-libxml-dir=$LIB_PREFIX \
+--without-sqlite \
+--with-config-file-path=/mnt/usb/export/etc/ \
+--with-config-file-scan-dir=/mnt/usb/export/etc/ \
+--disable-dba \
+--disable-exif \
+--disable-ftp \
+--disable-xmlreader \
+--disable-dom \
+--disable-dbase \
+--disable-embedded-mysqli \
+--disable-sockets \
+--disable-sysvsem \
+--disable-sysvshm \
+--disable-zip \
+--without-apache \
+--disable-filter \
+--disable-pdo \
+--without-pcre-regex \
+--without-pear
+
+#--with-libexpat=$LIB_PREFIX/ \
+sed -i s/"\-I\"*\/usr\/include\"*"//g Makefile
+make
+exit 2
+#ac_cv_func_libiconv=yes LDFLAGS="-ldl " \
+#make install
+

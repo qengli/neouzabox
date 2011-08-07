@@ -1,0 +1,42 @@
+#!/bin/sh
+
+. config/options
+
+NODIST="extra-codecs-nonfree gdb termcap"
+GEEXDIR=geexbox-$NEOUBOX_VERSION
+
+[ "$1" = full ] && $SCRIPTS/get
+
+mkdir $GEEXDIR
+ln -s ../AUTHORS $GEEXDIR/AUTHORS
+ln -s ../README $GEEXDIR/README
+ln -s ../COPYING $GEEXDIR/COPYING
+ln -s ../VERSION $GEEXDIR/VERSION
+ln -s ../ChangeLog $GEEXDIR/ChangeLog
+ln -s ../Makefile $GEEXDIR/Makefile
+ln -s ../DOCS $GEEXDIR/DOCS
+ln -s ../$CONFIG $GEEXDIR/$CONFIG
+ln -s ../$SCRIPTS $GEEXDIR/$SCRIPTS
+ln -s ../$PACKAGES $GEEXDIR/$PACKAGES
+ln -s ../debian $GEEXDIR/debian
+
+if [ "$1" = full ]; then
+  $SCRIPTS/clean --sources
+  mkdir -p $GEEXDIR/$SOURCES
+  for i in $SOURCES/*; do
+    DIST=yes
+    for j in $NODIST; do
+      [ ${i##*/} = $j ] && DIST=no break
+    done
+    if [ $DIST = yes ]; then
+      ln -s ../../$i $GEEXDIR/$i
+      mkdir -p $GEEXDIR/$STAMPS_NOARCH/${i##*/}
+      touch $GEEXDIR/$STAMPS_NOARCH/${i##*/}/get
+    fi
+  done
+  tar chf $GEEXDIR-full.tar --exclude CVS --exclude .svn --exclude .arch-ids $GEEXDIR
+else
+  tar chjf $GEEXDIR.tar.bz2 --exclude CVS --exclude .svn --exclude .arch-ids $GEEXDIR
+fi
+
+rm -rf $GEEXDIR

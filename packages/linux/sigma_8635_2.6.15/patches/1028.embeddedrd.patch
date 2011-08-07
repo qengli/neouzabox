@@ -1,0 +1,145 @@
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/arch/mips/kernel/setup.c linux-2.6.15/arch/mips/kernel/setup.c
+--- linux-2.6.15.ref/arch/mips/kernel/setup.c	2008-01-12 17:28:10.000000000 -0800
++++ linux-2.6.15/arch/mips/kernel/setup.c	2008-01-12 17:29:11.000000000 -0800
+@@ -102,6 +102,8 @@
+  */
+ unsigned long isa_slot_offset;
+ EXPORT_SYMBOL(isa_slot_offset);
++	
++extern void * __rd_start, * __rd_end;
+ 
+ static struct resource code_resource = { .name = "Kernel code", };
+ static struct resource data_resource = { .name = "Kernel data", };
+@@ -481,6 +483,10 @@
+ 
+ #ifdef CONFIG_BLK_DEV_INITRD
+ 	initrd_below_start_ok = 1;
++	if ((!initrd_start) && (&__rd_start != &__rd_end)) {
++		initrd_start = (unsigned long)&__rd_start;
++		initrd_end = (unsigned long)&__rd_end;
++	}
+ 	if (initrd_start) {
+ 		unsigned long initrd_size = ((unsigned char *)initrd_end) - ((unsigned char *)initrd_start);
+ 		printk("Initial ramdisk at: 0x%p (%lu bytes)\n",
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/arch/mips/kernel/vmlinux.lds.S linux-2.6.15/arch/mips/kernel/vmlinux.lds.S
+--- linux-2.6.15.ref/arch/mips/kernel/vmlinux.lds.S	2008-01-12 17:28:10.000000000 -0800
++++ linux-2.6.15/arch/mips/kernel/vmlinux.lds.S	2008-01-12 17:29:11.000000000 -0800
+@@ -54,6 +54,13 @@
+ 
+     *(.data)
+ 
++    /* Align the initial ramdisk image (INITRD) on page boundaries. */
++    . = ALIGN(4096);
++    __rd_start = .;
++    *(.initrd)
++    . = ALIGN(4096);
++    __rd_end = .;
++
+     CONSTRUCTORS
+   }
+   _gp = . + 0x8000;
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/arch/mips/Makefile linux-2.6.15/arch/mips/Makefile
+--- linux-2.6.15.ref/arch/mips/Makefile	2008-01-12 17:28:10.000000000 -0800
++++ linux-2.6.15/arch/mips/Makefile	2008-01-12 17:29:11.000000000 -0800
+@@ -802,6 +802,11 @@
+ core-$(CONFIG_TOSHIBA_RBTX4938) += arch/mips/tx4938/common/
+ load-$(CONFIG_TOSHIBA_RBTX4938) += 0xffffffff80100000
+ 
++# ramdisk/initrd support
++# You may need a compressed ramdisk image, named ramdisk.gz in
++# arch/mips/ramdisk
++core-$(CONFIG_EMBEDDED_RAMDISK) += arch/mips/ramdisk/
++
+ cflags-y			+= -Iinclude/asm-mips/mach-generic
+ drivers-$(CONFIG_PCI)		+= arch/mips/pci/
+ 
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/arch/mips/ramdisk/ld.script linux-2.6.15/arch/mips/ramdisk/ld.script
+--- linux-2.6.15.ref/arch/mips/ramdisk/ld.script	1969-12-31 16:00:00.000000000 -0800
++++ linux-2.6.15/arch/mips/ramdisk/ld.script	2008-01-12 17:29:11.000000000 -0800
+@@ -0,0 +1,9 @@
++OUTPUT_ARCH(mips)
++SECTIONS
++{
++  .initrd :
++  {
++       *(.data)
++  }
++}
++
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/arch/mips/ramdisk/Makefile linux-2.6.15/arch/mips/ramdisk/Makefile
+--- linux-2.6.15.ref/arch/mips/ramdisk/Makefile	1969-12-31 16:00:00.000000000 -0800
++++ linux-2.6.15/arch/mips/ramdisk/Makefile	2008-01-12 17:29:11.000000000 -0800
+@@ -0,0 +1,23 @@
++#
++# Makefile for a ramdisk image
++#
++# Note! Dependencies are done automagically by 'make dep', which also
++# removes any old dependencies. DON'T put your own dependencies here
++# unless it's something special (ie not a .c file).
++#
++
++ifneq ($(CONFIG_EMBEDDED_RAMDISK),)
++ifneq ($(CONFIG_EMBEDDED_RAMDISK_IMAGE),)
++IMAGENAME := $(CONFIG_EMBEDDED_RAMDISK_IMAGE)
++else
++IMAGENAME := $(SMP86XX_ROOTFS_PATH)/root_fs_mipsel.cramfs
++endif
++RDPATH := $(TOPDIR)/arch/mips/ramdisk
++O_FORMAT := $(shell $(OBJDUMP) -i | head -2 | grep elf32)
++RD_MADE := $(shell $(LD) $(LDFLAGS) -T $(RDPATH)/ld.script -b binary --oformat $(O_FORMAT) -o $(RDPATH)/ramdisk.o $(IMAGENAME))
++endif
++
++obj-$(CONFIG_EMBEDDED_RAMDISK) += ramdisk.o
++
++clean-files += ramdisk.o
++
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/drivers/block/Kconfig linux-2.6.15/drivers/block/Kconfig
+--- linux-2.6.15.ref/drivers/block/Kconfig	2008-01-12 17:28:10.000000000 -0800
++++ linux-2.6.15/drivers/block/Kconfig	2008-01-12 17:29:11.000000000 -0800
+@@ -408,6 +408,23 @@
+ 	  "real" root file system, etc. See <file:Documentation/initrd.txt>
+ 	  for details.
+ 
++config EMBEDDED_RAMDISK
++	bool "Embedded ramdisk"
++	default y
++	depends on BLK_DEV_INITRD=y && MIPS=y
++	help
++          Select this option if you want to build the ramdisk image into the
++          the final kernel binary. 
++
++config EMBEDDED_RAMDISK_IMAGE
++	string "File name of the ramdisk"
++	default ""
++	depends on EMBEDDED_RAMDISK=y
++        help
++	  This is the filename of the ramdisk image to be built into the 
++	  kernel.  Relative pathnames are relative to arch/mips/ramdisk/.
++	  The ramdisk image is not part of the kernel distribution; you must
++	  provide one yourself.
+ 
+ config CDROM_PKTCDVD
+ 	tristate "Packet writing on CD/DVD media"
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/README.1028.embeddedrd.patch linux-2.6.15/README.1028.embeddedrd.patch
+--- linux-2.6.15.ref/README.1028.embeddedrd.patch	1969-12-31 16:00:00.000000000 -0800
++++ linux-2.6.15/README.1028.embeddedrd.patch	2008-01-12 17:29:53.000000000 -0800
+@@ -0,0 +1,19 @@
++Feature:
++--------
++Support the same embedded ramdisk mechanism similar to the one
++in 2.4.x kernel.
++
++Prerequisite patch numbers:
++---------------------------
++none
++
++Primary author:
++---------------
++YH Lin
++
++Related to which chip version SMP86xx xx=?
++-----------------------------------------
++Tango2 ES6 or above
++
++(linux patches) which CONFIG_... are provided:
++----------------------------------------------

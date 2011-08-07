@@ -1,0 +1,16 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/install ppp
+
+mkdir -p $INSTALL/etc/ppp
+cp $PACKAGES/$1*/config/* $INSTALL/etc/ppp
+cp $BUILD/$1*/src/pppoe $INSTALL/sbin/
+cp $PACKAGES/$1*/scripts/pppoe-setup $INSTALL/sbin/
+cp $PACKAGES/$1*/scripts/pppoe-start $INSTALL/sbin/
+cp $PACKAGES/$1*/scripts/pppoe-stop $INSTALL/sbin/
+cp $PACKAGES/$1*/scripts/pppoe-connect $INSTALL/sbin/
+cp $PACKAGES/$1*/scripts/pppoe-status $INSTALL/sbin/
+chmod 755 $INSTALL/sbin/pppoe*
+

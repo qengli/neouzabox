@@ -1,0 +1,99 @@
+#!/bin/sh
+
+. config/options
+
+cd $ROOT/$BUILD/
+if [ ! -d 1.5mozilla -a -d mozilla ]; then
+    mv mozilla 1.5mozilla
+fi
+cd -
+
+#important 
+$SCRIPTS/fixconfigtools $BUILD/1.5$1*/build/autoconf/ 
+$SCRIPTS/fixconfigtools $BUILD/1.5$1*/nsprpub/build/autoconf/
+$SCRIPTS/fixconfigtools $BUILD/1.5$1*/directory/c-sdk/config/autoconf/
+
+#to avoid /usr/bin/libIDL2-config output uncorrect result
+export PATH=/usr/bin:/bin:$ROOT/hosttool
+
+cd $ROOT/$BUILD/1.5$1*
+sed /'a.tm_zone = NULL'/d $ROOT/$BUILD/1.5$1/nsprpub/pr/src/misc/prtime.c >$ROOT/$BUILD/1.5$1/nsprpub/pr/src/misc/prtime.tmp
+sed /'a.tm_gmtoff'/d $ROOT/$BUILD/1.5$1/nsprpub/pr/src/misc/prtime.tmp >$ROOT/$BUILD/1.5$1/nsprpub/pr/src/misc/prtime.c
+
+#added by Leo 2007-7-1 see neouzbox.doc problem 38
+#to avoid problem undefind symbol _PR_x86_AtomicSet ......
+sed -i s/"#if defined(__i386__)"/"#if defined(__xxxx__)"/ $ROOT/$BUILD/1.5$1/nsprpub/pr/include/md/_linux.h 
+
+#added by Leo 2007-7-2 to avoid assert crash , reference to doc problem #41
+sed -i /"PR_ASSERT(0 == rv)"/d $ROOT/$BUILD/1.5$1/nsprpub/pr/src/misc/prnetdb.c 
+
+#added by Leo 2007-7-12 to avoid jpeg lib caller mismatch
+THE_BOOLEAN_DEFINE=`egrep "typedef .{3,} boolean" $ROOT/$BUILD/jpeg*/jmorecfg.h` 
+sed -i s/"typedef .* boolean;"/"$THE_BOOLEAN_DEFINE"/g $ROOT/$BUILD/1.5$1/jpeg/jmorecfg.h
+
+#added by Leo 2008-5-25 
+#when build mozilla in mips arch , the nss build system can't detemain the TARGET_CPU , it use the 'uname -m' to get the cpu type , it is incorrectly obviously. the simplest way to correct it is replash the 'uname -m' shell comannd with 'mips' string.
+sed -i s/"OS_TEST\ \:=\ \$(shell\ uname\ -m)"/"OS_TEST\ \:=\ $TARGET_ARCH"/g $ROOT/$BUILD/1.5$1/security/coreconf/arch.mk 
+
+mkdir -p objdir-$MOZ_APP
+cd objdir-$MOZ_APP
+if [ "$MOZ_APP" = "xulrunner" ]; then
+	cp $ROOT/packages/mozilla/$VERSION/.mozconfig.xulrunner $ROOT/$BUILD/1.5$1/.mozconfig
+else
+	cp $ROOT/packages/mozilla/$VERSION/.mozconfig $ROOT/$BUILD/1.5$1*
+fi
+
+sed -i -e "s@\${SYSROOT_PREFIX}@${SYSROOT_PREFIX}@g" $ROOT/$BUILD/1.5$1/.mozconfig
+sed -i -e "s@\${TARGET_NAME}@${TARGET_NAME}@g" $ROOT/$BUILD/1.5$1/.mozconfig
+sed -i -e "s@\${HOST_NAME}@${HOST_NAME}@g" $ROOT/$BUILD/1.5$1/.mozconfig
+sed -i -e "s@\${ROOT}@${ROOT}@g" $ROOT/$BUILD/1.5$1/.mozconfig
+sed -i -e "s@\${LIB_PREFIX}@${LIB_PREFIX}@g" $ROOT/$BUILD/1.5$1/.mozconfig
+sed -i -e "s@\${TOOLCHAIN}@${TOOLCHAIN}@g" $ROOT/$BUILD/1.5$1/.mozconfig
+sed -i -e "s@\${BUILD_NAME}@${BUILD_NAME}@g" $ROOT/$BUILD/1.5$1/.mozconfig
+
+if [ "$JAVA" = "yes" ]; then
+        export JAVA_HOME=$ROOT/$BUILD/jdk1.5.0_14/
+        echo "ac_add_options --with-java-include-path=$JAVA_HOME/include" >>  $ROOT/$BUILD/1.5$1/.mozconfig
+else
+        echo "ac_add_options --disable-oji" >>  $ROOT/$BUILD/1.5$1/.mozconfig
+        echo "ac_add_options --disable-javaxpcom" >> $ROOT/$BUILD/1.5$1/.mozconfig
+        echo "ac_add_options --without-java" >>  $ROOT/$BUILD/1.5$1/.mozconfig
+fi    
+
+if [ "$DEBUG" = yes ]; then
+       echo "ac_add_options --enable-debug=-g" >> $ROOT/$BUILD/1.5$1/.mozconfig
+else
+       echo "ac_add_options --enable-optimize" >> $ROOT/$BUILD/1.5$1/.mozconfig
+       echo "ac_add_options --enable-strip" >> $ROOT/$BUILD/1.5$1/.mozconfig
+fi
+
+#Leo added 20070708 xulrunner needed
+if [ "$MOZ_APP" = "xulrunner" ]; then
+  #cd ..
+	#make -f ./client.mk checkout
+  #cd objdir-$MOZ_APP
+  ../configure
+  mkdir -p js/src 
+  cp $ROOT/$PACKAGES/$VDIR/jsautocfg.h js/src/ -f
+ 	make # -f client.mk build 
+else
+    ../configure 
+    mkdir -p js/src 
+    cp $ROOT/$PACKAGES/$VDIR/jsautocfg.h js/src/ -f
+    make 
+fi 
+
+#to let make use host_xpt_link
+if [ "$MOZ_APP" = "xulrunner" ]; then
+	cp -f $ROOT/$BUILD/1.5mozilla/objdir-$MOZ_APP/xpcom/typelib/xpt/tools/host_xpt_dump $ROOT/$BUILD/1.5mozilla/objdir-$MOZ_APP/xpcom/typelib/xpt/tools/xpt_dump
+	cp -f $ROOT/$BUILD/1.5mozilla/objdir-$MOZ_APP/xpcom/typelib/xpt/tools/host_xpt_link $ROOT/$BUILD/1.5mozilla/objdir-$MOZ_APP/xpcom/typelib/xpt/tools/xpt_link
+	make -C xulrunner/installer #leo added 20070708
+else
+	cp -f $ROOT/$BUILD/1.5mozilla/objdir-$MOZ_APP/xpcom/typelib/xpt/tools/host_xpt_dump $ROOT/$BUILD/1.5mozilla/objdir-$MOZ_APP/xpcom/typelib/xpt/tools/xpt_dump
+	cp -f $ROOT/$BUILD/1.5mozilla/objdir-$MOZ_APP/xpcom/typelib/xpt/tools/host_xpt_link $ROOT/$BUILD/1.5mozilla/objdir-$MOZ_APP/xpcom/typelib/xpt/tools/xpt_link
+	make -C browser/installer #leo commentted 20070630
+fi
+
+#build browser installer need enable-static option 
+#but build xulrunner cannot use enable-static options
+

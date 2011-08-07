@@ -1,0 +1,9 @@
+#!/bin/sh
+
+. config/options
+
+cp $BUILD/$1-*/pppd/pppd $INSTALL/sbin/
+chmod 755 $INSTALL/sbin/pppd
+
+#use the host tool
+#strip $INSTALL/sbin/pppd

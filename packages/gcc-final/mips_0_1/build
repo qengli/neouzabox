@@ -1,0 +1,33 @@
+#!/bin/sh
+
+. config/options
+echo ------------------------------------v
+#$SCRIPTS/install ccache toolchain
+#$SCRIPTS/install binutils toolchain #comment by Leo 2008.04.29 no need 
+#$SCRIPTS/install $TARGET_LIBC toolchain #comment by Leo 2008.04.29 no need 
+
+$SCRIPTS/unpack gcc
+
+setup_toolchain host
+#export ac_cv_path_PKG_CONFIG=no
+#export PATH=/home/leo/make/neouzabox.cur/build.i386.uClibc/toolchain/bin:/usr/kerberos/bin:/usr/local/ruby/bin:/usr/local/bin:/bin:/usr/bin:/usr/X11
+
+cd $BUILD/gcc*
+mkdir -p objdir-$1
+cd objdir-$1
+../configure --host=$HOST_NAME \
+             --build=$HOST_NAME \
+             --target=$TARGET_NAME \
+             --prefix=$ROOT/$TOOLCHAIN \
+             --with-sysroot=$SYSROOT_PREFIX \
+             --with-local-prefix=${LIB_PREFIX#$SYSROOT_PREFIX} \
+             --enable-languages=${TOOLCHAIN_LANGUAGES} \
+             --disable-__cxa_atexit \
+             --disable-libmudflap \
+             --disable-libssp \
+             --disable-shared \
+             --disable-nls
+             #--enable-threads=posix 
+#             --with-local-prefix=${LIB_PREFIX#$SYSROOT_PREFIX} \
+make
+make install

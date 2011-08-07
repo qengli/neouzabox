@@ -1,0 +1,11 @@
+--- ppp-2.4.2_cvs_20040102/pppd/Makefile.linux	2003-12-29 06:34:09.000000000 +0800
++++ ppp-2.4.2_cvs_20040102/pppd/Makefile.linux.orig	2008-01-21 19:33:29.000000000 +0800
+@@ -47,7 +47,7 @@
+ # Uncomment the next line to include support for PPP packet filtering.
+ # This requires that the libpcap library and headers be installed
+ # and that the kernel driver support PPP packet filtering.
+-FILTER=y
++#FILTER=y
+ 
+ # Uncomment the next line to enable multilink PPP (enabled by default)
+ # Linux distributions: Please leave multilink ENABLED in your builds

@@ -1,0 +1,126 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build dmalloc
+$SCRIPTS/build genxenv
+$SCRIPTS/build cramfs
+$SCRIPTS/build boot_auth
+$SCRIPTS/build samba
+
+DEST_DIR=$ROOT/$BUILD/$1/
+
+mkdir -p $BUILD/$1
+
+ln -sf /bin/busybox $ROOT/$BUILD/rootfs/init
+
+cd $BUILD/$1
+mkdir -p lib
+echo "-------------- install lib -------------------"
+cp -a \
+$SYSROOT_PREFIX/lib/ld-uClibc-0.9.27.so \
+$SYSROOT_PREFIX/lib/ld-uClibc.so.0 \
+$SYSROOT_PREFIX/lib/libcrypt-0.9.27.so \
+$SYSROOT_PREFIX/lib/libcrypt.so.0 \
+$SYSROOT_PREFIX/lib/libc.so.0 \
+$SYSROOT_PREFIX/lib/libdl-0.9.27.so \
+$SYSROOT_PREFIX/lib/libdl.so.0 \
+$SYSROOT_PREFIX/../lib/libgcc_s.so \
+$SYSROOT_PREFIX/../lib/libgcc_s.so.1 \
+$SYSROOT_PREFIX/lib/libm-0.9.27.so \
+$SYSROOT_PREFIX/lib/libm.so.0 \
+$SYSROOT_PREFIX/lib/libnsl-0.9.27.so \
+$SYSROOT_PREFIX/lib/libnsl.so.0 \
+$SYSROOT_PREFIX/lib/libpthread-0.9.27.so \
+$SYSROOT_PREFIX/lib/libpthread.so.0 \
+$SYSROOT_PREFIX/lib/libresolv-0.9.27.so \
+$SYSROOT_PREFIX/lib/libresolv.so.0 \
+$SYSROOT_PREFIX/lib/librt-0.9.27.so \
+$SYSROOT_PREFIX/lib/librt.so.0 \
+$SYSROOT_PREFIX/../lib/libstdc++.so \
+$SYSROOT_PREFIX/../lib/libstdc++.so.6 \
+$SYSROOT_PREFIX/../lib/libstdc++.so.6.0.2 \
+$SYSROOT_PREFIX/lib/libthread_db-0.9.27.so \
+$SYSROOT_PREFIX/lib/libthread_db.so.1 \
+$SYSROOT_PREFIX/lib/libuClibc-0.9.27.so \
+$SYSROOT_PREFIX/lib/libutil-0.9.27.so \
+$SYSROOT_PREFIX/lib/libutil.so.0 \
+$ROOT/$BUILD/$1/lib
+$TARGET_STRIP $ROOT/$BUILD/$1/lib/*
+
+echo "-------------- install /usr/lib -------------------"
+
+mkdir -p usr/lib
+cp -a \
+$LIB_PREFIX/lib/libncurses.so.5 \
+$LIB_PREFIX/lib/libncurses.so.5.5 \
+$LIB_PREFIX/lib/libcurses.so \
+$LIB_PREFIX/lib/libmenu.so \
+$LIB_PREFIX/lib/libmenu.so.5 \
+$LIB_PREFIX/lib/libmenu.so.5.5 \
+$LIB_PREFIX/lib/libform.so \
+$LIB_PREFIX/lib/libform.so.5 \
+$LIB_PREFIX/lib/libform.so.5.5 \
+$LIB_PREFIX/lib/libpanel.so \
+$LIB_PREFIX/lib/libpanel.so.5 \
+$LIB_PREFIX/lib/libpanel.so.5.5 \
+$ROOT/$BUILD/$1/usr/lib
+$TARGET_STRIP $ROOT/$BUILD/$1/usr/lib/*
+
+
+cp $LIB_PREFIX/lib/libdmalloc*.so $ROOT/$BUILD/$1/usr/lib
+mkdir -p usr/bin
+cp $ROOT/$BUILD/dmalloc-*/dmalloc $ROOT/$BUILD/$1/usr/bin
+$TARGET_STRIP  --remove-section=.comment --remove-section=.note -s $ROOT/$BUILD/$1/usr/bin/dmalloc
+
+
+cp $ROOT/$BUILD/genxenv/genxenv $ROOT/$BUILD/$1/usr/bin
+cp $ROOT/$BUILD/genxenv/setxenv $ROOT/$BUILD/$1/usr/bin
+
+ln -sf setxenv $ROOT/$BUILD/$1/usr/bin/unsetxenv
+cp $ROOT/$BUILD/genxenv/xbin/tobin.bash $ROOT/$BUILD/$1/usr/bin
+
+mkdir -p $ROOT/$BUILD/$1/etc 
+cp -df --preserve=mode --preserve=ownership $ROOT/$PACKAGES/$VDIR/etc/* $ROOT/$BUILD/$1/etc
+
+
+cp -fa $ROOT/$PACKAGES/$VDIR/target_generic/target_skeleton/* $ROOT/$BUILD/$1/ 
+
+mkdir -p $ROOT/$BUILD/$1/proc
+mkdir -p $ROOT/$BUILD/$1/home
+mkdir -p $ROOT/$BUILD/$1/tmp
+mkdir -p $ROOT/$BUILD/$1/var
+mkdir -p $ROOT/$BUILD/$1/mnt
+mkdir -p $ROOT/$BUILD/$1/root
+mkdir -p $ROOT/$BUILD/$1/dev
+mkdir -p $ROOT/$BUILD/$1/dev/pts
+mkdir -p $ROOT/$BUILD/$1/dev/tts
+ln -sf /tmp/log $ROOT/$BUILD/$1/dev/log 
+ln -sf ../ttyS0 $ROOT/$BUILD/$1/dev/tts/0 
+
+mkdir -p $ROOT/$BUILD/$1/sbin
+cp $ROOT/$BUILD/boot_auth/boot_auth $ROOT/$BUILD/$1/sbin/
+cp -f $ROOT/$BUILD/toolchain/bin/ldconfig $ROOT/$BUILD/$1/sbin/
+
+
+mkdir -p $ROOT/$BUILD/$1/etc/network/if-down.d
+mkdir -p $ROOT/$BUILD/$1/etc/network/if-post-down.d
+mkdir -p $ROOT/$BUILD/$1/etc/network/if-pre-up.d
+mkdir -p $ROOT/$BUILD/$1/etc/network/if-up.d
+mkdir -p $ROOT/$BUILD/$1/var/run
+mkdir -p $ROOT/$BUILD/$1/mnt/usb
+mkdir -p $ROOT/$BUILD/$1/mnt/nfs
+
+
+
+cd $ROOT
+$SCRIPTS/install busybox
+
+$SCRIPTS/install bash
+$TARGET_STRIP $ROOT/$BUILD/$1/bin/bash
+
+$ROOT/$BUILD/cramfs-*/mkcramfs -q -D $ROOT/$PACKAGES/$VDIR/target_generic/device_table.txt $ROOT/$BUILD/$1/ $ROOT/$BUILD/root_fs_mipsel.cramfs
+
+cp $ROOT/$BUILD/samba-*/source/bin/smbd $DEST_DIR/sbin/
+
+exit 2

@@ -1,0 +1,154 @@
+diff -Nur orig.DirectFB-1.0.0/systems/fbdev/fbdev.c DirectFB-1.0.0/systems/fbdev/fbdev.c
+--- orig.DirectFB-1.0.0/systems/fbdev/fbdev.c	2007-03-04 04:17:48.000000000 +0800
++++ DirectFB-1.0.0/systems/fbdev/fbdev.c	2008-06-12 16:24:15.000000000 +0800
+@@ -1482,16 +1482,17 @@
+ }
+ 
+ static int dfb_fbdev_compatible_format( struct fb_var_screeninfo *var,
+-                                        int al, int rl, int gl, int bl,
+-                                        int ao, int ro, int go, int bo )
++                                        int al, int bl, int gl, int rl,
++                                        int ao, int bo, int go, int ro )
+ {
+      int ah, rh, gh, bh;
+      int vah, vrh, vgh, vbh;
+-
+-     ah = al + ao - 1;
+-     rh = rl + ro - 1;
+-     gh = gl + go - 1;
+-     bh = bl + bo - 1;
++// 0, 5, 6, 5,
++// 0, 11, 5, 0
++     ah = al + ao - 1;//-1
++     rh = rl + ro - 1;//4
++     gh = gl + go - 1;//10
++     bh = bl + bo - 1;//15
+ 
+      vah = var->transp.length + var->transp.offset - 1;
+      vrh = var->red.length + var->red.offset - 1;
+@@ -1509,6 +1510,12 @@
+ 
+ static DFBSurfacePixelFormat dfb_fbdev_get_pixelformat( struct fb_var_screeninfo *var )
+ {
++     //Leo added 
++     //Just for qemu arm emulator system 
++     //because the DirectFB can not get the correct info from device
++     //return DSPF_RGB16;
++               printf("-+++++--  Leo  reach %s  %d  \n",__FILE__,__LINE__);
++
+      switch (var->bits_per_pixel) {
+ 
+           case 8:
+@@ -1518,57 +1525,97 @@
+                one to have correct colors)
+ 
+                if (fbdev_compatible_format( var, 0, 3, 3, 2, 0, 5, 2, 0 ))*/
++               printf("---  Leo  reach %s  %d RGB332 \n",__FILE__,__LINE__);
+ 
+-               return DSPF_RGB332;
+-
++               return DSPF_RGB332; 
+           case 15:
+                if (dfb_fbdev_compatible_format( var, 0, 5, 5, 5, 0, 10, 5, 0 ) |
+-                   dfb_fbdev_compatible_format( var, 1, 5, 5, 5,15, 10, 5, 0 ) )
++                   dfb_fbdev_compatible_format( var, 1, 5, 5, 5,15, 10, 5, 0 ) ){
++              printf("---  Leo  reach %s  %d RGB1555 \n",__FILE__,__LINE__);
+                     return DSPF_ARGB1555;
++               }
+ 
+                break;
+ 
+           case 16:
+                if (dfb_fbdev_compatible_format( var, 0, 5, 5, 5, 0, 10, 5, 0 ) |
+-                   dfb_fbdev_compatible_format( var, 1, 5, 5, 5,15, 10, 5, 0 ) )
++                   dfb_fbdev_compatible_format( var, 1, 5, 5, 5,15, 10, 5, 0 ) ){
++                   printf("---  Leo  reach %s  %d ARGB1555 \n",__FILE__,__LINE__);
++
+                     return DSPF_ARGB1555;
++               }
+ 
+                if (dfb_fbdev_compatible_format( var, 0, 4, 4, 4,  0, 8, 4, 0 ) |
+-                   dfb_fbdev_compatible_format( var, 4, 4, 4, 4, 12, 8, 4, 0 ) )
++                   dfb_fbdev_compatible_format( var, 4, 4, 4, 4, 12, 8, 4, 0 ) ){
++                   printf("---  Leo  reach %s  %d ARGB4444 \n",__FILE__,__LINE__);
++
+                     return DSPF_ARGB4444;
++               }
+ 
+-               if (dfb_fbdev_compatible_format( var, 0, 5, 6, 5, 0, 11, 5, 0 ))
+-                    return DSPF_RGB16;
++               if (dfb_fbdev_compatible_format( var, 0, 5, 6, 5, 0, 11, 5, 0 )){
++                   printf("---  Leo  reach %s  %d RGB16 \n",__FILE__,__LINE__);
+ 
++                    return DSPF_RGB16;
++               }
+                break;
+ 
+           case 18:
+-               if (dfb_fbdev_compatible_format( var, 1, 6, 6, 6, 18, 12, 6, 0 ))
++               if (dfb_fbdev_compatible_format( var, 1, 6, 6, 6, 18, 12, 6, 0 )){
++                   printf("---  Leo  reach %s  %d ARGB1666 \n",__FILE__,__LINE__);
++
+                     return DSPF_ARGB1666;
++               }
++
++               if (dfb_fbdev_compatible_format( var, 6, 6, 6, 6, 18, 12, 6, 0 )){
++                   printf("---  Leo  reach %s  %d ARGB6666 \n",__FILE__,__LINE__);
+ 
+-               if (dfb_fbdev_compatible_format( var, 6, 6, 6, 6, 18, 12, 6, 0 ))
+                     return DSPF_ARGB6666;
++               }
++
++               if (dfb_fbdev_compatible_format( var, 0, 6, 6, 6, 0, 12, 6, 0 )){
++                   printf("---  Leo  reach %s  %d RGB18 \n",__FILE__,__LINE__);
+ 
+-               if (dfb_fbdev_compatible_format( var, 0, 6, 6, 6, 0, 12, 6, 0 ))
+-                    return DSPF_RGB18;
++                    return DSPF_RGB18;}
+                break;
+ 
+           case 24:
+-               if (dfb_fbdev_compatible_format( var, 0, 8, 8, 8, 0, 16, 8, 0 ))
+-                    return DSPF_RGB24;
++               if (dfb_fbdev_compatible_format( var, 0, 8, 8, 8, 0, 16, 8, 0 )){
++                  printf("---  Leo  reach %s  %d RGB24 \n",__FILE__,__LINE__);    
++                  return DSPF_RGB24;
++               }
++                
++
+ 
+                break;
+ 
+           case 32:
+-               if (dfb_fbdev_compatible_format( var, 0, 8, 8, 8, 0, 16, 8, 0 ))
++               if (dfb_fbdev_compatible_format( var, 0, 8, 8, 8, 0, 16, 8, 0 )){
++                   printf("---  Leo  reach %s  %d RGB32 \n",__FILE__,__LINE__);
++
+                     return DSPF_RGB32;
++               }
++
++               if (dfb_fbdev_compatible_format( var, 8, 8, 8, 8, 24, 16, 8, 0 )){
++                   printf("---  Leo  reach %s  %d ARGB \n",__FILE__,__LINE__);
+ 
+-               if (dfb_fbdev_compatible_format( var, 8, 8, 8, 8, 24, 16, 8, 0 ))
+                     return DSPF_ARGB;
++               }
+ 
+                break;
+      }
+ 
++
++
++     printf( " +++++++++ Leo reach DirectFB/FBDev: Unsupported pixelformat: "
++               "rgba %d/%d, %d/%d, %d/%d, %d/%d (%dbit)\n",
++               var->red.length,    var->red.offset,
++               var->green.length,  var->green.offset,
++               var->blue.length,   var->blue.offset,
++               var->transp.length, var->transp.offset,
++               var->bits_per_pixel );
++     // rgba 5/0, 6/5, 5/11, 0/0 (16bit)
++
++
+      D_ERROR( "DirectFB/FBDev: Unsupported pixelformat: "
+                "rgba %d/%d, %d/%d, %d/%d, %d/%d (%dbit)\n",
+                var->red.length,    var->red.offset,

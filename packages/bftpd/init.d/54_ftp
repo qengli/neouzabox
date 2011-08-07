@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# start ftp server
+#
+# runlevels: neouzabox, debug
+
+# get options
+test -f /etc/network || exit 1
+. /etc/network
+
+if test "$FTP_SERVER" = "yes" -a -f /etc/bftpd.conf; then
+  echo "### Starting FTP server ###"
+  bftpd -d -c /etc/bftpd.conf &
+fi
+
+exit 0

@@ -1,0 +1,35 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build configtools toolchain
+
+$SCRIPTS/install make
+$SCRIPTS/install sed
+$SCRIPTS/install lzma
+$SCRIPTS/install pkg-config #Leo 2007-08-06
+
+$SCRIPTS/install gcc-core toolchain
+$SCRIPTS/build $TARGET_LIBC toolchain 
+$SCRIPTS/install gcc-final toolchain 
+#$SCRIPTS/clean gcc #comment 070603 #important comment just for test if can speed build and no hard 20070804 Leo
+if [ "$TARGET_LIBC" = "uClibc" ]; then #modified by Leo 20070804 to support basing on glibc
+	#$SCRIPTS/clean $TARGET_LIBC #modified by Leo 20070804 to support basing on glibc  #comment by Leo 20080805 to speed build process
+
+#added by Leo 20030313
+#if [ "$2" = full ]; then #Leo added 20070604
+        make -C $BUILD/$TARGET_LIBC*/utils #Leo added 20070806
+        #after build utils , copy these file to dest
+        cp $BUILD/$TARGET_LIBC*/utils/ldd $ROOT/$TOOLCHAIN/bin/
+        cp $BUILD/$TARGET_LIBC*/utils/ldconfig $ROOT/$TOOLCHAIN/bin/
+        cp $BUILD/$TARGET_LIBC*/utils/readelf $ROOT/$TOOLCHAIN/bin/
+#        exit 0
+#fi
+
+
+#	$SCRIPTS/build $TARGET_LIBC full #modified by Leo 20070806 to support basing on glibc
+	#$SCRIPTS/install $TARGET_LIBC full #modified by Leo 20070804 to support basing on glibc
+fi
+
+#added by Leo to fix libstrip exec mode
+chmod 755 $TOOLCHAIN/bin/libstrip

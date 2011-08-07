@@ -1,0 +1,27 @@
+#!/bin/sh
+
+. config/options
+
+KERNEL_VERSION=`sed -n 's/^.*-\([0-9]\.[0-9]\.[0-9]*\)\..*\..*$/\1/p' $ROOT/$PACKAGES/$VDIR/url`
+cd $ROOT/$BUILD/linux-$KERNEL_VERSION
+
+#sed  -e "s/@CURRENT_UID@/$(shell id -u)/;s/@CURRENT_GID@/$(shell id -g)/" .config >.config
+
+if [ ! -f .seded ]; then
+  find -name Makefile -exec sed -i s@' mipsel-linux-'@' $(CROSS_COMPILE)'@g {} \;
+  touch .seded
+fi
+
+export INSTALL_MOD_PATH=$ROOT/$BUILD/rootfs
+make dep ARCH=$TARGET_ARCH CROSS_COMPILE=$ROOT/$TOOLCHAIN/bin/$TARGET_NAME-  # -C "$LINUX"
+make vmlinux ARCH=$TARGET_ARCH CROSS_COMPILE=$ROOT/$TOOLCHAIN/bin/$TARGET_NAME-  # -C "$LINUX"
+make modules ARCH=$TARGET_ARCH CROSS_COMPILE=$ROOT/$TOOLCHAIN/bin/$TARGET_NAME-  # -C "$LINUX"
+make modules_install ARCH=$TARGET_ARCH CROSS_COMPILE=$ROOT/$TOOLCHAIN/bin/$TARGET_NAME-  # -C "$LINUX"
+
+#!important or the build tool can't find openssl and make a wrong .bin  it cannot boot. Leo added
+sed -i 's@^openssl@/usr/bin/openssl@' $ROOT/$BUILD/linux-2.6.15/scripts/build_cpu_xrpc_xload.bash
+XSDK_ROOT=$ROOT/hosttool/CPU_KEYS_SMP86xx_2008-03-05/signed_items \
+PATH=$PATH:$ROOT/hosttool/CPU_KEYS_SMP86xx_2008-03-05/xbin:/usr/bin \
+XSDK_OPENSSL=/usr/bin/openssl \
+RMCFLAGS="-DWITH_PROD=1 -DWITH_FACSPROD=1" make zbimage-linux-xrpc ARCH=$TARGET_ARCH CROSS_COMPILE=$ROOT/$TOOLCHAIN/bin/$TARGET_NAME- 
+cd -

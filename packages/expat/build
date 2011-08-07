@@ -1,0 +1,17 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+echo "|||||||||||||||||||| prepareing to build $1 |||||||||||||||||||||||"
+
+#added by Leo 2007-06-19 with this export system can build without link library to /lib
+export LD_LIBRARY_PATH=/lib/tls:${SYSROOT_PREFIX}/usr/local/lib:${SYSROOT_PREFIX}/lib
+
+cd $BUILD/$1*
+./configure --prefix=$LIB_PREFIX \
+	--host=$HOST_NAME #added by Leo 2007-06-19 info the configure it is cross compiling
+make
+make install
+

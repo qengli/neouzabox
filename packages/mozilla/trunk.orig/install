@@ -1,0 +1,49 @@
+#!/bin/sh
+
+. config/options
+
+if [ "$TARGET_LIBC" = "glibc" ]; then
+  $SCRIPTS/install libpng $*
+fi
+
+mkdir -p $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libgtk-x11-2.0.so.0 $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libgdk-x11-2.0.so.0 $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libjpeg.so.62 $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libpangoxft-1.0.so.0 $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libpangox-1.0.so.0 $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libX11.so.6 $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libXt.so.6 $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libXft.so.2 $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libXrandr.so.2 $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libXext.so.6 $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libXrender.so.1 $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libSM.so.6 $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libICE.so.6 $INSTALL/usr/lib
+
+mkdir -p $INSTALL/usr/local/
+if [ "$MOZ_APP" = "firefox" ]; then
+ cd $INSTALL/usr/local/
+ tar xzf $ROOT/$BUILD/$1/objdir/dist/firefox-*.tar.gz 
+ cp -f $ROOT/$PACKAGES/$VDIR/scripts/firefox $ROOT/$INSTALL/usr/local/firefox/
+fi
+
+if [ "$MOZ_APP" = "xulrunner" ]; then
+ cd $INSTALL/usr/local/
+ tar xzf $ROOT/$BUILD/$1/objdir/xulrunner/dist/xulrunner-*.en-US.linux-x86_32.tar.gz
+ #cp -f $ROOT/packages/mozilla/scripts/firefox $ROOT/$INSTALL/usr/local/firefox/
+fi
+
+
+
+if [ "$TARGET_LIBC" = "glibc" ]; then
+ [ -f $ROOT/hosttool/libflashplayer.so ] && mkdir -p $ROOT/$INSTALL/usr/local/$MOZ_APP/plugins && cp -f $ROOT/hosttool/libflashplayer.so $ROOT/$INSTALL/usr/local/$MOZ_APP/plugins
+ [ -f $ROOT/hosttool/libgcc_s.so.1 ] && cp -f $ROOT/hosttool/libgcc_s.so.1 $ROOT/$INSTALL/usr/lib 
+
+fi
+
+if [ "$JAVA" = "yes" ]; then
+ ln -s /usr/local/jre/plugin/i386/ns7/libjavaplugin_oji.so $ROOT/$INSTALL/usr/local/$MOZ_APP/plugins/
+fi
+
+exit 0

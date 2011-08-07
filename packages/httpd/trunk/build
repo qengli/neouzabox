@@ -1,0 +1,39 @@
+#!/bin/sh
+
+. config/options
+
+
+cp $PACKAGES/$1/$VERSION/ap_release.h $BUILD/$1*/include/
+
+cd $BUILD/$1*
+PKG_CONFIG=$LIB_PREFIX/bin/pkg-config \
+
+
+if [ $DEBUG = TRUE ]; then
+
+CFLAGS="-O0 -g -ggdb3 -DAPR_BUCKET_DEBUG"; export CFLAGS
+./configure \
+--prefix=/usr/local/gateway \
+--host=$TARGET_NAME \
+"--enable-modules=so proxy rewrite auth deflate flter ssl cgi " \
+"--disable-status" \
+--enable-maintainer-mode \
+--with-mpm=prefork
+
+else
+
+CFLAGS="-O0 -g -ggdb3 -DAPR_BUCKET_DEBUG"; export CFLAGS
+#CFLAGS="-O2 "; export CFLAGS
+./configure \
+--prefix=/usr/local/gateway \
+--host=$TARGET_NAME \
+"--enable-modules=so proxy rewrite auth deflate flter ssl cgi " \
+"--disable-status" \
+--with-mpm=worker
+
+
+
+fi
+
+make
+#make install

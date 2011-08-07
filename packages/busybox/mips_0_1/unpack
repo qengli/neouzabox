@@ -1,0 +1,18 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+BUSYBOX=`ls -d $BUILD/$1*`
+
+cat <<EOF >$BUSYBOX/Makefile.custom
+HOSTCC = $HOST_CC
+CROSS_COMPILE = $TARGET_PREFIX
+EOF
+
+cp $PACKAGES/$1/$VERSION/config/$1.conf $BUSYBOX/.config
+
+[ "$DEVTOOLS" = yes ] && cat $PACKAGES/$1/$VERSION/config/$1.devtools.conf >> $BUSYBOX/.config
+
+#make -C $BUSYBOX oldconfig

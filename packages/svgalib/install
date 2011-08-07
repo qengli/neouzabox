@@ -1,0 +1,23 @@
+#!/bin/sh
+
+. config/options
+
+mkdir -p $INSTALL/etc
+mkdir -p $INSTALL/usr/bin
+mkdir -p "`ls -d $INSTALL/lib/modules/*`/misc"
+
+cp $BUILD/$1*/kernel/svgalib_helper/svgalib_helper.ko \
+   $INSTALL/lib/modules/*/misc
+
+cp $PACKAGES/$1/config/libvga.config $INSTALL/etc
+
+case "$2" in
+  generator)
+    ;;
+
+  installator)
+    ;;
+
+  *)
+    ;;
+esac

@@ -1,0 +1,8 @@
+#!/bin/sh 
+. config/options
+
+echo extracting glibc-ports-2.5 ......
+tar xjf $SOURCES/$1/glibc-ports-2.5.tar.bz2 -C $BUILD/$1-*/
+cd $BUILD/$1-*/
+mv glibc-ports-2.5 ports
+cd -

@@ -1,0 +1,72 @@
+#!/bin/sh
+#
+# configure MPlayer's audio settings
+#
+# runlevels: neoubox, debug
+
+echo "### Configuring MPlayer's audio settings ###"
+
+# include audio configuration file
+. /etc/audio
+
+echo $ALSA_CARD | grep -q ".." || ALSA_CARD="0$ALSA_CARD"
+
+case $SOUNDCARD_MODE in
+  SPDIF)
+    ALSA_REAL_MODE=IEC958
+    ALSA_INTERFACE=plughw 
+    ;;
+  analog)
+    ALSA_REAL_MODE=DAC
+    ALSA_INTERFACE=hw
+    ;;
+esac
+
+ALSA_DEVICE=`sed -n "s/^$ALSA_CARD-\(..\): .*$ALSA_REAL_MODE.*/\1/p" /proc/asound/pcm | tail -n 1`
+[ -z "$ALSA_DEVICE" ] && ALSA_DEVICE=`grep -iv Modem /proc/asound/pcm | sed -n "s/^$ALSA_CARD-\(..\): .*playback.*/\1/p" | tail -n 1`
+[ -z "$ALSA_DEVICE" ] && ALSA_DEVICE=`sed -n "s/^$ALSA_CARD-\(..\): .*playback.*/\1/p" /proc/asound/pcm | tail -n 1`
+
+[ -n "$ALSA_DEVICE" ] && AO_DEVICE=":device=$ALSA_INTERFACE=$ALSA_CARD.$ALSA_DEVICE"
+
+# set alsa as audio output isn't forced already.
+mp_set_option ao "alsa$AO_DEVICE"
+if [ -f /usr/bin/freevo ]; then
+  freevo_set_option MPLAYER_AO_DEV "alsa$AO_DEVICE"
+fi
+
+# enable hardware AC3 output via S/PDIF if audio codec isn't forced already.
+if [ "$SOUNDCARD_MODE" = SPDIF ]; then
+  if [ "$AC3_DECODER" = ac3 ]; then
+    mp_set_option ac "hwac3,"
+  elif [ "$AC3_DECODER" = dts ]; then
+    mp_set_option ac "hwdts,"
+  elif [ "$AC3_DECODER" = ac3dts ]; then
+    mp_set_option afm "hwac3"
+  fi
+fi
+
+# don't use Master mixer channel when not available
+if [ -z "`amixer -c $ALSA_CARD simple | grep "'Master'"`" ]; then
+  sed -i 's/mixer-channel=Master//' /etc/mplayer/mplayer.conf
+fi
+
+# set number of playback channels if isn't forced already.
+mp_set_option channels "$CHANNELS"
+
+# set DVD default language
+#echo "alang=`sed 's/.*lang=\([^ ]*\).*/\1/p' /proc/cmdline | head -n 1`,en" >> /etc/mplayer/mplayer.conf #comment by Leo 2007-08-12 to prevent generate uncorrect mplayer.conf
+
+# Set suitable background movie when playing audio-only.
+for i in background-audio.avi background.avi; do
+  if [ -f /usr/share/mplayer/$i ]; then
+    mp_set_option bgvideo "/usr/share/mplayer/$i"
+    break
+  fi
+done
+
+# set softvol for VIA 8235 rev80 and SiS SI7012 rev16 cards
+if grep -q -e '0401: 1106:3059 (rev 80)' -e '0401: 13f6:0111 (rev 16)' /tmp/pci; then
+  mp_set_option softvol "yes"
+fi
+
+exit 0

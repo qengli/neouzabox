@@ -1,0 +1,36 @@
+diff -Nur fontconfig-2.3.2.orig/fc-cache/Makefile.in fontconfig-2.3.2/fc-cache/Makefile.in
+--- fontconfig-2.3.2.orig/fc-cache/Makefile.in	2005-04-28 03:08:47.000000000 +0800
++++ fontconfig-2.3.2/fc-cache/Makefile.in	2008-04-30 15:47:46.000000000 +0800
+@@ -115,7 +115,7 @@
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@
+ INSTALL_SCRIPT = @INSTALL_SCRIPT@
+ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+-LDFLAGS = @LDFLAGS@
++LDFLAGS = @LDFLAGS@ -lfreetype -lexpat -lz
+ LIBOBJS = @LIBOBJS@
+ LIBS = @LIBS@
+ LIBTOOL = @LIBTOOL@
+diff -Nur fontconfig-2.3.2.orig/fc-list/Makefile.in fontconfig-2.3.2/fc-list/Makefile.in
+--- fontconfig-2.3.2.orig/fc-list/Makefile.in	2005-04-28 03:08:49.000000000 +0800
++++ fontconfig-2.3.2/fc-list/Makefile.in	2008-04-30 15:48:05.000000000 +0800
+@@ -115,7 +115,7 @@
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@
+ INSTALL_SCRIPT = @INSTALL_SCRIPT@
+ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+-LDFLAGS = @LDFLAGS@
++LDFLAGS = @LDFLAGS@  -lfreetype -lexpat -lz
+ LIBOBJS = @LIBOBJS@
+ LIBS = @LIBS@
+ LIBTOOL = @LIBTOOL@
+diff -Nur fontconfig-2.3.2.orig/fc-match/Makefile.in fontconfig-2.3.2/fc-match/Makefile.in
+--- fontconfig-2.3.2.orig/fc-match/Makefile.in	2005-04-28 03:08:49.000000000 +0800
++++ fontconfig-2.3.2/fc-match/Makefile.in	2008-04-30 15:48:18.000000000 +0800
+@@ -115,7 +115,7 @@
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@
+ INSTALL_SCRIPT = @INSTALL_SCRIPT@
+ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+-LDFLAGS = @LDFLAGS@
++LDFLAGS = @LDFLAGS@  -lfreetype -lexpat -lz
+ LIBOBJS = @LIBOBJS@
+ LIBS = @LIBS@
+ LIBTOOL = @LIBTOOL@

@@ -1,0 +1,67 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+$SCRIPTS/build iconv-base #Leo added 2008-08-21
+setup_toolchain --optimize target
+echo "|||||||||||||||||||| prepareing to build $1 |||||||||||||||||||||||"
+echo $HOST_NAME $TARGET_NAME  $AS
+sleep 1
+cd $BUILD/$1*
+cp -f $ROOT/packages/$1/uclibc.cache .
+#export LD_LIBRARY_PATH=/lib/tls:${SYSROOT_PREFIX}/usr/local/lib:${SYSROOT_PREFIX}/lib #Leo 2008.8.21 comment
+
+if [ $VERSION = mips_sigma_8635 ]; then 
+ LD_FLAGS="-L${SYSROOT_PREFIX}/usr/local/lib:${SYSROOT_PREFIX}/lib -liconv"
+fi
+
+rm -f $SYSROOT_PREFIX/usr/local/bin/glib-genmarshal #added by Leo 2007-06-18 or the build will fail because the system want to use this file
+export LDFLAGS="$LDFLAGS -ldl " 
+if [ ! $TARGET_ARCH = mips ]; then 
+./configure --cache-file=uclibc.cache \
+	--host=$TARGET_NAME \
+	--build=$HOST_NAME \
+	--target=$TARGET_NAME \
+	--sysconfdir=$SYSROOT_PREFIX/etc \
+	--prefix=$LIB_PREFIX \
+	--with-libiconv=native  \
+	--enable-threads=yes \
+	--disable-man 
+#	--with-libiconv=native 
+else
+echo glib_cv_uscore=no>>$TARGET_ARCH-linux.cache
+echo ac_cv_func_posix_getpwuid_r=yes>>$TARGET_ARCH-linux.cache
+echo ac_cv_func_posix_getgrgid_r=yes>>$TARGET_ARCH-linux.cache
+echo glib_cv_stack_grows=no>>$TARGET_ARCH-linux.cache
+./configure --cache-file=$TARGET_ARCH-linux.cache \
+	--host=$TARGET_NAME \
+	--build=$HOST_NAME \
+	--target=$TARGET_NAME \
+	--sysconfdir=$SYSROOT_PREFIX/etc \
+	--prefix=$LIB_PREFIX \
+	--with-libiconv=native  \
+	--enable-threads=yes \
+	--disable-man 
+
+
+fi
+make
+
+make install
+
+#added by Leo 20070803
+#mplayer plugin used it
+cp -f $ROOT/$BUILD/$1-*/gthread/.libs/libgthread-2.0.so.0 $ROOT/$BUILD/iso/NEOUBOX/usr/lib
+
+cat > ${SYSROOT_PREFIX}/usr/local/bin/glib-config <<EOF
+#!/bin/sh
+${SYSROOT_PREFIX}/usr/local/bin/pkg-config glib-2.0 \$*
+EOF
+chmod 755 ${SYSROOT_PREFIX}/usr/local/bin/glib-config
+
+cat > ${SYSROOT_PREFIX}/usr/local/bin/gmodule-config <<EOF
+#!/bin/sh
+${SYSROOT_PREFIX}/usr/local/bin/pkg-config gmodule-2.0 \$*
+EOF
+chmod 755 ${SYSROOT_PREFIX}/usr/local/bin/gmodule-config

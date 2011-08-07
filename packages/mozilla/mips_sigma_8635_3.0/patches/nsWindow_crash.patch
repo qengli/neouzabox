@@ -1,0 +1,12 @@
+--- build.mipsel.uClibc/3mozilla/widget/src/gtk2/nsWindow.ori	2008-09-03 13:38:46.000000000 +0800
++++ build.mipsel.uClibc/3mozilla/widget/src/gtk2/nsWindow.cpp	2008-09-03 13:40:42.000000000 +0800
+@@ -3925,6 +3925,9 @@
+     if (!top_window)
+         return;
+ 
++    //Leo add for mips
++    return;
++
+     // Try to get a pointer to gdk_window_set_urgency_hint
+     PRLibrary* lib;
+     _gdk_window_set_urgency_hint_fn _gdk_window_set_urgency_hint = nsnull;

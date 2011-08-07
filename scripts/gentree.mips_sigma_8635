@@ -1,0 +1,149 @@
+#!/bin/sh
+
+. config/options
+echo "|||||||||||||||||||||||||||| install dir = $INSTALL |||||||||||||||||||||||||||"
+if [ "$2" != boot ]; then
+  mkdir -p $INSTALL/sbin
+  mkdir -p $INSTALL/etc/init.d
+  mkdir -p $INSTALL/codecs
+  mkdir -p $INSTALL/firmwares
+  cp $CONFIG/init $INSTALL/sbin
+echo "++++++++++++++++++++gentree with $1+++++++++++++++++++++++++++++++"
+#  cp -i $PACKAGES/*/init.d/* $INSTALL/etc/init.d/
+#  modified by Leo 070606 to avoid the cp problem of above in Redhat ES AS 4
+#  the following is comment by Leo 
+#for  d in $(find $PACKAGES -name 'init.d' -type d -maxdepth 2)
+#do
+        #cp $d/* $INSTALL/etc/init.d/
+#done
+
+  cp $CONFIG/file_ext $INSTALL/etc
+  cp $CONFIG/list_ext $INSTALL/etc
+  #$SCRIPTS/install alsa $1
+  #$SCRIPTS/install tvout $1
+  #$SCRIPTS/install theme $1
+  if [ "$NETWORK" = yes ]; then
+    $SCRIPTS/install webgui $1 #modified by Leo 20060227
+    $SCRIPTS/install bftpd
+  fi
+
+ if [ ! $TARGET_ARCH = mips ]; then  
+  $SCRIPTS/install pciutils $1
+  [ "$MPLAYER" = yes ] && $SCRIPTS/install MPlayer $1
+  $SCRIPTS/install i18n $1
+ #$SCRIPTS/install sleeptimer $1
+  #$SCRIPTS/install cpufreqd $1
+  [ "$NETWORK" = yes ] && $SCRIPTS/install network $1
+  #[ "$VIEW_IMG" = yes ] && $SCRIPTS/install fbi $1
+  [ "$GDB" = yes ] && $SCRIPTS/install gdb $1 #modified by Leo 20060302 "$DEBUG" = yes
+  [ "$MPLAYER" = yes ] && [ "$EXTRACODECS" = yes ] && $SCRIPTS/install extra-codecs-nonfree $1
+fi
+
+#added by Leo shared lib version need these so file when system run. 2006-03-07
+  $SCRIPTS/install zlib
+  $SCRIPTS/build pkgconfig 
+
+  #$SCRIPTS/build linux
+
+  #Added by Leo 2006-03-02
+  if [ "$KONQUEROR" = yes ]; then
+	$SCRIPTS/install qt- $1
+	$SCRIPTS/build qtopia $1 #Leo added 2007-6-15
+	$SCRIPTS/build expat $1
+	$SCRIPTS/install konqueror $1
+  fi 
+
+  #Added by Leo 2007-06-16
+  if [ "$MOZILLA" = yes ]; then
+	GTK=yes
+	X11=yes
+  fi 
+
+  if [ "$GTK_FB" = no -a "$GTK" = yes ]; then
+	X11=yes
+  fi 
+
+#  if [ "$GTK" = yes -o "$GTK_FB" = yes ]; then
+#	$SCRIPTS/install freetype 
+#  fi 
+
+
+  #Added by Leo 2007-06-25
+  if [ "$X11" = yes ]; then
+	$SCRIPTS/build expat $1
+	$SCRIPTS/install freetype
+	$SCRIPTS/install fontconfig 
+	$SCRIPTS/install xc $1
+  fi 
+
+  #Added by Leo 2007-06-13
+  if [ "$GTK" = yes -o "$GTK_FB" = yes ]; then
+        $SCRIPTS/install libpng
+	$SCRIPTS/build gettext $1
+	$SCRIPTS/install cairo $1 #
+  $SCRIPTS/build iconv-base $1 #
+	$SCRIPTS/install glib $1
+	$SCRIPTS/install atk $1
+	$SCRIPTS/install pango $1
+	$SCRIPTS/install gtk $1
+  fi 
+
+  [ "$JAVA" = yes ] && $SCRIPTS/install jdk $1
+
+  if [ "$MOZILLA" = yes ]; then
+	$SCRIPTS/build libIDL $1
+	$SCRIPTS/install mozilla
+  fi 
+
+#  [ "$GALE" = yes ] && $SCRIPTS/install gale $1 #2008-1-9
+
+  #added by Leo 20071114
+  #add for vlc suport
+#  if [ "$VLC" = yes ]; then
+#       $SCRIPTS/build vlc 
+#  fi
+
+  #added by Leo 20080112
+#  if [ "$PPPOE" = yes -a $TARGET_LIBC = glibc ]; then
+#       $SCRIPTS/install rp-pppoe
+#  fi
+#  [ "$VIAFB" = yes ] && $SCRIPTS/install viafb $1
+  
+# VER=`ls $INSTALL/lib/modules`
+#  $BUILD/module-init-tool*/depmod -b $INSTALL -v $VER > /dev/null
+#  for i in `ls $INSTALL/lib/modules/*/modules.* | grep -v modules.dep`; do
+#    rm -f $i
+#  done
+
+#  if [ $INSTALLATOR = "yes" ]; then
+#  	#Leo 2007-07-15 added
+#  	echo " ======================== make cramfs .....============="
+#        mkdir -p $INSTALL/installator/
+#	$SCRIPTS/install installator $1
+#        chmod 755 $INSTALL/usr/bin/*  #Leo added 20080129
+# 	mkcramfs $INSTALL/usr $INSTALL/installator/usr.img
+#	#mkcramfs $INSTALL/lib $INSTALL/installator/lib.img
+#    
+#  fi
+    echo "|||||||||||||||||||||||||||||||||| gentree lzma ||||||||||||||||||||||"
+    tar cf - -C $INSTALL lib usr/bin usr/lib | lzma e $INSTALL/bin.tar.lzma -si -a2
+ 
+ 
+ #uncommented by Leo 2007-07-15 for debug
+ #rm -rf $INSTALL/lib $INSTALL/usr/bin $INSTALL/usr/lib
+fi
+
+if [ "$2" = boot -o "$2" = full ]; then
+echo "|||||||||||||||||||| install linux image ||||||||||"
+  $SCRIPTS/install linux image $1
+echo "|||||||||||||||||||| install initrd ||||||||||"
+   if [ $INSTALLATOR = "yes" ]; then
+        echo "===== install installed initrd ============="
+  	$SCRIPTS/install initrd installed
+   fi
+ $SCRIPTS/install initrd $1
+echo "|||||||||||||||||||| install syslinux ||||||||||"
+  $SCRIPTS/install syslinux $1
+echo "|||||||||||||||||||| install yaboot ||||||||||"
+  $SCRIPTS/install yaboot $1
+fi

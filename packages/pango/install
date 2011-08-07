@@ -1,0 +1,23 @@
+#!/bin/sh
+
+. config/options
+
+#Leo added 2007-06-13
+mkdir -p $INSTALL/usr/bin
+
+# commentted by Leo 20070702 querymodules have been delelted 
+#and module.conf is generated manually so this file is not needed
+#cp -f $SYSROOT_PREFIX/usr/local/bin/pango-querymodules  $INSTALL/usr/bin
+
+mkdir -p $INSTALL/etc/pango/modules
+cp -fr $ROOT/$BUILD/$1*/modules/*/.libs/*.so $INSTALL/etc/pango/modules
+#cp -fr  $SYSROOT_PREFIX/usr/local/lib/pango/*/modules $INSTALL/etc/pango
+cp $PACKAGES/$1/config/pango.modules $INSTALL/etc/pango
+mkdir -p $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+
+#Leo added 2007-08-04
+if [ ! $TARGET_ARCH = mips ]; then
+  cp -f $BUILD/$1*/pango/.libs/libpangocairo-1.0.so.0 $INSTALL/usr/lib
+  cp -f $BUILD/$1*/pango/.libs/libpangoft2-1.0.so.0 $INSTALL/usr/lib
+fi
+exit 0

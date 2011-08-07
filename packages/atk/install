@@ -1,0 +1,10 @@
+#!/bin/sh 
+
+. config/options
+
+#if [ "$TARGET_LIBC" = uClibc ]; then 
+#fi
+
+cp -f $ROOT/$BUILD/atk-*/atk/.libs/libatk-1.0.so.0 $INSTALL/usr/lib
+
+exit 0

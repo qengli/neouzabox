@@ -1,0 +1,26 @@
+#define KDriveXServer YES
+#define Freetype2Dir  [SYSROOT]/usr/local
+#define TinyXServer YES
+#define BuildFreeType YES
+#undef FontServerAccess 
+#define FontServerAccess YES 
+#define XfbdevServer		YES
+#undef CrossCompiling	
+#define CrossCompiling		YES
+#define ProjectRoot             [SYSROOT]/usr/X11R6
+#define XInputDrivers		mouse keyboard
+
+#define HasFreetype2		YES
+#define HasFontconfig		YES
+#define HasLibpng		YES
+#define HasZlib			YES
+#define IncRoot [SYSROOT]/usr/include
+#define LibDir [SYSROOT]/usr/lib
+
+#define SystemUsrIncDir [SYSROOT]/usr/include
+#define SystemUsrLibDir [SYSROOT]/usr/lib
+#define BuildFonts	NO
+#define BuildGLULibrary NO
+#define FontDir	/usr/share/X11/fonts
+
+#define NothingOutsideProjectRoot YES

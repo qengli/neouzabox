@@ -1,0 +1,11 @@
+--- vlc-0.8.6c/modules/audio_output/alsa.c.orig	2008-01-11 17:42:24.000000000 +0800
++++ vlc-0.8.6c/modules/audio_output/alsa.c	2008-01-11 17:43:14.000000000 +0800
+@@ -325,6 +325,8 @@
+         free( p_sys );
+         return VLC_EGENERIC;
+     }
++   
++    psz_device = strdup("hw:0,0");
+ 
+     /* Choose the IEC device for S/PDIF output:
+        if the device is overriden by the user then it will be the one

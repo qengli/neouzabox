@@ -1,0 +1,23 @@
+diff -Nur orig-qt/configure qt-2.3.7/configure
+--- orig-qt/configure	2006-03-01 16:54:34.000000000 +0800
++++ qt-2.3.7/configure	2006-03-01 17:00:32.000000000 +0800
+@@ -97,7 +97,8 @@
+ 	echo "Type 'no' to decline this license offer."
+ 	echo
+ 	echo "Do you accept the terms of the license?"
+-	read acceptance
++	#read acceptance modified by Leo 20060301
++	acceptance=yes
+ 	if [ "$acceptance" = yes ]
+ 	then
+ 	    break
+@@ -839,7 +840,8 @@
+ then
+     echo
+     echo "Enable Qt Virtual Framebuffer support for development on X11 (default yes)"
+-    read QWS_QVFB
++    #read QWS_QVFB #Leo modified 20060301
++    QWS_QVFB=n
+     if [ "$QWS_QVFB" != n -a "$QWS_QVFB" != no ]
+     then
+ 	QWS_QVFB=y

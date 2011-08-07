@@ -1,0 +1,64 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+#setup_toolchain target
+
+cd $BUILD/$1*
+
+if [ ! $TARGET_ARCH = mips ]; then
+./configure --prefix=$LIB_PREFIX --with-default-fonts=/usr/share/fonts --with-confdir=/etc/fonts --sysconfdir=/etc \
+	--build=$HOST_NAME  #added by Leo 2007-06-19 info the configure it is cross compiling
+
+else
+setup_toolchain target
+CXXFLAGS=""
+CFLAGS=""
+#export LDFLAGS="$LDFLAGS -lfreetype -lexpat "
+./configure --prefix=$LIB_PREFIX --with-default-fonts=/usr/share/fonts --with-confdir=/etc/fonts --sysconfdir=/etc \
+ --build=$HOST_NAME	--host=$TARGET_NAME
+#--with-expat-includes=$LIB_PREFIX/include \
+#  --with-expat-lib=$LIB_PREFIX/lib
+
+
+fi
+#--sysconfdir=$SYSROOT_PREFIX/etc --prefix=$LIB_PREFIX 
+make
+#make install
+
+mkdir -p $SYSROOT_PREFIX/usr/lib
+
+if [ $TARGET_ARCH = i386 ]; then
+  BUILDLIBS=.libs
+else
+  BUILDLIBS=.
+fi
+
+cp -f $ROOT/$BUILD/$1*/fc-cache/$BUILDLIBS/fc-cache $SYSROOT_PREFIX/usr/local/bin
+cp -f $ROOT/$BUILD/$1*/fc-list/$BUILDLIBS/fc-list $SYSROOT_PREFIX/usr/local/bin
+cp -f $ROOT/$BUILD/$1*/fc-match/$BUILDLIBS/fc-match $SYSROOT_PREFIX/usr/local/bin
+mkdir -p $SYSROOT_PREFIX/etc/fonts/conf.d/
+cp -f $ROOT/$BUILD/$1*/fonts.dtd $SYSROOT_PREFIX/etc/fonts
+cp -f $ROOT/$BUILD/$1*/fonts.conf $SYSROOT_PREFIX/etc/fonts
+cp -f $ROOT/$BUILD/$1*/conf.d/*.conf $SYSROOT_PREFIX/etc/fonts/conf.d
+mkdir -p $SYSROOT_PREFIX/usr/local/include/fontconfig
+cp -f $ROOT/$BUILD/$1*/fontconfig/*.h $SYSROOT_PREFIX/usr/local/include/fontconfig
+mkdir -p $SYSROOT_PREFIX/usr/local/lib
+cp -f $ROOT/$BUILD/$1*/src/.libs/libfontconfig.a $SYSROOT_PREFIX/usr/local/lib
+cp -f $ROOT/$BUILD/$1*/src/.libs/libfontconfig.la $SYSROOT_PREFIX/usr/local/lib
+if [ ! $TARGET_ARCH = mips ]; then
+  cp -f $ROOT/$BUILD/$1*/src/.libs/libfontconfig.so.1.0.4 $SYSROOT_PREFIX/usr/local/lib
+  cd $SYSROOT_PREFIX/usr/local/lib
+  ln -sf libfontconfig.so.1.0.4 libfontconfig.so.1
+  ln -sf libfontconfig.so.1.0.4 libfontconfig.so
+
+  #added by Leo 2007-6-30
+  #gtk with X11 need it
+  mkdir -p $SYSROOT_PREFIX/usr/local/lib/.libs
+  ln -sf $SYSROOT_PREFIX/usr/local/lib/libfontconfig.so.1.0.4 .libs/libfontconfig.so
+fi
+
+cd -
+cp -f $ROOT/$BUILD/$1*/fontconfig.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+

@@ -1,0 +1,19 @@
+--- vlc-0.8.6c/mozilla/vlcshell.cpp.orig	2007-06-16 22:25:19.000000000 +0800
++++ vlc-0.8.6c/mozilla/vlcshell.cpp	2008-01-09 16:38:27.000000000 +0800
+@@ -274,11 +274,15 @@
+     return NPERR_NO_ERROR;
+ }
+ 
+-jref NPP_GetJavaClass( void )
++//added by Leo to avoid not found symbol at runtime
++void * NPP_GetJavaClass( void );
++
++void * NPP_GetJavaClass( void )
+ {
+     return NULL;
+ }
+ 
++
+ void NPP_Shutdown( void )
+ {
+     ;

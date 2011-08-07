@@ -1,0 +1,19 @@
+#!/bin/sh
+
+. config/options
+
+cd $BUILD/$1*
+if [ ! -f configure ]; then
+ ./buildconf
+fi
+./configure \
+  --build=$HOST_NAME \
+	--host=$TARGET_NAME \
+	--prefix=$LIB_PREFIX \
+
+make
+
+make install
+
+#added by Leo 20070803
+#mplayer plugin used it

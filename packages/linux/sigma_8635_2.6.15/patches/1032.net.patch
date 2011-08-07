@@ -1,0 +1,87 @@
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/net/ipv4/ipconfig.c linux-2.6.15/net/ipv4/ipconfig.c
+--- linux-2.6.15.ref/net/ipv4/ipconfig.c	2006-01-25 20:52:05.000000000 -0800
++++ linux-2.6.15/net/ipv4/ipconfig.c	2007-10-03 11:11:01.000000000 -0700
+@@ -542,6 +542,8 @@
+ 	u8 exten[312];		/* DHCP options / BOOTP vendor extensions */
+ };
+ 
++static char ic_serv_name[64];   /* sname */
++
+ /* packet ops */
+ #define BOOTP_REQUEST	1
+ #define BOOTP_REPLY	2
+@@ -954,6 +956,7 @@
+ 				/* Let's accept that offer. */
+ 				ic_myaddr = b->your_ip;
+ 				ic_servaddr = server_id;
++				strncpy(ic_serv_name, b->serv_name, sizeof(b->serv_name));
+ #ifdef IPCONFIG_DEBUG
+ 				printk("DHCP: Offered address %u.%u.%u.%u",
+ 				       NIPQUAD(ic_myaddr));
+@@ -980,6 +983,7 @@
+ 				/* Urque.  Forget it*/
+ 				ic_myaddr = INADDR_NONE;
+ 				ic_servaddr = INADDR_NONE;
++				memset(ic_serv_name, 0, sizeof(ic_serv_name));
+ 				goto drop_unlock;
+ 			};
+ 
+@@ -1003,6 +1007,7 @@
+ 	ic_dev = dev;
+ 	ic_myaddr = b->your_ip;
+ 	ic_servaddr = b->server_ip;
++	strncpy(ic_serv_name, b->serv_name, sizeof(b->serv_name));
+ 	if (ic_gateway == INADDR_NONE && b->relay_ip)
+ 		ic_gateway = b->relay_ip;
+ 	if (ic_nameservers[0] == INADDR_NONE)
+@@ -1248,6 +1253,7 @@
+ static int __init ip_auto_config(void)
+ {
+ 	u32 addr;
++	int retries = CONF_OPEN_RETRIES;
+ 
+ #ifdef CONFIG_PROC_FS
+ 	proc_net_fops_create("pnp", S_IRUGO, &pnp_seq_fops);
+@@ -1285,8 +1291,6 @@
+ 	    ic_first_dev->next) {
+ #ifdef IPCONFIG_DYNAMIC
+ 	
+-		int retries = CONF_OPEN_RETRIES;
+-
+ 		if (ic_dynamic() < 0) {
+ 			ic_close_devs();
+ 
+@@ -1366,8 +1370,9 @@
+ 	printk(", addr=%u.%u.%u.%u", NIPQUAD(ic_myaddr));
+ 	printk(", mask=%u.%u.%u.%u", NIPQUAD(ic_netmask));
+ 	printk(", gw=%u.%u.%u.%u", NIPQUAD(ic_gateway));
+-	printk(",\n     host=%s, domain=%s, nis-domain=%s",
+-	       system_utsname.nodename, ic_domain, system_utsname.domainname);
++	printk(",\n     host=%s, domain=%s, nis-domain=%s sname=%s",
++	       system_utsname.nodename, ic_domain, 
++	       system_utsname.domainname, ic_serv_name);
+ 	printk(",\n     bootserver=%u.%u.%u.%u", NIPQUAD(ic_servaddr));
+ 	printk(", rootserver=%u.%u.%u.%u", NIPQUAD(root_server_addr));
+ 	printk(", rootpath=%s", root_server_path);
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/README.1032.net.patch linux-2.6.15/README.1032.net.patch
+--- linux-2.6.15.ref/README.1032.net.patch	1969-12-31 16:00:00.000000000 -0800
++++ linux-2.6.15/README.1032.net.patch	2007-10-03 11:15:33.000000000 -0700
+@@ -0,0 +1,18 @@
++Feature:
++--------
++From customers, fixing DHCP boot problem.
++
++Prerequisite patch numbers:
++---------------------------
++none
++
++Primary author:
++---------------
++External
++
++Related to which chip version SMP86xx xx=?
++-----------------------------------------
++all
++
++(linux patches) which CONFIG_... are provided:
++----------------------------------------------

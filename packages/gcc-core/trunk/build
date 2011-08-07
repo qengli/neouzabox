@@ -1,0 +1,26 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/install ccache
+#$SCRIPTS/install binutils
+$SCRIPTS/build $TARGET_LIBC-headers
+$SCRIPTS/unpack gcc
+setup_toolchain host
+
+cd $BUILD/gcc*
+mkdir -p objdir-$1
+cd objdir-$1
+../configure --host=$HOST_NAME \
+             --build=$HOST_NAME \
+             --target=$TARGET_NAME \
+             --prefix=$ROOT/$TOOLCHAIN \
+             --with-sysroot=$SYSROOT_PREFIX \
+             --with-local-prefix=${LIB_PREFIX#$SYSROOT_PREFIX} \
+             --enable-languages=c \
+             --disable-libmudflap \
+             --disable-libssp \
+             --disable-shared \
+             --with-newlib \
+             --disable-nls
+make

@@ -1,0 +1,26 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+echo "|||||||||||||||||||| prepareing to build $1 |||||||||||||||||||||||"
+
+cd $BUILD/$1*
+
+CFLAGS=-DFT_FREETYPE_H; ./configure --build=$HOST_NAME \
+	--host=$TARGET_NAME \
+	--disable-glibtest \
+	--without-libtiff \
+	--disable-glibtest \
+	--enable-fbmanager \
+	--disable-xim \
+	--disable-xkb \
+	--disable-modules \
+	--without-query-immodules \
+	--prefix=$LIB_PREFIX 
+make
+make install
+#	--x-includes=../xc/exports/include \
+#	--x-libraries=../xc/exports/lib \
+

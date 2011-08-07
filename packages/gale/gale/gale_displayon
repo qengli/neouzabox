@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# 
+# gale_displayon    This file functions is that the display is alway on.
+#
+# Author:        Scott Zeng 
+#
+
+timeout=1100
+log="/var/log/gale.log"
+xsetmouse="/usr/bin/xsetmouse"
+
+glog() {
+    echo -e "`date`, $*." >> $log
+}
+
+if [ ! -f $xsetmouse ]; then
+    glog "no xsetmouse"
+    exit 1
+fi
+
+while [ true ]
+do
+    sleep $timeout
+    $xsetmouse 1920 1280
+done
+	
+

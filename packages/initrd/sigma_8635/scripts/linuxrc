@@ -1,0 +1,133 @@
+#!/bin/sh
+busybox echo "linuxrc start..."
+
+busybox mount -t ramfs none /ramfs
+usybox mkdir -p /ramfs/bin
+busybox mkdir -p /ramfs/sbin
+busybox mkdir -p /ramfs/lib
+busybox mkdir -p /ramfs/dev
+busybox mkdir -p /ramfs/sbin
+busybox mkdir -p /ramfs/usr
+busybox mkdir /ramfs/initrd
+#busybox pivot_root /ramfs /ramfs/initrd
+busybox mkdir -p /proc /sys /usr/bin /usr/sbin
+busybox mount -t proc none /proc
+busybox mount -t sysfs none /sys
+busybox --install -s
+
+echo neouzabox > /proc/sys/kernel/hostname
+#echo 0 > /proc/sys/dev/cdrom/autoclose
+#echo 0 > /proc/sys/dev/cdrom/lock
+
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
+export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib/:./
+export DISPLAY=10.10.11.1:0
+progress() {
+  if test -f /proc/splash; then
+    echo "show $1" > /proc/splash
+  fi
+  echo "### $2 ###"
+}
+
+progress 8000 "setting up ramfs tree"
+mkdir -p /dev
+mkdir -p /mnt
+mkdir -p /tmp
+mkdir -p /var/run
+mkdir -p /var/log
+mkdir -p /var/lock
+
+echo -n "" > /etc/mtab
+echo -n "" > /etc/fstab
+echo -n "" > /etc/mnts
+
+UDEVD_EXPECTED_SEQNUM=$(($(cat /sys/kernel/hotplug_seqnum) + 1)) \
+udevd --daemon
+
+udevstart
+echo /sbin/udevsend > /proc/sys/kernel/hotplug
+
+grep -q installator /proc/cmdline && INSTALLATOR=yes
+grep -q debugging /proc/cmdline && DEBUG=yes
+BOOT=`sed 's/.*boot=\([^\ ]*\).*/\1/' /proc/cmdline`
+
+if test "$BOOT" = nfs; then
+  progress 11000 "getting nfs tree"
+  NFS=`sed 's/.*nfsroot=\([^\ ]*\).*/\1/' /proc/cmdline`
+  NEOUZABOX=/nfs
+  mkdir -p $NEOUZABOX
+  udhcpc -q -H neouzabox -n && mount -t nfs -o ro,nolock,nfsvers=2 $NFS $NEOUZABOX
+  if [ ! -f "$NEOUZABOX/bin.tar.lzma" ]; then
+    umount $NEOUZABOX
+    rmdir $NEOUZABOX
+    NEOUZABOX=
+  fi
+fi
+
+ifconfig lo up
+ifconfig eth0 10.10.11.100 netmask 255.255.255.0 up
+telnetd
+/sbin/bftpd -d
+route add default gw 10.10.11.1
+for i in 0 1 2 3 4 5 6 7; do
+/bin/sh
+done
+
+progress 12000 "searching cdrom drives boot=$BOOT"
+if [ "$BOOT" = cdrom ]; then
+  #added by Leo for some external usb cdrom ,we should wait some time till the kernel found them 2007-09-07
+  for i in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18; do
+    for DEV in `grep '^/dev/cdrom' /etc/mnts | cut -f1`; do
+      CDROM=`grep "^$DEV	" /etc/mnts | cut -f2-`
+      progress 12100 "dev=$DEV  cdrom=$CDROM"
+      if [ -d "$CDROM/NEOUBOX" ]; then
+        NEOUZABOX="$CDROM/NEOUBOX"
+        ln -s "$DEV" /dev/cdrom
+	progress 12300 "found cdrom drives $NEOUZABOX"
+        break
+      fi
+    done
+    [ -n "$NEOUZABOX" ] && break
+    sleep 1
+  done
+fi
+[ ! -e /dev/cdrom -a -b /dev/cdrom1 ] && ln -s /dev/cdrom1 /dev/cdrom
+
+if test -n "$NEOUZABOX" ; then
+  INIT=/sbin/init
+else
+  INIT=/sbin/nosystem
+  progress 65535 "cleaning ram disk"
+fi
+
+if test "$BOOT" = nfs; then
+  if test "$INSTALLATOR" = yes; then
+    export NFS="$NEOUZABOX"
+  elif test -n "$NEOUZABOX"; then
+    umount "$NEOUZABOX"
+  fi
+fi
+
+if test "$BOOT" = cdrom; then
+  export CDROM="${NEOUZABOX%/NEOUBOX}"
+fi
+
+RUNLEVEL="neouzabox"
+if test "$INSTALLATOR" = yes; then
+  RUNLEVEL="install"
+elif test "$DEBUG" = yes; then
+  RUNLEVEL="debug"
+fi
+
+if test "$DEBUG" = yes; then
+  /sbin/console </dev/tty2 >/dev/tty2 2>&1 &
+fi
+/bin/sh $INIT $RUNLEVEL </dev/tty1 >/dev/tty1 2>&1
+
+if test "$INSTALLATOR" = yes -o $? = 64; then
+  reboot
+else
+  echo "(cdrom)I am being power off ... "
+  sleep 25
+  poweroff
+fi

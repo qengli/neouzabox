@@ -1,0 +1,22 @@
+diff -r 974208590746 libvo/Makefile
+--- a/libvo/Makefile	Sun Apr 30 16:54:29 2006 +0200
++++ b/libvo/Makefile	Sun Apr 30 16:54:29 2006 +0200
+@@ -9,7 +14,6 @@ SRCS=aclib.c \
+                video_out.c \
+                vo_mpegpes.c \
+                vo_null.c \
+-               vo_yuv4mpeg.c \
+                $(VO_SRCS) \
+ 
+ SRCS_MPLAYER-$(VIDIX)          +=  vosub_vidix.c
+diff -r 974208590746 libvo/video_out.c
+--- a/libvo/video_out.c	Sun Apr 30 16:54:29 2006 +0200
++++ b/libvo/video_out.c	Sun Apr 30 16:54:29 2006 +0200
+@@ -249,7 +238,6 @@ vo_functions_t* video_out_drivers[] =
+         &video_out_xvmc,
+ #endif
+ 	&video_out_mpegpes,
+-	&video_out_yuv4mpeg,
+ #ifdef HAVE_PNG
+ 	&video_out_png,
+ #endif	

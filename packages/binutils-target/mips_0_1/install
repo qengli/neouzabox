@@ -1,0 +1,6 @@
+#!/bin/sh
+
+. config/options
+
+make -C $BUILD/$1*/objdir install
+cp $PACKAGES/$1/$VERSION/scripts/libstrip $TOOLCHAIN/bin

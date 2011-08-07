@@ -1,0 +1,7 @@
+#!/bin/sh 
+
+. config/options
+
+mkdir -p $ROOT/$BUILD/rootfs/lib
+cp $LIB_PREFIX/lib/libdmalloc*.so $ROOT/$BUILD/rootfs/lib
+exit 0

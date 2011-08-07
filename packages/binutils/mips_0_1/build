@@ -1,0 +1,33 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/install ccache
+
+setup_toolchain host
+
+cd $BUILD/$1*
+mkdir -p objdir
+cd objdir
+
+if [ $TARGET_ARCH = "mips" ]; then
+
+../configure --host=$HOST_NAME \
+             --target=$TARGET_NAME \
+             --prefix=$ROOT/$TOOLCHAIN \
+             --with-sysroot=$SYSROOT_PREFIX \
+             --disable-werror \
+             --disable-nls
+make configure-host
+else
+
+../configure --host=$HOST_NAME \
+             --build=$HOST_NAME \
+             --target=$TARGET_NAME \
+             --prefix=$ROOT/$TOOLCHAIN \
+             --with-sysroot=$SYSROOT_PREFIX \
+             --disable-werror \
+             --disable-nls
+
+fi
+make

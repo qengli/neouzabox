@@ -1,0 +1,732 @@
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/arch/mips/configs/tango2_defconfig linux-2.6.15/arch/mips/configs/tango2_defconfig
+--- linux-2.6.15.ref/arch/mips/configs/tango2_defconfig	2006-10-12 10:24:30.000000000 -0700
++++ linux-2.6.15/arch/mips/configs/tango2_defconfig	2006-10-12 10:28:24.000000000 -0700
+@@ -344,7 +344,81 @@
+ #
+ # Memory Technology Devices (MTD)
+ #
+-# CONFIG_MTD is not set
++CONFIG_MTD=y
++# CONFIG_MTD_DEBUG is not set
++CONFIG_MTD_CONCAT=y
++CONFIG_MTD_PARTITIONS=y
++# CONFIG_MTD_REDBOOT_PARTS is not set
++# CONFIG_MTD_CMDLINE_PARTS is not set
++
++#
++# User Modules And Translation Layers
++#
++CONFIG_MTD_CHAR=y
++CONFIG_MTD_BLOCK=y
++# CONFIG_FTL is not set
++# CONFIG_NFTL is not set
++# CONFIG_INFTL is not set
++# CONFIG_RFD_FTL is not set
++
++#
++# RAM/ROM/Flash chip drivers
++#
++CONFIG_MTD_CFI=y
++# CONFIG_MTD_JEDECPROBE is not set
++CONFIG_MTD_GEN_PROBE=y
++# CONFIG_MTD_CFI_ADV_OPTIONS is not set
++CONFIG_MTD_MAP_BANK_WIDTH_1=y
++CONFIG_MTD_MAP_BANK_WIDTH_2=y
++CONFIG_MTD_MAP_BANK_WIDTH_4=y
++# CONFIG_MTD_MAP_BANK_WIDTH_8 is not set
++# CONFIG_MTD_MAP_BANK_WIDTH_16 is not set
++# CONFIG_MTD_MAP_BANK_WIDTH_32 is not set
++CONFIG_MTD_CFI_I1=y
++CONFIG_MTD_CFI_I2=y
++# CONFIG_MTD_CFI_I4 is not set
++# CONFIG_MTD_CFI_I8 is not set
++CONFIG_MTD_CFI_INTELEXT=y
++CONFIG_MTD_CFI_AMDSTD=y
++CONFIG_MTD_CFI_AMDSTD_RETRY=0
++CONFIG_MTD_CFI_STAA=y
++CONFIG_MTD_CFI_UTIL=y
++# CONFIG_MTD_RAM is not set
++# CONFIG_MTD_ROM is not set
++# CONFIG_MTD_ABSENT is not set
++
++#
++# Mapping drivers for chip access
++#
++CONFIG_MTD_PHYSMAP=y
++# CONFIG_MTD_PLATRAM is not set
++
++#
++# Self-contained MTD device drivers
++#
++# CONFIG_MTD_PMC551 is not set
++# CONFIG_MTD_SLRAM is not set
++# CONFIG_MTD_PHRAM is not set
++# CONFIG_MTD_MTDRAM is not set
++# CONFIG_MTD_BLKMTD is not set
++# CONFIG_MTD_BLOCK2MTD is not set
++
++#
++# Disk-On-Chip Device Drivers
++#
++# CONFIG_MTD_DOC2000 is not set
++# CONFIG_MTD_DOC2001 is not set
++# CONFIG_MTD_DOC2001PLUS is not set
++
++#
++# NAND Flash Device Drivers
++#
++# CONFIG_MTD_NAND is not set
++
++#
++# OneNAND Flash Device Drivers
++#
++# CONFIG_MTD_ONENAND is not set
+ 
+ #
+ # Parallel port support
+@@ -905,6 +979,8 @@
+ # CONFIG_BEFS_FS is not set
+ # CONFIG_BFS_FS is not set
+ # CONFIG_EFS_FS is not set
++# CONFIG_JFFS_FS is not set
++# CONFIG_JFFS2_FS is not set
+ CONFIG_CRAMFS=y
+ # CONFIG_VXFS_FS is not set
+ # CONFIG_HPFS_FS is not set
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/arch/mips/configs/tango3_defconfig linux-2.6.15/arch/mips/configs/tango3_defconfig
+--- linux-2.6.15.ref/arch/mips/configs/tango3_defconfig	2006-10-12 10:24:30.000000000 -0700
++++ linux-2.6.15/arch/mips/configs/tango3_defconfig	2006-10-12 10:28:24.000000000 -0700
+@@ -339,7 +339,81 @@
+ #
+ # Memory Technology Devices (MTD)
+ #
+-# CONFIG_MTD is not set
++CONFIG_MTD=y
++# CONFIG_MTD_DEBUG is not set
++CONFIG_MTD_CONCAT=y
++CONFIG_MTD_PARTITIONS=y
++# CONFIG_MTD_REDBOOT_PARTS is not set
++# CONFIG_MTD_CMDLINE_PARTS is not set
++
++#
++# User Modules And Translation Layers
++#
++CONFIG_MTD_CHAR=y
++CONFIG_MTD_BLOCK=y
++# CONFIG_FTL is not set
++# CONFIG_NFTL is not set
++# CONFIG_INFTL is not set
++# CONFIG_RFD_FTL is not set
++
++#
++# RAM/ROM/Flash chip drivers
++#
++CONFIG_MTD_CFI=y
++# CONFIG_MTD_JEDECPROBE is not set
++CONFIG_MTD_GEN_PROBE=y
++# CONFIG_MTD_CFI_ADV_OPTIONS is not set
++CONFIG_MTD_MAP_BANK_WIDTH_1=y
++CONFIG_MTD_MAP_BANK_WIDTH_2=y
++CONFIG_MTD_MAP_BANK_WIDTH_4=y
++# CONFIG_MTD_MAP_BANK_WIDTH_8 is not set
++# CONFIG_MTD_MAP_BANK_WIDTH_16 is not set
++# CONFIG_MTD_MAP_BANK_WIDTH_32 is not set
++CONFIG_MTD_CFI_I1=y
++CONFIG_MTD_CFI_I2=y
++# CONFIG_MTD_CFI_I4 is not set
++# CONFIG_MTD_CFI_I8 is not set
++CONFIG_MTD_CFI_INTELEXT=y
++CONFIG_MTD_CFI_AMDSTD=y
++CONFIG_MTD_CFI_AMDSTD_RETRY=0
++CONFIG_MTD_CFI_STAA=y
++CONFIG_MTD_CFI_UTIL=y
++# CONFIG_MTD_RAM is not set
++# CONFIG_MTD_ROM is not set
++# CONFIG_MTD_ABSENT is not set
++
++#
++# Mapping drivers for chip access
++#
++CONFIG_MTD_PHYSMAP=y
++# CONFIG_MTD_PLATRAM is not set
++
++#
++# Self-contained MTD device drivers
++#
++# CONFIG_MTD_PMC551 is not set
++# CONFIG_MTD_SLRAM is not set
++# CONFIG_MTD_PHRAM is not set
++# CONFIG_MTD_MTDRAM is not set
++# CONFIG_MTD_BLKMTD is not set
++# CONFIG_MTD_BLOCK2MTD is not set
++
++#
++# Disk-On-Chip Device Drivers
++#
++# CONFIG_MTD_DOC2000 is not set
++# CONFIG_MTD_DOC2001 is not set
++# CONFIG_MTD_DOC2001PLUS is not set
++
++#
++# NAND Flash Device Drivers
++#
++# CONFIG_MTD_NAND is not set
++
++#
++# OneNAND Flash Device Drivers
++#
++# CONFIG_MTD_ONENAND is not set
+ 
+ #
+ # Parallel port support
+@@ -899,6 +973,8 @@
+ # CONFIG_BEFS_FS is not set
+ # CONFIG_BFS_FS is not set
+ # CONFIG_EFS_FS is not set
++# CONFIG_JFFS_FS is not set
++# CONFIG_JFFS2_FS is not set
+ CONFIG_CRAMFS=y
+ # CONFIG_VXFS_FS is not set
+ # CONFIG_HPFS_FS is not set
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/drivers/mtd/chips/cfi_cmdset_0002.c linux-2.6.15/drivers/mtd/chips/cfi_cmdset_0002.c
+--- linux-2.6.15.ref/drivers/mtd/chips/cfi_cmdset_0002.c	2006-01-25 20:51:27.000000000 -0800
++++ linux-2.6.15/drivers/mtd/chips/cfi_cmdset_0002.c	2006-10-12 11:54:46.000000000 -0700
+@@ -407,6 +407,22 @@
+  * correctly and is therefore not done	(particulary with interleaved chips
+  * as each chip must be checked independantly of the others).
+  */
++#ifdef CONFIG_TANGOX
++/* For TANGOX, verify content in start address as well */
++static int __xipram chip_ready(struct map_info *map, unsigned long addr, unsigned long start, map_word z_val)
++{
++	map_word d, t, z;
++
++	d = map_read(map, addr);
++	mb();
++	t = map_read(map, addr);
++	mb();
++	z = map_read(map, start);
++	mb();
++
++	return map_word_equal(map, d, t) && map_word_equal(map, z, z_val);
++}
++#else
+ static int __xipram chip_ready(struct map_info *map, unsigned long addr)
+ {
+ 	map_word d, t;
+@@ -416,6 +432,7 @@
+ 
+ 	return map_word_equal(map, d, t);
+ }
++#endif
+ 
+ /*
+  * Return true if the chip is ready and has the correct value.
+@@ -449,6 +466,9 @@
+ 	struct cfi_private *cfi = map->fldrv_priv;
+ 	unsigned long timeo;
+ 	struct cfi_pri_amdstd *cfip = (struct cfi_pri_amdstd *)cfi->cmdset_priv;
++#ifdef CONFIG_TANGOX
++	map_word z_val = map_read(map, chip->start);
++#endif
+ 
+  resettime:
+ 	timeo = jiffies + HZ;
+@@ -457,8 +477,13 @@
+ 
+ 	case FL_STATUS:
+ 		for (;;) {
++#ifdef CONFIG_TANGOX
++			if (chip_ready(map, adr, chip->start, z_val))
++				break;
++#else
+ 			if (chip_ready(map, adr))
+ 				break;
++#endif
+ 
+ 			if (time_after(jiffies, timeo)) {
+ 				printk(KERN_ERR "Waiting for chip to be ready timed out.\n");
+@@ -487,6 +512,12 @@
+ 		      || (mode == FL_WRITING && (cfip->EraseSuspend & 0x1))))
+ 			goto sleep;
+ 
++		/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++		 * Sentivision FIX: map_write here whole flash operation freeze on VIP1216 STB.
++		 *   So we just will sleep waitting for state change: */
++		goto sleep;
++		/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
++
+ 		/* We could check to see if we're trying to access the sector
+ 		 * that is currently being erased. However, no user will try
+ 		 * anything like that so we just wait for the timeout. */
+@@ -499,8 +530,13 @@
+ 		chip->state = FL_ERASE_SUSPENDING;
+ 		chip->erase_suspended = 1;
+ 		for (;;) {
++#ifdef CONFIG_TANGOX
++			if (chip_ready(map, adr, chip->start, z_val))
++				break;
++#else
+ 			if (chip_ready(map, adr))
+ 				break;
++#endif
+ 
+ 			if (time_after(jiffies, timeo)) {
+ 				/* Should have suspended the erase by now.
+@@ -956,6 +992,9 @@
+ 	int ret = 0;
+ 	map_word oldd;
+ 	int retry_cnt = 0;
++#ifdef CONFIG_TANGOX
++	map_word z_val;
++#endif
+ 
+ 	adr += chip->start;
+ 
+@@ -975,6 +1014,9 @@
+ 	 * data at other locations when 0xff is written to a location that
+ 	 * already contains 0xff.
+ 	 */
++#ifdef CONFIG_TANGOX
++	z_val = ((adr == chip->start) ? datum : map_read(map, chip->start));
++#endif
+ 	oldd = map_read(map, adr);
+ 	if (map_word_equal(map, oldd, datum)) {
+ 		DEBUG( MTD_DEBUG_LEVEL3, "MTD %s(): NOP\n",
+@@ -1013,15 +1055,25 @@
+ 			continue;
+ 		}
+ 
+-		if (time_after(jiffies, timeo) && !chip_ready(map, adr)){
++#ifdef CONFIG_TANGOX
++		if (time_after(jiffies, timeo) && !chip_ready(map, adr, chip->start, z_val))
++#else
++		if (time_after(jiffies, timeo) && !chip_ready(map, adr))
++#endif
++		{
+ 			xip_enable(map, chip, adr);
+ 			printk(KERN_WARNING "MTD %s(): software timeout\n", __func__);
+ 			xip_disable(map, chip, adr);
+ 			break;
+ 		}
+ 
++#ifdef CONFIG_TANGOX
++		if (chip_ready(map, adr, chip->start, z_val))
++			break;
++#else
+ 		if (chip_ready(map, adr))
+ 			break;
++#endif
+ 
+ 		/* Latency issues. Drop the lock, wait a while and retry */
+ 		UDELAY(map, chip, adr, 1);
+@@ -1204,6 +1256,9 @@
+ 	unsigned long cmd_adr;
+ 	int z, words;
+ 	map_word datum;
++#ifdef CONFIG_TANGOX
++	map_word z_val;
++#endif
+ 
+ 	adr += chip->start;
+ 	cmd_adr = adr;
+@@ -1224,6 +1279,9 @@
+ 	ENABLE_VPP(map);
+ 	xip_disable(map, chip, cmd_adr);
+ 
++#ifdef CONFIG_TANGOX
++	z_val = ((adr == chip->start) ? datum : map_read(map, chip->start));
++#endif
+ 	cfi_send_gen_cmd(0xAA, cfi->addr_unlock1, chip->start, map, cfi, cfi->device_type, NULL);
+ 	cfi_send_gen_cmd(0x55, cfi->addr_unlock2, chip->start, map, cfi, cfi->device_type, NULL);
+ 	//cfi_send_gen_cmd(0xA0, cfi->addr_unlock1, chip->start, map, cfi, cfi->device_type, NULL);
+@@ -1274,10 +1332,20 @@
+ 			continue;
+ 		}
+ 
++#ifdef CONFIG_TANGOX
++		if (time_after(jiffies, timeo) && !chip_ready(map, adr, chip->start, z_val))
++			break;
++#else
+ 		if (time_after(jiffies, timeo) && !chip_ready(map, adr))
+ 			break;
++#endif
+ 
+-		if (chip_ready(map, adr)) {
++#ifdef CONFIG_TANGOX
++		if (chip_ready(map, adr, chip->start, z_val)) 
++#else
++		if (chip_ready(map, adr)) 
++#endif
++		{
+ 			xip_enable(map, chip, adr);
+ 			goto op_done;
+ 		}
+@@ -1395,6 +1463,10 @@
+ 	unsigned long int adr;
+ 	DECLARE_WAITQUEUE(wait, current);
+ 	int ret = 0;
++#ifdef CONFIG_TANGOX
++	map_word z_val;
++	z_val.x[0] = ((map->bankwidth == 1) ? 0xff : 0xffff);
++#endif
+ 
+ 	adr = cfi->addr_unlock1;
+ 
+@@ -1447,8 +1519,13 @@
+ 			chip->erase_suspended = 0;
+ 		}
+ 
++#ifdef CONFIG_TANGOX
++		if (chip_ready(map, adr, chip->start, z_val))
++			break;
++#else
+ 		if (chip_ready(map, adr))
+ 			break;
++#endif
+ 
+ 		if (time_after(jiffies, timeo)) {
+ 			printk(KERN_WARNING "MTD %s(): software timeout\n",
+@@ -1483,6 +1560,9 @@
+ 	unsigned long timeo = jiffies + HZ;
+ 	DECLARE_WAITQUEUE(wait, current);
+ 	int ret = 0;
++#ifdef CONFIG_TANGOX
++	map_word z_val;
++#endif
+ 
+ 	adr += chip->start;
+ 
+@@ -1496,6 +1576,13 @@
+ 	DEBUG( MTD_DEBUG_LEVEL3, "MTD %s(): ERASE 0x%.8lx\n",
+ 	       __func__, adr );
+ 
++#ifdef CONFIG_TANGOX
++	if (adr == chip->start)
++		z_val.x[0] = ((map->bankwidth == 1) ? 0xff : 0xffff);
++	else
++		z_val = map_read(map, chip->start);
++#endif
++
+ 	XIP_INVAL_CACHED_RANGE(map, adr, len);
+ 	ENABLE_VPP(map);
+ 	xip_disable(map, chip, adr);
+@@ -1529,13 +1616,18 @@
+ 			continue;
+ 		}
+ 		if (chip->erase_suspended) {
+-			/* This erase was suspended and resumed.
++		/* This erase was suspended and resumed.
+ 			   Adjust the timeout */
+ 			timeo = jiffies + (HZ*20); /* FIXME */
+ 			chip->erase_suspended = 0;
+ 		}
+ 
+-		if (chip_ready(map, adr)) {
++#ifdef CONFIG_TANGOX
++		if (chip_ready(map, adr, chip->start, z_val))
++#else
++		if (chip_ready(map, adr)) 
++#endif
++		{
+ 			xip_enable(map, chip, adr);
+ 			break;
+ 		}
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/drivers/mtd/maps/Kconfig linux-2.6.15/drivers/mtd/maps/Kconfig
+--- linux-2.6.15.ref/drivers/mtd/maps/Kconfig	2006-01-25 20:51:27.000000000 -0800
++++ linux-2.6.15/drivers/mtd/maps/Kconfig	2006-10-12 10:28:25.000000000 -0700
+@@ -6,14 +6,14 @@
+ 
+ config MTD_COMPLEX_MAPPINGS
+ 	bool "Support non-linear mappings of flash chips"
+-	depends on MTD
++	depends on MTD && TANGOX_XENV_READ!=y
+ 	help
+ 	  This causes the chip drivers to allow for complicated
+ 	  paged mappings of flash chips.
+ 
+ config MTD_PHYSMAP
+ 	tristate "CFI Flash device in physical memory map"
+-	depends on MTD_CFI
++	depends on MTD_CFI 
+ 	help
+ 	  This provides a 'mapping' driver which allows the CFI probe and
+ 	  command set driver code to communicate with flash chips which
+@@ -24,7 +24,7 @@
+ 
+ config MTD_PHYSMAP_START
+ 	hex "Physical start address of flash mapping"
+-	depends on MTD_PHYSMAP
++	depends on MTD_PHYSMAP && TANGOX_XENV_READ!=y
+ 	default "0x8000000"
+ 	help
+ 	  This is the physical memory location at which the flash chips
+@@ -36,7 +36,7 @@
+ 
+ config MTD_PHYSMAP_LEN
+ 	hex "Physical length of flash mapping"
+-	depends on MTD_PHYSMAP
++	depends on MTD_PHYSMAP && TANGOX_XENV_READ!=y
+ 	default "0x4000000"
+ 	help
+ 	  This is the total length of the mapping of the flash chips on
+@@ -48,9 +48,9 @@
+ 	  Ignore this option if you use run-time physmap configuration
+ 	  (i.e., run-time calling physmap_configure()).
+ 
+-config MTD_PHYSMAP_BANKWIDTH
++config MTD_PHYSMAP_BANKWIDTH 
+ 	int "Bank width in octets"
+-	depends on MTD_PHYSMAP
++	depends on MTD_PHYSMAP && TANGOX_XENV_READ!=y
+ 	default "2"
+ 	help
+ 	  This is the total width of the data bus of the flash devices
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/drivers/mtd/maps/physmap.c linux-2.6.15/drivers/mtd/maps/physmap.c
+--- linux-2.6.15.ref/drivers/mtd/maps/physmap.c	2006-01-25 20:51:27.000000000 -0800
++++ linux-2.6.15/drivers/mtd/maps/physmap.c	2006-10-12 10:28:25.000000000 -0700
+@@ -21,6 +21,52 @@
+ #include <linux/mtd/partitions.h>
+ #include <linux/mtd/physmap.h>
+ 
++#if defined(CONFIG_TANGOX) && defined(CONFIG_TANGOX_XENV_READ)
++
++#ifdef CONFIG_TANGO2
++#include <asm/tango2/emhwlib_registers_tango2.h>
++#include <asm/tango2/tango2_gbus.h>
++#elif defined(CONFIG_TANGO3)
++#include <asm/tango3/emhwlib_registers_tango3.h>
++#include <asm/tango3/tango3_gbus.h>
++#endif
++
++#define XENV_MAX_FLASH    4
++#define XENV_MAX_FLASH_PARTITIONS   16
++static struct mtd_info *mymtds[XENV_MAX_FLASH] = { NULL, NULL, NULL, NULL };
++static struct mtd_partition *mtd_parts[XENV_MAX_FLASH] = { NULL, NULL, NULL, NULL };
++static unsigned int p_cnts[XENV_MAX_FLASH] = { 0, 0, 0, 0 };
++static unsigned int f_sizes[XENV_MAX_FLASH] = { 0, 0, 0, 0 };
++
++struct map_info physmap_maps[XENV_MAX_FLASH] = {
++	{
++		.name = "CS0: Physically mapped flash",
++		.phys = 0x40000000,
++		.size = 0, /* To be filled by XENV */
++		.bankwidth = 2, /* To be checked by PBI registers */
++	},
++	{
++		.name = "CS1: Physically mapped flash",
++		.phys = 0x44000000,
++		.size = 0, /* To be filled by XENV */
++		.bankwidth = 2, /* To be checked by PBI registers */
++	},
++	{
++		.name = "CS2: Physically mapped flash",
++		.phys = 0x48000000,
++		.size = 0, /* To be filled by XENV */
++		.bankwidth = 2, /* To be checked by PBI registers */
++	},
++	{
++		.name = "CS3: Physically mapped flash",
++		.phys = 0x4c000000,
++		.size = 0, /* To be filled by XENV */
++		.bankwidth = 2, /* To be checked by PBI registers */
++	},
++};
++int tangox_flash_get_info(int cs, unsigned int *size, unsigned int *part_count);
++int tangox_flash_get_parts(int cs, unsigned int offset[], unsigned int size[]);
++#else
+ static struct mtd_info *mymtd;
+ 
+ struct map_info physmap_map = {
+@@ -45,12 +91,124 @@
+ 	num_physmap_partitions=num_parts;
+ }
+ #endif /* CONFIG_MTD_PARTITIONS */
++#endif /* CONFIG_TANGOX && CONFIG_TANGOX_XENV_READ */
+ 
+ static int __init init_physmap(void)
+ {
+ 	static const char *rom_probe_types[] = { "cfi_probe", "jedec_probe", "map_rom", NULL };
+ 	const char **type;
+ 
++#if defined(CONFIG_TANGOX) && defined(CONFIG_TANGOX_XENV_READ)
++	int cs;
++	int part_num = 0;
++	unsigned long csconfig = gbus_read_uint32(pGBus, REG_BASE_host_interface + PB_CS_config) & 0xf;
++
++	for (cs = 0; cs < XENV_MAX_FLASH; cs++) {
++		
++		/* Check XENV for availability */
++		f_sizes[cs] = p_cnts[cs] = 0;
++
++		tangox_flash_get_info(cs, &f_sizes[cs], &p_cnts[cs]);
++		if (f_sizes[cs] == 0)
++			continue;
++		else {
++			physmap_maps[cs].size = f_sizes[cs];
++			physmap_maps[cs].bankwidth = ((csconfig >> cs) & 0x1) ? 1 : 2;
++		}
++
++		printk(KERN_NOTICE "physmap flash device CS%d: %lx at %lx\n", 
++				cs, physmap_maps[cs].size, physmap_maps[cs].phys);
++		physmap_maps[cs].virt = ioremap(physmap_maps[cs].phys, physmap_maps[cs].size);
++
++		if (!physmap_maps[cs].virt) {
++			printk("Failed to ioremap\n");
++			continue;
++		}
++
++		simple_map_init(&physmap_maps[cs]);
++
++		mymtds[cs] = NULL;
++		type = rom_probe_types;
++		for(; !mymtds[cs] && *type; type++) {
++			mymtds[cs] = do_map_probe(*type, &physmap_maps[cs]);
++		}
++
++		if (mymtds[cs] && (mymtds[cs]->size != f_sizes[cs])) { 
++			/* Redo ioremap if size specified is not the same as detected */ 
++			iounmap((void *)physmap_maps[cs].virt);
++			physmap_maps[cs].size = mymtds[cs]->size;
++			physmap_maps[cs].virt = ioremap(physmap_maps[cs].phys, physmap_maps[cs].size);
++
++			if (!physmap_maps[cs].virt) { 
++				printk(KERN_NOTICE "Failed to ioremap at 0x%08lx, size 0x%08lx\n", 
++						physmap_maps[cs].phys, physmap_maps[cs].size);
++				continue;
++			} 
++			printk(KERN_NOTICE "CS%d: flash size mismatched, re-do probing/initialization.\n", cs);
++			printk(KERN_NOTICE "physmap flash device CS%d: %lx at %lx (remapped %x)\n", 
++					cs, physmap_maps[cs].size, physmap_maps[cs].phys, (u32)physmap_maps[cs].virt);
++
++			/* Re-do initialization */
++			simple_map_init(&physmap_maps[cs]);
++			mymtds[cs] = NULL;
++			type = rom_probe_types;
++			for(; !mymtds[cs] && *type; type++) {
++				mymtds[cs] = do_map_probe(*type, &physmap_maps[cs]);
++			}
++		}
++
++		if (mymtds[cs]) {
++			mymtds[cs]->owner = THIS_MODULE;
++			add_mtd_device(mymtds[cs]);
++			part_num++;
++
++#ifdef CONFIG_MTD_PARTITIONS
++			if (p_cnts[cs] > 0) {
++				int p, pcnt;
++				struct mtd_partition *part_ptr;
++				unsigned int offsets[XENV_MAX_FLASH_PARTITIONS];
++				unsigned int szs[XENV_MAX_FLASH_PARTITIONS];
++
++				if ((mtd_parts[cs] = (struct mtd_partition *)kmalloc(
++						sizeof(struct mtd_partition) * p_cnts[cs], GFP_KERNEL)) == NULL) {
++					printk(KERN_NOTICE "Out of memory.\n");
++					return -ENOMEM;
++				}
++				memset(mtd_parts[cs], 0, sizeof(struct mtd_partition) * p_cnts[cs]);
++				tangox_flash_get_parts(cs, offsets, szs);
++
++				printk(KERN_NOTICE "Using physmap partition definition\n");
++
++				/* Initialize each partition */
++				for (pcnt = 0, part_ptr = mtd_parts[cs], p = 0; p < p_cnts[cs]; p++) {
++					if (((szs[p] & 0x7fffffff) + offsets[p]) > physmap_maps[cs].size) {
++						printk(KERN_NOTICE "CS%d-Part%d (offset:0x%x, size:0x%x) outside physical map, removed.\n", 
++								cs, p + 1, offsets[p], szs[p] & 0x7fffffff);
++							continue;
++					}
++					part_ptr->size = szs[p] & 0x7fffffff;
++					part_ptr->offset = offsets[p];
++					if (part_ptr->size & 0x80000000)
++						part_ptr->mask_flags = MTD_WRITEABLE;
++					part_ptr->name = (char *)kmalloc(16, GFP_KERNEL); 
++					if (part_ptr->name != NULL) 
++						sprintf(part_ptr->name, "CS%d-Part%d", cs, p + 1);
++					pcnt++;
++					part_ptr++;
++				}
++				p_cnts[cs] = pcnt;
++
++				if (p_cnts[cs] > 0) {
++					printk(KERN_NOTICE "Adding partition #%d-#%d\n", part_num, part_num + p_cnts[cs] - 1);
++					add_mtd_partitions(mymtds[cs], mtd_parts[cs], p_cnts[cs]);
++					part_num += p_cnts[cs];
++				}
++			}
++#endif
++		}
++	}
++	return 0;
++#else
+        	printk(KERN_NOTICE "physmap flash device: %lx at %lx\n", physmap_map.size, physmap_map.phys);
+ 	physmap_map.virt = ioremap(physmap_map.phys, physmap_map.size);
+ 
+@@ -95,10 +253,35 @@
+ 
+ 	iounmap(physmap_map.virt);
+ 	return -ENXIO;
++#endif /* CONFIG_TANGOX && CONFIG_TANGOX_XENV_READ */
+ }
+ 
+ static void __exit cleanup_physmap(void)
+ {
++#if defined(CONFIG_TANGOX) && defined(CONFIG_TANGOX_XENV_READ)
++	int cs, p;
++	struct mtd_partition *part_ptr;
++
++	for (cs = 0; cs < XENV_MAX_FLASH; cs++) {
++		if (f_sizes[cs] != 0) {
++			if (p_cnts[cs] != 0) {
++				for (part_ptr = mtd_parts[cs], p = 0; p < p_cnts[cs]; p++, part_ptr++) {
++					if (part_ptr->name) {
++						kfree(part_ptr->name);
++						part_ptr->name = NULL;
++					}
++				}
++				del_mtd_partitions(mymtds[cs]);
++				kfree(mtd_parts[cs]);
++				mtd_parts[cs] = NULL;
++			}
++			del_mtd_device(mymtds[cs]);
++			map_destroy(mymtds[cs]);
++			iounmap(physmap_maps[cs].virt);
++			physmap_maps[cs].virt = NULL;
++		}
++	}
++#else
+ #ifdef CONFIG_MTD_PARTITIONS
+ 	if (mtd_parts_nb) {
+ 		del_mtd_partitions(mymtd);
+@@ -115,6 +298,7 @@
+ 
+ 	iounmap(physmap_map.virt);
+ 	physmap_map.virt = NULL;
++#endif /* CONFIG_TANGOX && CONFIG_TANGOX_XENV_READ */
+ }
+ 
+ module_init(init_physmap);
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/README.1007.mtd.patch linux-2.6.15/README.1007.mtd.patch
+--- linux-2.6.15.ref/README.1007.mtd.patch	1969-12-31 16:00:00.000000000 -0800
++++ linux-2.6.15/README.1007.mtd.patch	2006-10-12 11:55:20.000000000 -0700
+@@ -0,0 +1,19 @@
++Feature:
++--------
++Customization of MTD layer for SMP863x/SMP865x
++
++Prerequisite patch numbers:
++---------------------------
++0000
++1000
++
++Primary author:
++---------------
++YH Lin
++
++Related to which chip version SMP86xx xx=?
++------------------------------------------
++Tango2 ES6/RevA or above, or Tango3 ES1 or above
++
++(linux patches) which CONFIG_... are provided:
++----------------------------------------------

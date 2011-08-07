@@ -1,0 +1,11 @@
+#!/bin/sh
+
+. config/options
+
+mkdir -p $ROOT/$TOOLCHAIN/bin
+cp $BUILD/$1*/$1 $ROOT/$TOOLCHAIN/bin
+
+#added by Leo 2008-1-19
+mkdir -p $SYSROOT_PREFIX/usr/local/bin
+cp $BUILD/$1*/$1 $SYSROOT_PREFIX/usr/local/bin
+

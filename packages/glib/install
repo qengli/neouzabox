@@ -1,0 +1,12 @@
+#!/bin/sh 
+
+. config/options
+
+#if [ "$TARGET_LIBC" = uClibc ]; then 
+#fi
+
+cp -f $ROOT/$BUILD/glib-*/gobject/.libs/libgobject-2.0.so.0 $INSTALL/usr/lib
+cp -f $ROOT/$BUILD/glib-*/glib/.libs/libglib-2.0.so.0 $INSTALL/usr/lib
+cp -f $ROOT/$BUILD/glib-*/gmodule/.libs/libgmodule-2.0.so.0 $INSTALL/usr/lib
+
+exit 0

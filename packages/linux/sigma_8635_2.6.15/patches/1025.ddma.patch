@@ -1,0 +1,611 @@
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/arch/mips/tangox/prom.c linux-2.6.15/arch/mips/tangox/prom.c
+--- linux-2.6.15.ref/arch/mips/tangox/prom.c	2008-01-18 18:23:08.000000000 -0800
++++ linux-2.6.15/arch/mips/tangox/prom.c	2008-01-18 18:29:37.000000000 -0800
+@@ -12,6 +12,7 @@
+ #include <asm/bootinfo.h>
+ #include <asm/page.h>
+ #include <linux/module.h>
++#include <linux/mm.h>
+ 
+ #include "setup.h"
+ 
+@@ -762,3 +763,67 @@
+ EXPORT_SYMBOL(max_remap_size);
+ #endif
+ 
++#ifdef CONFIG_SD_DIRECT_DMA
++
++/* Given an address and length, determine if this area is physically contiguous or not, and
++   return the physical address of starting point, caller needs to ensure the page_table is
++   locked so no change is allowed. */
++int is_contiguous_memory(void __user *userbuf, unsigned int len, unsigned long *physaddr)
++{
++	pgd_t *pgd;
++	pud_t *pud;
++	pmd_t *pmd;
++	pte_t *pte;
++	unsigned long start = (unsigned long)userbuf;
++	unsigned long paddr, ppaddr;
++	unsigned long start_pg_addr, start_pg_offset, end_pg_addr, pg_addr;
++	struct mm_struct *mm = current->mm;
++	int ret = 0;
++
++//printk("%s:%d: start=0x%08lx, len=0x%x\n", __FILE__, __LINE__, start, len);
++
++	*physaddr = 0;
++	start_pg_addr = start & PAGE_MASK; /* address of start page */
++	start_pg_offset = start & (PAGE_SIZE - 1); /* offset within start page */
++	end_pg_addr = ((start + len) & PAGE_MASK) - (((start + len) & (PAGE_SIZE - 1)) ? 0 : PAGE_SIZE); /* address of last page */
++
++	for (ppaddr = 0, pg_addr = start_pg_addr; pg_addr <= end_pg_addr; pg_addr += PAGE_SIZE) {
++		if (pg_addr > TASK_SIZE)
++			pgd = pgd_offset_k(pg_addr);
++		else
++			pgd = pgd_offset_gate(mm, pg_addr);
++		BUG_ON(pgd_none(*pgd));
++		pud = pud_offset(pgd, pg_addr);
++		BUG_ON(pud_none(*pud));
++		pmd = pmd_offset(pud, pg_addr);
++		if (pmd_none(*pmd)) 
++			goto error;
++		pte = pte_offset_map(pmd, pg_addr);
++		if (pte_none(*pte)) {
++			pte_unmap(pte);
++			goto error;
++		}
++		paddr = pte_val(*pte) & PAGE_MASK;
++//printk("TRANSLATED 0x%08lx, pte=0x%p, paddr=0x%lx\n", pg, pte, paddr);
++		pte_unmap(pte);
++
++		if (ppaddr == 0) { /* first page */
++			ppaddr = paddr;
++			*physaddr = (ppaddr | start_pg_offset);
++		} else if ((ppaddr + PAGE_SIZE) != paddr) /* not contiguous */
++			goto not_contiguous;
++		else
++			ppaddr = paddr;
++	}
++	ret = 1;
++
++not_contiguous:
++error:
++//printk("%s:%d: return %d\n", __FILE__, __LINE__, ret);
++	return ret;
++}
++
++EXPORT_SYMBOL(is_contiguous_memory);
++
++#endif /* CONFIG_SD_DIRECT_DMA */
++
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/block/ll_rw_blk.c linux-2.6.15/block/ll_rw_blk.c
+--- linux-2.6.15.ref/block/ll_rw_blk.c	2008-01-18 17:57:48.000000000 -0800
++++ linux-2.6.15/block/ll_rw_blk.c	2008-01-18 18:29:37.000000000 -0800
+@@ -2148,6 +2148,11 @@
+ 	struct bio *bio;
+ 	int reading;
+  	int dma_alignment = 0;
++#ifdef CONFIG_SD_DIRECT_DMA
++	extern int is_contiguous_memory(void __user *userbuf, unsigned int len, unsigned long *paddr);
++	unsigned long paddr;
++	struct gendisk *disk = rq->rq_disk;
++#endif
+ 
+ 	if (len > (q->max_sectors << 9))
+ 		return -EINVAL;
+@@ -2176,11 +2181,34 @@
+ 		else
+ 			dma_cache_wback_inv(uaddr, len);
+ #endif
+-		bio = bio_map_user(q, NULL, uaddr, len, reading);
+-		if (IS_ERR(bio)) {
+-			/* the map operation failed, use copy instead */
+-			bio = bio_copy_user(q, uaddr, len, reading);
+-		} 
++#ifdef CONFIG_SD_DIRECT_DMA
++		down_read(&current->mm->mmap_sem); /* lock the page table */
++		if ((len >= (128 * 1024)) && (is_contiguous_memory(ubuf, len, &paddr) != 0) && 
++		    (disk->major == IDE0_MAJOR)) { /* Only with Sigma's IDE interface */
++
++			bio = kmalloc(sizeof(struct bio), GFP_KERNEL);
++			if (bio == NULL)
++				return -ENOMEM;
++
++			memset(bio, 0, sizeof(struct bio));
++			bio->bi_flags |= (1<<BIO_PHYSICAL);
++			bio->bi_rw = (reading ? 0 : 1) | BIO_RW_SYNC;
++			bio->bi_size = len;
++			bio->bi_io_vec = (void *)ubuf;
++
++			/* to carry physical addr to ide driver */
++			bio->bi_private = (void *)paddr;
++		} else {
++			up_read(&current->mm->mmap_sem); /* unlock the table since DDMA is not used */
++#endif
++			bio = bio_map_user(q, NULL, uaddr, len, reading);
++			if (IS_ERR(bio)) {
++				/* the map operation failed, use copy instead */
++				bio = bio_copy_user(q, uaddr, len, reading);
++			} 
++#ifdef CONFIG_SD_DIRECT_DMA
++		}
++#endif
+ 	} else 
+  		bio = bio_copy_user(q, uaddr, len, reading);
+ 
+@@ -2270,10 +2298,19 @@
+ 	int ret = 0;
+ 
+ 	if (bio) {
+-		if (bio_flagged(bio, BIO_USER_MAPPED))
+-			bio_unmap_user(bio);
+-		else
+-			ret = bio_uncopy_user(bio);
++#ifdef CONFIG_SD_DIRECT_DMA
++		if (bio_flagged(bio, BIO_PHYSICAL)) {
++			up_read(&current->mm->mmap_sem); 
++			kfree(bio);
++		} else {
++#endif
++			if (bio_flagged(bio, BIO_USER_MAPPED))
++				bio_unmap_user(bio);
++			else
++				ret = bio_uncopy_user(bio);
++#ifdef CONFIG_SD_DIRECT_DMA
++		}
++#endif
+ 	}
+ 
+ 	return 0;
+@@ -3232,12 +3269,30 @@
+ 	/* first three bits are identical in rq->flags and bio->bi_rw */
+ 	rq->flags |= (bio->bi_rw & 7);
+ 
+-	rq->nr_phys_segments = bio_phys_segments(q, bio);
+-	rq->nr_hw_segments = bio_hw_segments(q, bio);
+-	rq->current_nr_sectors = bio_cur_sectors(bio);
+-	rq->hard_cur_sectors = rq->current_nr_sectors;
+-	rq->hard_nr_sectors = rq->nr_sectors = bio_sectors(bio);
+-	rq->buffer = bio_data(bio);
++#ifdef CONFIG_SD_DIRECT_DMA
++	if (bio_flagged(bio, BIO_PHYSICAL)) {
++		rq->nr_phys_segments = 1;
++		rq->nr_hw_segments = 1;
++		rq->current_nr_sectors = bio_cur_sectors(bio);
++		rq->hard_cur_sectors = rq->current_nr_sectors;
++		rq->hard_nr_sectors = rq->nr_sectors = bio_sectors(bio);
++		rq->buffer = bio_data(bio);
++
++		/*elevator doesn't know about this request*/
++		rq->flags &= ~REQ_SORTED; 
++	} else {
++#endif
++		rq->nr_phys_segments = bio_phys_segments(q, bio);
++		rq->nr_hw_segments = bio_hw_segments(q, bio);
++		rq->current_nr_sectors = bio_cur_sectors(bio);
++		rq->hard_cur_sectors = rq->current_nr_sectors;
++		rq->hard_nr_sectors = rq->nr_sectors = bio_sectors(bio);
++		rq->buffer = bio_data(bio);
++#ifdef CONFIG_SD_DIRECT_DMA
++	}
++#endif
++//printk("%x %x %x %x %x %x\n", rq->nr_phys_segments,rq->nr_hw_segments,rq->current_nr_sectors,rq->hard_cur_sectors, rq->hard_nr_sectors,rq->buffer);
++//printk("bi_io_vec=%x\n",bio->bi_io_vec);
+ 	rq->bio = rq->biotail = bio;
+ }
+ 
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/block/scsi_ioctl.c linux-2.6.15/block/scsi_ioctl.c
+--- linux-2.6.15.ref/block/scsi_ioctl.c	2008-01-18 17:57:48.000000000 -0800
++++ linux-2.6.15/block/scsi_ioctl.c	2008-01-18 18:29:37.000000000 -0800
+@@ -252,6 +252,10 @@
+ 	if (!rq)
+ 		return -ENOMEM;
+ 
++#ifdef CONFIG_SD_DIRECT_DMA
++	rq->rq_disk = bd_disk;
++#endif
++
+ 	if (hdr->iovec_count) {
+ 		const int size = sizeof(struct sg_iovec) * hdr->iovec_count;
+ 		struct sg_iovec *iov;
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/drivers/ide/Kconfig linux-2.6.15/drivers/ide/Kconfig
+--- linux-2.6.15.ref/drivers/ide/Kconfig	2008-01-18 17:57:48.000000000 -0800
++++ linux-2.6.15/drivers/ide/Kconfig	2008-01-18 18:29:37.000000000 -0800
+@@ -858,6 +858,13 @@
+        help
+          How many maximum sectors can be tranferred per request.
+ 
++config SD_DIRECT_DMA
++       depends on (((BLK_DEV_BMIDE_TANGOX && BLK_DEV_BMIDE_TANGOX_DMA) || (BLK_DEV_PBIDE_TANGOX && BLK_DEV_PBIDE_TANGOX_DMA))) && EXPERIMENTAL
++       bool "Enabling DDMA support for TangoX platform (experimental)"
++       default n
++       help
++         Enable user level direct DMA transfer to speed up IDE I/O for TangoX chips.
++
+ config SD_CDROM_WAIT
+        bool "enable CDROM wait for spin-up"
+        default y
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/drivers/ide/tangox/tangox-bmide.c linux-2.6.15/drivers/ide/tangox/tangox-bmide.c
+--- linux-2.6.15.ref/drivers/ide/tangox/tangox-bmide.c	2008-01-18 18:23:08.000000000 -0800
++++ linux-2.6.15/drivers/ide/tangox/tangox-bmide.c	2008-01-18 18:37:26.000000000 -0800
+@@ -321,8 +321,8 @@
+ 	}
+ 
+ 	if (g_next_sg > hwif->sg_nents)
+-		return;
+-	else if (g_next_sg == hwif->sg_nents) { /* no more */
++		return; /* should be the last interrupt */
++	else if (g_next_sg == hwif->sg_nents) { /* no more sg */
+ 		g_next_sg++;
+ 		em86xx_mbus_setup_dma_void(g_mbus_reg);
+ 		return;
+@@ -387,7 +387,7 @@
+ {
+ 	ide_hwif_t *hwif = HWIF(drive);
+ 	struct request *rq;
+-	int iswrite;
++	int iswrite, phys_mapped;
+         struct scatterlist *sg = hwif->sg_table;
+ 
+         rq = HWGROUP(drive)->rq;
+@@ -395,10 +395,14 @@
+ 	iswrite = (rq_data_dir(rq) == WRITE);
+ 	hwif->sg_dma_direction = iswrite ? DMA_TO_DEVICE : DMA_FROM_DEVICE;
+ 
+-	/*
+-	 * ide_map_sg will merge contiguous memory zone for us
+-	 */
+-        ide_map_sg(drive, rq);
++	phys_mapped = (bio_flagged(rq->bio, BIO_PHYSICAL) ? 1 : 0);
++
++	if (!phys_mapped) {
++		/*
++		 * ide_map_sg will merge contiguous memory zone for us
++		 */
++		ide_map_sg(drive, rq);
++	}
+ 
+ 	/* try to setup dma channel */
+ 	if (em86xx_mbus_alloc_dma(SBOX_IDEDVD, iswrite ? 0 : 1, &g_mbus_reg,
+@@ -407,34 +411,50 @@
+ 		goto fallback_pio;
+ 	}
+ 
+-	/*
+-	 * map and transfer first segment
+-	 */
+-	dma_map_sg(&hwif->gendev, sg, hwif->sg_nents, hwif->sg_dma_direction);
+-	g_next_sg = 1;
++ 	if (!phys_mapped) {
++		/*
++		 * map and transfer first segment
++		 */
++		dma_map_sg(&hwif->gendev, sg, hwif->sg_nents, hwif->sg_dma_direction);
++		g_next_sg = 1;
+ 
+-	/*
+-	 * setup mbus dma for this address.  we want an mbus interrupt
+-	 * only if this is not the last sg element,  so we can refeed
+-	 * mbus.
+-	 */
+-	if (em86xx_mbus_setup_dma(g_mbus_reg, sg_dma_address(sg),
+-				  sg_dma_len(sg),
+-				  (hwif->sg_nents == 1) ? NULL : tangox_mbus_intr, 
+-				  drive, 
+-				  (hwif->sg_nents == 1) ? 1 : 0)) {
+-		printk(KERN_ERR PFX "fail to setup dma, fallback to pio\n");
+-		dma_unmap_sg(&hwif->gendev, sg, hwif->sg_nents,
+-			     hwif->sg_dma_direction);
+-		em86xx_mbus_free_dma(g_mbus_reg, SBOX_IDEDVD);
+-		goto fallback_pio;
+-	}
++		/*
++		 * setup mbus dma for this address.  we want an mbus interrupt
++		 * only if this is not the last sg element,  so we can refeed
++		 * mbus.
++		 */
++		if (em86xx_mbus_setup_dma(g_mbus_reg, sg_dma_address(sg),
++					  sg_dma_len(sg),
++					  (hwif->sg_nents == 1) ? NULL : tangox_mbus_intr, 
++					  drive, 
++					  (hwif->sg_nents == 1) ? 1 : 0)) {
++			printk(KERN_ERR PFX "fail to setup dma, fallback to pio\n");
++			dma_unmap_sg(&hwif->gendev, sg, hwif->sg_nents,
++				     hwif->sg_dma_direction);
++			em86xx_mbus_free_dma(g_mbus_reg, SBOX_IDEDVD);
++			goto fallback_pio;
++		}
++ 	} else {
++ 		/*
++ 		 * setup mbus dma for this address.  we want an mbus interrupt
++ 		 * only if this  is not the last sg element,  so we can refeed
++ 		 * mbus.
++ 		 */
++ 		/* physical addr was carried by bi_private*/	
++ 		if (em86xx_mbus_setup_dma(g_mbus_reg, (unsigned int)rq->bio->bi_private, 
++ 					rq->bio->bi_size, NULL, drive, 1)) {
++ 			printk(KERN_ERR PFX "fail to setup dma, fallback to pio\n");
++ 			em86xx_mbus_free_dma(g_mbus_reg, SBOX_IDEDVD);
++ 			goto fallback_pio;
++ 		}
++  	}
+ 
+ 	drive->waiting_for_dma = 1;
+ 	return 0;
+ 
+ fallback_pio:
+-	ide_map_sg(drive, rq);
++ 	if (!phys_mapped) 
++ 		ide_map_sg(drive, rq);
+ 	return 1;
+ }
+ 
+@@ -444,6 +464,11 @@
+ 	u8 dma_stat;
+ 	int mbus_stat;
+         struct scatterlist *sg = hwif->sg_table;
++	struct request *rq;
++	int phys_mapped;
++
++        rq = HWGROUP(drive)->rq;
++	phys_mapped = (bio_flagged(rq->bio, BIO_PHYSICAL) ? 1 : 0);
+ 
+ 	dma_stat = hwif->INB(hwif->dma_status);
+ 
+@@ -471,8 +496,10 @@
+ 	/* stop bus mastering */
+ 	hwif->OUTB(0x4, hwif->dma_command);
+ 
+-	dma_unmap_sg(&hwif->gendev, sg, hwif->sg_nents,
+-		     hwif->sg_dma_direction);
++	if (!phys_mapped) 
++		dma_unmap_sg(&hwif->gendev, sg, hwif->sg_nents,
++				hwif->sg_dma_direction);
++
+ 	drive->waiting_for_dma = 0;
+ 
+ 	/* fake  dma  error  in  case  of mbus  timeout,  else  return
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/drivers/ide/tangox/tangox-pbide.c linux-2.6.15/drivers/ide/tangox/tangox-pbide.c
+--- linux-2.6.15.ref/drivers/ide/tangox/tangox-pbide.c	2008-01-18 18:23:08.000000000 -0800
++++ linux-2.6.15/drivers/ide/tangox/tangox-pbide.c	2008-01-18 18:29:37.000000000 -0800
+@@ -21,6 +21,8 @@
+ extern int tangox_isaide_enabled(void);
+ extern int tangox_isaide_cs_select(void);
+ extern int tangox_isaide_timing_slot(void);
++extern void mbus_setup_dma_double(unsigned int regbase, unsigned int addr, 
++		unsigned int count, unsigned int addr2, unsigned int count2, unsigned int width);
+ 
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("SMP86xx PB IDE driver");
+@@ -280,13 +282,18 @@
+ 
+         ide_hwif_t *hwif = HWIF(drive);
+         struct scatterlist *sg = hwif->sg_table;
++	int phys_mapped;
+ 
+-        dma_map_sg(&hwif->gendev, sg, hwif->sg_nents, hwif->sg_dma_direction);
++	phys_mapped = (bio_flagged(rq->bio, BIO_PHYSICAL) ? 1 : 0);
+ 
+-	if (hwif->sg_nents > 2) { /* this shouldn't happen since we limited rqsize=16 for now*/
+-      		printk("cannot handle multiple transfer yet. sg_nents=0x%x\n", hwif->sg_nents);
+-                dma_unmap_sg(&hwif->gendev, sg, hwif->sg_nents, hwif->sg_dma_direction);
+-	        return 1;
++	if (!phys_mapped) {
++		dma_map_sg(&hwif->gendev, sg, hwif->sg_nents, hwif->sg_dma_direction);
++
++		if (hwif->sg_nents > 2) { /* this shouldn't happen since we limited rqsize=16 for now*/
++			printk("cannot handle multiple transfer yet. sg_nents=0x%x\n", hwif->sg_nents);
++			dma_unmap_sg(&hwif->gendev, sg, hwif->sg_nents, hwif->sg_dma_direction);
++			return 1;
++		}
+ 	}
+ 
+ 	// setup switchbox and wait for its readiness
+@@ -306,51 +313,67 @@
+ 	if (drive->media == ide_disk)
+ 		ide_set_handler(drive, &tangox_pbide_dma_intr, 2 * WAIT_CMD, NULL);
+ 
+-        addr = sg_dma_address(sg);
+-       	size = sg_dma_len(sg);
++	if (!phys_mapped) {
++		addr = sg_dma_address(sg); 
++		size = sg_dma_len(sg);
++	} else {
++		addr = (unsigned int)rq->bio->bi_private;
++		size = rq->bio->bi_size;
++	}
+ 
+-	if (hwif->sg_nents == 1) {
++	if (!phys_mapped) {
++		if (hwif->sg_nents == 1) {
+ 
+-		/* perform a single (linear/rectangle) transfer */
++			/* perform a single (linear/rectangle) transfer */
+ 
+-	        // setup PB automode registers
+-	        gbus_writel(REG_BASE_host_interface + PB_automode_start_address, 0);
+-	        gbus_writel(REG_BASE_host_interface + PB_automode_control,
+-				0x00140000 | ((read ? 1 : 0) << 16) | (size >> 1));
++			// setup PB automode registers
++			gbus_writel(REG_BASE_host_interface + PB_automode_start_address, 0);
++			gbus_writel(REG_BASE_host_interface + PB_automode_control,
++					0x00140000 | ((read ? 1 : 0) << 16) | (size >> 1));
++
++			if (read)
++				dma_cache_inv((unsigned int)phys_to_virt(addr), size);
++			else
++				dma_cache_wback_inv((unsigned int)phys_to_virt(addr), size);
++
++			em86xx_mbus_setup_dma(read ? g_regbase_read : g_regbase_write,
++					addr, size, NULL, NULL, 1);
++		} else { 
++			/* perform a double transfer */
++			unsigned int addr1 = 0;
++			unsigned int size1 = 0;
++
++			sg = &hwif->sg_table[1];
++
++			addr1 = sg_dma_address(sg);
++			size1 = sg_dma_len(sg);
++
++			// setup PB automode registers
++			gbus_writel(REG_BASE_host_interface + PB_automode_start_address, 0);
++			gbus_writel(REG_BASE_host_interface + PB_automode_control,
++					0x00140000 | ((read ? 1 : 0) << 16) | ((size+size1) >> 1));
++
++			if (read) {
++				dma_cache_inv((unsigned int)phys_to_virt(addr), size);
++				dma_cache_inv((unsigned int)phys_to_virt(addr1), size1);
++			} else {
++				dma_cache_wback_inv((unsigned int)phys_to_virt(addr), size);
++				dma_cache_wback_inv((unsigned int)phys_to_virt(addr1), size1);
++			}
+ 
+-	        if (read)
+-        	        dma_cache_inv((unsigned int)phys_to_virt(addr), size);
+-	        else
+-	                dma_cache_wback_inv((unsigned int)phys_to_virt(addr), size);
+-
+-        	em86xx_mbus_setup_dma(read ? g_regbase_read : g_regbase_write,
+-                		addr, size, NULL, NULL, 1);
+-	}
+-	else { 
+-		/* perform a double transfer */
+-		unsigned int addr1 = 0;
+-		unsigned int size1 = 0;
+-
+-		sg = &hwif->sg_table[1];
+-
+-	        addr1 = sg_dma_address(sg);
+-	       	size1 = sg_dma_len(sg);
+-
+-	        // setup PB automode registers
+-	        gbus_writel(REG_BASE_host_interface + PB_automode_start_address, 0);
+-	        gbus_writel(REG_BASE_host_interface + PB_automode_control,
+-				0x00140000 | ((read ? 1 : 0) << 16) | ((size+size1) >> 1));
+-
+-                if (read) {
+-                        dma_cache_inv((unsigned int)phys_to_virt(addr), size);
+-                        dma_cache_inv((unsigned int)phys_to_virt(addr1), size1);
+-		} else {
+-                        dma_cache_wback_inv((unsigned int)phys_to_virt(addr), size);
+-                        dma_cache_wback_inv((unsigned int)phys_to_virt(addr1), size1);
++			mbus_setup_dma_double(read ? g_regbase_read : g_regbase_write, 
++					addr, size, addr1, size1, 1);
+ 		}
++	} else {
++		/* perform a single (linear/rectangle) transfer */
+ 
+-                mbus_setup_dma_double(read ? g_regbase_read : g_regbase_write, 
+-				addr, size, addr1, size1, 1);
++		// setup PB automode registers
++		gbus_writel(REG_BASE_host_interface + PB_automode_start_address, 0);
++		gbus_writel(REG_BASE_host_interface + PB_automode_control,
++				0x00140000 | ((read ? 1 : 0) << 16) | (size >> 1));
++
++		em86xx_mbus_setup_dma(read ? g_regbase_read : g_regbase_write, 
++				addr, size, NULL, NULL, 1);
+ 	}
+ 
+ 	if (drive->media == ide_disk) {
+@@ -367,14 +390,18 @@
+         ide_hwif_t *hwif = HWIF(drive);
+         struct request *rq;
+         int iswrite;
++	int phys_mapped;
+ 
+         drive->waiting_for_dma = 1;
+         rq = HWGROUP(drive)->rq;
+         iswrite = (rq_data_dir(rq) == WRITE);
+         hwif->sg_dma_direction = iswrite ? DMA_TO_DEVICE : DMA_FROM_DEVICE;
++	phys_mapped = (bio_flagged(rq->bio, BIO_PHYSICAL) ? 1 : 0);
+ 	
+-	// this will do the merge
+-	ide_map_sg(drive, rq);
++	if (!phys_mapped) {
++		// this will do the merge
++		ide_map_sg(drive, rq);
++	}
+ 
+         return tangox_pbide_rwdma(drive, !iswrite, rq);
+ }
+@@ -448,13 +475,16 @@
+ static int tangox_pbide_dma_end_io(ide_drive_t *drive)
+ {
+ 	ide_hwif_t *hwif = HWIF(drive);
+-	struct scatterlist *sg = hwif->sg_table;
+ 	struct request *rq = HWGROUP(drive)->rq;
+-
++        struct scatterlist *sg = hwif->sg_table;
++	int phys_mapped;
+ 	int stat = em86xx_mbus_wait(rq->cmd == READ ? g_regbase_read : 
+ 					g_regbase_write, SBOX_IDEFLASH);
+ 
+-	dma_unmap_sg(&hwif->gendev, sg, hwif->sg_nents, hwif->sg_dma_direction);
++	phys_mapped = (bio_flagged(rq->bio, BIO_PHYSICAL) ? 1 : 0);
++
++	if (!phys_mapped)
++		dma_unmap_sg(&hwif->gendev, sg, hwif->sg_nents, hwif->sg_dma_direction);
+ 
+ 	/* Free up MBUS channel */
+ 	em86xx_mbus_free_dma(g_regbase_read, SBOX_IDEFLASH);
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/include/linux/bio.h linux-2.6.15/include/linux/bio.h
+--- linux-2.6.15.ref/include/linux/bio.h	2006-01-25 20:52:00.000000000 -0800
++++ linux-2.6.15/include/linux/bio.h	2008-01-18 18:29:37.000000000 -0800
+@@ -124,6 +124,7 @@
+ #define BIO_BOUNCED	5	/* bio is a bounce bio */
+ #define BIO_USER_MAPPED 6	/* contains user pages */
+ #define BIO_EOPNOTSUPP	7	/* not supported */
++#define BIO_PHYSICAL	8	/* this bio is pointing to physically contiguous space */
+ #define bio_flagged(bio, flag)	((bio)->bi_flags & (1 << (flag)))
+ 
+ /*
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/include/linux/slab.h linux-2.6.15/include/linux/slab.h
+--- linux-2.6.15.ref/include/linux/slab.h	2008-01-18 18:23:20.000000000 -0800
++++ linux-2.6.15/include/linux/slab.h	2008-01-18 18:29:37.000000000 -0800
+@@ -76,7 +76,7 @@
+ extern struct cache_sizes malloc_sizes[];
+ extern void *__kmalloc(size_t, gfp_t);
+ 
+-#define MAX_KMALLOC_ORDER    8  /* 2^8 pages max */
++#define MAX_KMALLOC_ORDER    10  /* 2^10 pages max */
+ 
+ static inline void *kmalloc(size_t size, gfp_t flags)
+ {
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/mm/highmem.c linux-2.6.15/mm/highmem.c
+--- linux-2.6.15.ref/mm/highmem.c	2006-01-25 20:52:04.000000000 -0800
++++ linux-2.6.15/mm/highmem.c	2008-01-18 18:29:37.000000000 -0800
+@@ -469,6 +469,9 @@
+ {
+ 	mempool_t *pool;
+ 
++	if (bio_flagged(*bio_orig, BIO_PHYSICAL)) 
++		return;
++
+ 	/*
+ 	 * for non-isa bounce case, just check if the bounce pfn is equal
+ 	 * to or bigger than the highest pfn in the system -- in that case,
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/README.1025.ddma.patch linux-2.6.15/README.1025.ddma.patch
+--- linux-2.6.15.ref/README.1025.ddma.patch	1969-12-31 16:00:00.000000000 -0800
++++ linux-2.6.15/README.1025.ddma.patch	2008-01-18 18:38:02.000000000 -0800
+@@ -0,0 +1,21 @@
++Feature:
++--------
++Enabling more direct DDMA (adding RUA memory as well) operations.
++
++Prerequisite patch numbers:
++---------------------------
++0000
++1000
++1003
++1004
++
++Primary author:
++---------------
++Craig Qu/YH Lin
++
++Related to which chip version SMP86xx xx=?
++-----------------------------------------
++Tango2 ES6/RevA or above, or Tango3 ES1 or above
++
++(linux patches) which CONFIG_... are provided:
++----------------------------------------------

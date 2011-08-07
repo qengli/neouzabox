@@ -1,0 +1,32 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+#$SCRIPTS/build module-init-tools
+
+#DEPMOD=`ls -d $ROOT/$BUILD/module-init-tool*/depmod`
+LINUX=$(kernel_path)
+MODDIR=$LINUX/modules
+
+rm -rf $MODDIR
+mkdir -p $MODDIR
+
+case $TARGET_ARCH in
+  i386)
+    make bzImage -C "$LINUX"
+    ;;
+  powerpc)
+    unset LDFLAGS
+    make vmlinux -C "$LINUX"
+    ;;
+  mips)
+    make vmlinux ARCH=$TARGET_ARCH CROSS_COMPILE=$ROOT/$TOOLCHAIN/bin/$TARGET_NAME-  -C "$LINUX"
+    ;;
+
+  arm)
+    make zImage ARCH=$TARGET_ARCH CROSS_COMPILE=$ROOT/$TOOLCHAIN/bin/$TARGET_NAME-  -C "$LINUX"
+
+    ;;
+
+esac

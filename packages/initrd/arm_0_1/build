@@ -1,0 +1,59 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build genext2fs
+
+export INSTALL=$BUILD/$1/mnt
+
+rm -rf $INSTALL
+mkdir -p $INSTALL
+rm -f $BUILD/$1/$1 $BUILD/$1/$1.gz
+
+mkdir $INSTALL/bin
+mkdir $INSTALL/etc
+mkdir $INSTALL/ramfs
+mkdir $INSTALL/sbin
+mkdir $INSTALL/usr
+mkdir $INSTALL/usr/bin
+
+$SCRIPTS/install $TARGET_LIBC #modified by Leo 20070804 to support basing on glibc
+$SCRIPTS/install busybox
+#cp $ROOT/busybox $INSTALL/bin
+$SCRIPTS/install udev
+$SCRIPTS/install iscd
+
+if [ "installed" = "$2" ]; then
+  echo " cp linuxrc.hd "
+  cp $PACKAGES/$1/$VERSION/scripts/linuxrc.installed $INSTALL/init
+  chmod 755 $INSTALL/init
+else
+  cp $PACKAGES/$1/$VERSION/scripts/linuxrc $INSTALL/init
+  chmod 755 $INSTALL/init
+fi
+
+#following 2 is add by Leo
+#cp $ROOT/$BUILD/toolchain/mipsel-unknown-linux-gnu/lib/libgcc_s.so.1 $INSTALL/lib
+
+cp $BUILD/bftpd*/bftpd $INSTALL/sbin
+cp $PACKAGES/bftpd/config/bftpd.conf $INSTALL/etc
+
+#leo added 2008.05.26 the arm linux boot on qemu need libgcc_s.so
+cp $TOOLCHAIN/arm-unknown-linux-gnu/lib/libgcc_s.so.1 $INSTALL/lib
+
+cp $PACKAGES/$1/$VERSION/scripts/console $INSTALL/sbin
+cp $PACKAGES/$1/$VERSION/scripts/nosystem $INSTALL/sbin
+cp $PACKAGES/$1/$VERSION/scripts/r[ow] $INSTALL/usr/bin
+
+ln -s /bin/busybox $INSTALL/bin/sh
+echo "|||||||| $BUILD/genext2fs*/genext2fs -d $INSTALL -b $RAMDISK_SIZE -i 1024 $BUILD/$1/$1 |||||||"
+#$BUILD/genext2fs*/genext2fs -d $INSTALL -b $RAMDISK_SIZE -i 1024 $BUILD/$1/$1
+cd $INSTALL
+find . | cpio -H newc -o > ../initrd
+cd -
+
+if [ "installed" = "$2" ]; then
+  gzip -9 -S .installed.gz $BUILD/$1/$1
+else
+  gzip -9 $BUILD/$1/$1
+fi

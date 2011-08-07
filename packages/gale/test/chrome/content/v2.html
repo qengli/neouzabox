@@ -1,0 +1,77 @@
+<HTML>
+
+<head>
+	<title>VLC Test Application</title>
+</head>
+
+<BODY style="overflow: hidden">
+
+<p>
+    <input type= 'text' id= 'MRL' size= '50' value='file://./chrome/content/test.mpg'>  </input>
+    <input type= 'button' value= 'Go!' onclick= 'Go()'> </input>
+</p>
+
+<embed 
+    type="application/x-vlc-plugin" 
+    pluginspage="http://www.videolan.org" 
+    version="VideoLAN.VLCPlugin.2"
+    width="400"
+    height="300"
+    id="player"
+    loop="yes">
+</embed>
+
+
+<p> 
+    
+    <a href="#" onclick='Play()'>Play</a> 
+    <a href="#" onclick='Pause()'>Pause</a> 
+    <a href="#" onclick='Stop()'>Stop</a> 
+    <a href="#" onclick='FullScreen()'>Fullscreen</a>
+    <a href="#" onclick='test()'>Test</a>
+
+</p>
+
+
+<SCRIPT type=text/javascript>
+
+	var vlc = document.getElementById ('player');
+	
+	function test ()
+	{
+		alert ('VLC Version Info: ' + vlc.versionInfo ());
+	}
+
+	function Play()
+	{
+		vlc.playlist.play();
+	}
+
+	function Pause()
+	{
+		vlc.playlist.togglePause();
+	}
+
+	function Stop ()
+	{
+		vlc.playlist.stop();
+	}
+	
+	function Go()
+	{
+		var mrl = document.getElementById ('MRL').value;
+	        //alert ('about to play: ' + mrl );
+		vlc.playlist.items.clear ();
+		vlc.playlist.add (mrl);
+		vlc.playlist.play ();
+	}
+	
+	function FullScreen ()
+	{
+		vlc.video.toggleFullscreen ();
+	}
+	
+</script> 
+</BODY>
+</HTML>
+

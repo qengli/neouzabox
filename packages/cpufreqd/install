@@ -1,0 +1,24 @@
+#!/bin/sh
+
+. config/options
+
+case $TARGET_ARCH in
+  i386)
+    pm_type=acpi
+    ;;
+  ppc)
+    pm_type=pmu
+    ;;
+esac
+
+mkdir -p $INSTALL/usr/lib
+cp $BUILD/$1*/.libs/libsys_$pm_type.so $INSTALL/usr/lib
+
+mkdir -p $INSTALL/usr/bin
+cp $BUILD/$1*/$1 $INSTALL/usr/bin
+
+mkdir -p $INSTALL/etc
+sed "s%pm_type=.*%pm_type=$pm_type%" $PACKAGES/$1*/config/$1.conf > $INSTALL/etc/$1.conf
+
+#Leo added 2008-02-18
+cp -f $PACKAGES/$1*/init.d/* $INSTALL/etc/init.d/

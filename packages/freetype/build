@@ -1,0 +1,17 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+$SCRIPTS/build zlib
+
+cd $BUILD/$1*
+./configure \
+            --host=$TARGET_NAME \
+            --build=$HOST_NAME \
+            --prefix=$LIB_PREFIX \
+            --with-zlib \
+	    --disable-static
+#--disable-shared \ comment by Leo 20060303
+make
+make install

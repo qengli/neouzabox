@@ -1,0 +1,15 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+cd $BUILD/$1*
+./configure --host=$TARGET_NAME \
+            --build=$HOST_NAME \
+            --prefix=$SYSROOT_PREFIX/usr/local \
+	    --enable-graphics \
+	    --libdir=$SYSROOT_PREFIX/usr/local/include \
+	    --includedir=$SYSROOT_PREFIX/usr/local/lib 
+make
+make install

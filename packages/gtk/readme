@@ -1,0 +1,7 @@
+2.10.13
+2.10.11
+can build success 
+but can't run with directfb 
+the problem is testrgb have no color picture display. it may be caused by color_map
+there is only 2.10.1 can run with directfb
+

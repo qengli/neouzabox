@@ -1,0 +1,12 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+setup_toolchain --optimize target
+
+cd $BUILD/$1*
+cp -f $ROOT/packages/$1/config/cross.def config/cf
+cp -f $ROOT/packages/$1/config/host.def config/cf
+make World 
+#make install

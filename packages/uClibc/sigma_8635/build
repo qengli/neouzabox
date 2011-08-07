@@ -1,0 +1,22 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/install gcc-core toolchain
+[ "$DEBUG" = yes ] && CFLAGS="$CFLAGS -D_DLSYM_TRACE_NAME"
+
+make -C $BUILD/$1*
+
+if [ "$2" = "full" ]; then #Leo added 070604
+        make -C $BUILD/$1*/utils #Leo added
+fi
+
+#Leo moved from install 2008.5.5
+if [ "$2" = toolchain ]; then
+  rm -rf "$SYSROOT_PREFIX/lib" "$SYSROOT_PREFIX/usr/lib" #"$SYSROOT_PREFIX/usr/include"
+  make -C $BUILD/$1* PREFIX="$SYSROOT_PREFIX" install
+  exit 0
+fi
+
+#[ "$DEVTOOLS" = yes ] && make -C $BUILD/$1*/utils
+exit 0

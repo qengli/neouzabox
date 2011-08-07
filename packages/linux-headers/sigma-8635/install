@@ -1,0 +1,54 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/unpack linux
+
+case $TARGET_ARCH in
+  i386)
+    HEADERS=$SYSROOT_PREFIX/usr/include
+    EXTRA_DIRECTORIES="asm-i386 asm"
+    ;;
+
+  mips)
+    HEADERS=$SYSROOT_PREFIX/usr/include
+    EXTRA_DIRECTORIES="asm-mips"
+    ;;
+
+  arm)
+    cd $BUILD/linux-*
+    make ARC=$TARGET_ARCH include/linux/version.h
+    HEADERS=$SYSROOT_PREFIX/usr/include
+    EXTRA_DIRECTORIES="asm-arm linux sound mtd scsi"
+    ;;
+
+
+  powerpc)
+    HEADERS=$SYSROOT_PREFIX/include
+    EXTRA_DIRECTORIES="asm-powerpc asm-ppc asm"
+    ;;
+esac
+
+mkdir -p $HEADERS
+
+if [ $TARGET_ARCH = "mips" ]; then
+  cd $BUILD/linux-*
+  make ARC=$TARGET_ARCH include/linux/version.h
+  cp -a -rf ./include/asm-mips $HEADERS/asm
+  cp -a -rf ./include/asm-generic $HEADERS/asm-generic
+  cp -a -rf ./include/linux $HEADERS/linux
+  cp -a -rf ./include/sound $HEADERS/sound
+  cp -a -rf ./include/mtd $HEADERS/mtd
+  cp -a -rf ./include/scsi $HEADERS/scsi
+else
+
+  for d in linux asm-generic $EXTRA_DIRECTORIES; do
+    cp -pPR $(kernel_path)/include/$d $HEADERS/
+  done
+
+if [ $TARGET_ARCH = "arm" ]; then
+   rm -fr $HEADERS/asm
+   mv $HEADERS/asm-arm $HEADERS/asm
+fi 
+fi
+

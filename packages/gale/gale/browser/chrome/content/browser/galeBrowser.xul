@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://gale/skin/galeBrowser.css" type="text/css"?> 
+<!DOCTYPE window SYSTEM "chrome://gale/locale/galeBrowser.dtd">
+
+<window id="main-window"
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns:html="http://www.w3.org/1999/xhtml"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        onload="browserStartup();"
+        onclose="onClose();return false;"
+        onunload="browserShutdown();"
+        windowtype="navigator:browser"
+        hidechrome="true"
+        sizemode="maximized"
+>
+    <script type="application/x-javascript" src="chrome://gale/content/browser/browserMsg.js"/>
+    <script type="application/x-javascript" src="chrome://gale/content/browser/galeBrowser.js"/>
+    <script type="application/x-javascript" src="chrome://gale/content/common/common.js"/>
+    <script type="application/x-javascript" src="chrome://gale/content/common/inf.js"/>
+    <script type="application/x-javascript" src="chrome://gale/content/common/keyboard.js"/>
+    
+    <stringbundle id="strings" src="chrome://gale/locale/galeBrowser.properties"/>
+
+    <stack flex="1">
+    
+        <html:div id="statusBox" style="left:0px;width:0px;height:0px;"> 
+            <stack>
+               <html:div id="volDiv" style="left:0px;top:-2px;visibility:hidden;">
+                   <stack>
+                       <html:div style="left:0px;top:0px; width:800px; height:48px;">		   	 
+                       <image id="volBgPic" src="chrome://gale/skin/bg.jpg"/>
+                       </html:div>			
+                       <html:div style="left:80px;top:13px;width:637px;height:30px;">  
+                       <image id="volProgressPic" src="" 
+                        style="list-style-image:url('chrome://gale/skin/bg_s.jpg');
+                             -moz-image-region:rect(0px 10px 30px 0px);"/>
+                       </html:div> 
+                  </stack> 
+               </html:div> 
+               <hbox id="msgBox" style="visibility:hidden;">
+                    <image id="volMutePic" flex='0' width="0" height="0" src="chrome://gale/skin/msgkey2.jpg"/>
+                    <html:div id="msgDiv" flex='1' style="visibility:hidden;">    
+                    </html:div>
+               </hbox>
+                
+            </stack>
+        </html:div>
+        <!--  notice the div which contains the browser has a style 'top=-15px', if put it to 0px,
+              there will be blank on top of the browser, i don't know why ...-->
+        <html:div  style="left:0px;top:-16px;">   
+                <tabbrowser name="content" 
+                    id="content" 
+                    autoscroll="false"
+                    width="0" height="0" flex="1"/> 
+        </html:div>
+    
+    </stack>    
+           
+</window>

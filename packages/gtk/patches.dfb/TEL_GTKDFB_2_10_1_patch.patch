@@ -1,0 +1,174 @@
+diff -urNP /home/gtk+-2.10.1/gdk/directfb/gdkgc-directfb.c ./gdk/directfb/gdkgc-directfb.c
+--- /home/gtk+-2.10.1/gdk/directfb/gdkgc-directfb.c	2006-02-05 09:34:28.000000000 +0530
++++ ./gdk/directfb/gdkgc-directfb.c	2006-11-17 20:02:47.000000000 +0530
+@@ -224,8 +224,9 @@
+     {
+       GdkPixmap *oldpm = private->values.tile;
+ 
+-      if (values->tile)
++/*TEL_MOZ_DFB      if (values->tile)
+         g_assert (GDK_PIXMAP_OBJECT (values->tile)->depth > 1);
++TEL_MOZ_DFB*/
+ 
+       private->values.tile = values->tile ? g_object_ref (values->tile) : NULL;
+       private->values_mask |= GDK_GC_TILE;
+diff -urNP /home/gtk+-2.10.1/gdk/gdkcolor.c ./gdk/gdkcolor.c
+--- /home/gtk+-2.10.1/gdk/gdkcolor.c	2005-12-06 02:21:18.000000000 +0530
++++ ./gdk/gdkcolor.c	2006-11-17 20:34:04.000000000 +0530
+@@ -94,7 +94,7 @@
+ 
+   for (i = 0; i < ncolors; i++)
+     {
+-      colormap->colors[i].pixel = colors[i].pixel;
++//TEL_MOZ_DFB      colormap->colors[i].pixel = colors[i].pixel;
+       colormap->colors[i].red = colors[i].red;
+       colormap->colors[i].green = colors[i].green;
+       colormap->colors[i].blue = colors[i].blue;
+diff -urNP /home/gtk+-2.10.1/gdk/gdkgc.c ./gdk/gdkgc.c
+--- /home/gtk+-2.10.1/gdk/gdkgc.c	2006-05-14 09:28:05.000000000 +0530
++++ ./gdk/gdkgc.c	2006-11-17 21:13:58.000000000 +0530
+@@ -49,6 +49,14 @@
+   
+   guint32 fg_pixel;
+   guint32 bg_pixel;
++ //TEL_MOZ_DFB
++  unsigned char fg_red;
++  unsigned char fg_green;
++  unsigned char fg_blue;
++
++  unsigned char bg_red;
++  unsigned char bg_green;
++  unsigned char bg_blue;
+ };
+ 
+ #define GDK_GC_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GDK_TYPE_GC, GdkGCPrivate))
+@@ -75,8 +83,17 @@
+   /* These are the default X11 value, which we match. They are clearly
+    * wrong for TrueColor displays, so apps have to change them.
+    */
+-  priv->fg_pixel = 0;
+-  priv->bg_pixel = 1;
++//  priv->fg_pixel = 0;
++//  priv->bg_pixel = 1;
++  //TEL_MOZ_DFB
++  priv->fg_red = 0;
++  priv->fg_green = 0;
++  priv->fg_blue = 0;
++
++  priv->bg_red = 1;
++  priv->bg_green = 1;
++  priv->bg_blue = 1;
++  //TEL_MOZ_DFB
+ }
+ 
+ /**
+@@ -169,9 +186,21 @@
+ 	g_object_ref (priv->tile);
+     }
+   if (values_mask & GDK_GC_FOREGROUND)
+-    priv->fg_pixel = values->foreground.pixel;
++    {
++	//TEL_MOZ_DFB	
++        //priv->fg_pixel = values->foreground.pixel;
++        priv->fg_red = values->foreground.red;
++        priv->fg_green = values->foreground.green;
++        priv->fg_blue = values->foreground.blue;
++    } 
+   if (values_mask & GDK_GC_BACKGROUND)
+-    priv->bg_pixel = values->background.pixel;
++    {
++	//TEL_MOZ_DFB
++	//priv->bg_pixel = values->background.pixel;
++	priv->bg_red = values->background.red;
++	priv->bg_green = values->background.green;
++	priv->bg_blue = values->background.blue;
++    }
+ 
+   gc->colormap = gdk_drawable_get_colormap (drawable);
+   if (gc->colormap)
+@@ -311,9 +340,21 @@
+ 	}
+     }
+   if (values_mask & GDK_GC_FOREGROUND)
+-    priv->fg_pixel = values->foreground.pixel;
++    {
++	//TEL_MOZ_DFB
++	//priv->fg_pixel = values->foreground.pixel;
++          priv->fg_red = values->foreground.red;
++          priv->fg_green = values->foreground.green;
++          priv->fg_blue = values->foreground.blue;
++    }
+   if (values_mask & GDK_GC_BACKGROUND)
+-    priv->bg_pixel = values->background.pixel;
++    {
++	//TEL_MOZ_DFB
++	//priv->bg_pixel = values->background.pixel;
++    	  priv->bg_red = values->background.red;	
++    	  priv->bg_green = values->background.green;	
++    	  priv->bg_blue = values->background.blue;	
++    }
+   
+   GDK_GC_GET_CLASS (gc)->set_values (gc, values, values_mask);
+ }
+@@ -337,7 +378,11 @@
+   g_return_if_fail (GDK_IS_GC (gc));
+   g_return_if_fail (color != NULL);
+ 
+-  values.foreground = *color;
++  //TEL_MOZ_DFB
++  //values.foreground = *color;
++    values.foreground.red = color->red;
++    values.foreground.green = color->green;
++    values.foreground.blue = color->blue;
+   gdk_gc_set_values (gc, &values, GDK_GC_FOREGROUND);
+ }
+ 
+@@ -901,9 +946,17 @@
+   dst_priv->tile = src_priv->tile;
+   if (dst_priv->tile)
+     g_object_ref (dst_priv->tile);
+-
++/*TEL_MOZ_DFB
+   dst_priv->fg_pixel = src_priv->fg_pixel;
+   dst_priv->bg_pixel = src_priv->bg_pixel;
++  TEL_MOZ_DFB*/
++  dst_priv->fg_red = src_priv->fg_red;
++  dst_priv->fg_green= src_priv->fg_green;
++  dst_priv->fg_blue = src_priv->fg_blue;
++  
++  dst_priv->bg_red = src_priv->bg_red;
++  dst_priv->bg_green = src_priv->bg_green;
++  dst_priv->bg_blue = src_priv->bg_blue;
+ }
+ 
+ /**
+@@ -1079,9 +1132,13 @@
+ 		   GdkColor *color)
+ {
+   GdkGCPrivate *priv = GDK_GC_GET_PRIVATE (gc);
+-  
+-  color->pixel = priv->bg_pixel;
++  //TEL_MOZ_DFB
++ // color->pixel = priv->bg_pixel;
+ 
++  color->red = priv->fg_red;
++  color->green = priv->fg_green;
++  color->blue = priv->fg_blue;
++  
+   if (gc->colormap)
+     gdk_colormap_query_color (gc->colormap, priv->fg_pixel, color);
+   else
+@@ -1093,8 +1150,12 @@
+ 		   GdkColor *color)
+ {
+   GdkGCPrivate *priv = GDK_GC_GET_PRIVATE (gc);
++  //TEL_MOZ_DFB
++  //color->pixel = priv->bg_pixel;
+   
+-  color->pixel = priv->bg_pixel;
++  color->red = priv->bg_red;
++  color->green = priv->bg_green;
++  color->blue = priv->bg_blue;
+ 
+   if (gc->colormap)
+     gdk_colormap_query_color (gc->colormap, priv->bg_pixel, color);

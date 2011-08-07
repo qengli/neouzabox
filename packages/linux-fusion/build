@@ -1,0 +1,24 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+setup_toolchain target
+
+cd $ROOT/$BUILD/linux-2.*/
+LINUX_DIR=`pwd`
+LINUX_VERSION=${LINUX_DIR##/**-}
+echo $LINUX_VERSION
+cp $ROOT/$PACKAGES/$1*/Makefile $ROOT/$BUILD/$1*/
+cd $ROOT/$BUILD/$1*
+sed -i s@_LINUX_VERSION_@${LINUX_VERSION}@ Makefile
+sed -i s@_LINUX_DIR_@${LINUX_DIR}@ Makefile
+sed -i s@_ROOTBUILD_@${ROOT}/${BUILD}@ Makefile
+sed -i s@_SYSROOT_@${SYSROOT_PREFIX}@ Makefile
+sed -i s@_TARGET_NAME_@${TARGET_NAME}@ Makefile
+sed -i s@_TARGET_ARCH_@${TARGET_ARCH}@ Makefile
+
+make
+
+cp linux/include/linux/fusion.h $SYSROOT_PREFIX/usr/include/linux/

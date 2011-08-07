@@ -1,0 +1,36 @@
+#!/bin/sh
+
+. config/options
+
+#Leo added 2008-02-18
+cp -f $PACKAGES/$VDIR/init.d/* $INSTALL/etc/init.d/
+if [ -d busybox/$VERSION ]; then
+cp -f $PACKAGES/busybox/$VERSION/init.d/* $INSTALL/etc/init.d/
+else
+cp -f $PACKAGES/busybox/trunk/init.d/* $INSTALL/etc/init.d/
+fi
+
+case "$2" in
+  image)
+    test "$3" != installator && INSTALL="$INSTALL/boot"
+    mkdir -p $INSTALL
+    case $TARGET_ARCH in
+      i386)
+        cp $BUILD/$1*/arch/$TARGET_CPU/boot/bzImage $INSTALL/vmlinuz
+        ;;
+      powerpc)
+        cp $BUILD/$1*/vmlinux $INSTALL/vmlinux
+        $STRIP $INSTALL/vmlinux
+        ;;
+    esac
+    ;;
+
+  modules)
+    cp -r $BUILD/$1*/modules/* $INSTALL
+    mkdir -p $INSTALL/etc
+    cp $PACKAGES/$VDIR/config/modules $INSTALL/etc
+    cp $PACKAGES/$VDIR/config/tvcard $INSTALL/etc
+    ;;
+esac
+
+

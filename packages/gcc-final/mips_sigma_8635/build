@@ -1,0 +1,28 @@
+#!/bin/sh
+
+. config/options
+
+setup_toolchain host
+
+cd $BUILD/gcc*
+mkdir -p objdir-$1
+cd objdir-$1
+if [ 1 ]; then
+ln -sf ${SYSROOT_PREFIX}/usr/include ${SYSROOT_PREFIX}/../sys-include
+../configure --host=$HOST_NAME \
+             --build=$HOST_NAME \
+             --target=$TARGET_NAME \
+             --prefix=$ROOT/$TOOLCHAIN \
+             --with-sysroot=$SYSROOT_PREFIX \
+             --with-local-prefix=/usr/local \
+             --enable-languages=${TOOLCHAIN_LANGUAGES} \
+             --enable-shared \
+             --enable-target-optspace \
+             --enable-sjlj-exceptions \
+             --enable-multilib \
+             --with-gnu-ld \
+             --disable-nls \
+             --disable-__cxa_atexit \
+             --with-float=soft 
+fi
+make

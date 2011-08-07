@@ -1,0 +1,58 @@
+/* $XFree86: xc/config/cf/cross.def,v 1.1 2000/12/08 22:09:34 keithp Exp $ */
+/*
+ * This file contains redefinitions of some symbols to enable
+ * cross compilation: e.g. paths for include files and paths to
+ * compiler images.  It will have to be edited to reflect these
+ * given your local configuration.
+ */
+#define Ai386Architecture
+
+#undef OptimizedCDebugFlags
+#define OptimizedCDebugFlags 	-O2
+#define ServerCDebugFlags	-O2
+#undef StandardDefines
+#define StandardDefines 	-Dlinux -D_POSIX_SOURCE \
+				-DFT_FREETYPE_H -DBSD_SOURCE -D_GNU_SOURCE -DX_LOCALE
+
+
+#undef CplusplusCmd
+#define CplusplusCmd /home/leo/neouzabox/build.i386/toolchain/bin/i386-pc-linux-uclibc-g++
+
+
+#undef CplusplusFilt 
+#define CplusplusFilt /home/leo/neouzabox/build.i386/toolchain/bin/i386-pc-linux-uclibc-c++filt
+
+
+#undef  CplusplusYaccCmd 
+
+#undef  CppCmd 
+#define CppCmd /home/leo/neouzabox/build.i386/toolchain/bin/i386-pc-linux-uclibc-cpp
+
+#define StdIncDir /home/leo/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/sysroot/usr/include
+#define PreIncDir 
+
+#undef PostIncDir 
+#define PostIncDir /home/leo/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/sysroot/usr/include 
+
+#undef CcCmd
+#define CcCmd /home/leo/neouzabox/build.i386/toolchain/bin/i386-pc-linux-uclibc-gcc
+
+#define DoRanlibCmd YES
+#define RanlibCmd /home/leo/neouzabox/build.i386/toolchain/bin/i386-pc-linux-uclibc-ranlib
+
+#undef ExtraLoadFlags
+#define ExtraLoadFlags
+#define FbNoPixelAddrCode
+#undef TermcapLibrary
+#define TermcapLibrary -ltermcap
+
+#undef LdPostLib
+#define LdPostLib	-L/home/leo/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/sysroot/usr/include 
+
+
+#undef ExtensionOSDefines
+#define ExtensionOSDefines
+
+#define ServerXdmcpDefines	/**/
+
+#include <cross.rules>

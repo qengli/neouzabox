@@ -1,0 +1,9 @@
+#!/bin/sh
+
+. config/options
+
+$1 geexbox-$NEOUBOX_VERSION-*.iso \
+   geexbox-generator-$NEOUBOX_VERSION*.tar.gz \
+   geexbox-$NEOUBOX_VERSION.tar.bz2 \
+   geexbox-$NEOUBOX_VERSION-full.tar \
+   > geexbox-$NEOUBOX_VERSION.$1

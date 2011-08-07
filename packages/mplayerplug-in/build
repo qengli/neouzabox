@@ -1,0 +1,23 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+echo "|||||||||||||||||||| prepareing to build mplayer-plugin |||||||||||||||||||||||"
+
+if [ "$MOZ_APP" = "xulrunner" ]; then
+	WITH_GECKO=--with-gecko-sdk=$ROOT/$BUILD/mozilla/objdir/xulrunner/dist/gecko-sdk 
+else
+	WITH_GECKO=--with-gecko-sdk=$ROOT/$BUILD/mozilla/objdir/dist/sdk 
+fi
+
+cd $BUILD/$1*
+./configure --prefix=$LIB_PREFIX \
+	${WITH_GECKO} \
+	--enable-gtk2 \
+        --build=$HOST_NAME \
+        --host=$TARGET_NAME
+make
+make install
+

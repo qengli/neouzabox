@@ -1,0 +1,11 @@
+--- php-4.4.9/configure.in	2008-08-06 16:32:30.000000000 +0800
++++ php-4.4.9.new/configure.in	2008-09-18 12:58:11.000000000 +0800
+@@ -876,7 +876,7 @@
+ ;;
+ esac
+ 
+-EXTRA_LIBS="$EXTRA_LIBS $DLIBS $LIBS"
++EXTRA_LIBS="$EXTRA_LIBS $DLIBS $LIBS -ldl -liconv"
+ 
+ dnl this has to be here to prevent the openssl crypt() from
+ dnl overriding the system provided crypt().

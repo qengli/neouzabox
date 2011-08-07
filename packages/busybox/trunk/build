@@ -1,0 +1,10 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+cd $BUILD/$1*
+#ARCH=$TARGET_ARCH make $1
+ARCH=$TARGET_ARCH make CROSS_COMPILE=$ROOT/$TOOLCHAIN/bin/$TARGET_NAME- $1
+

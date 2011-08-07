@@ -1,0 +1,8 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/install alsa-lib
+$SCRIPTS/install alsa-utils
+
+cp $PACKAGES/$1/config/audio $INSTALL/etc

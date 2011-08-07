@@ -1,0 +1,134 @@
+diff -Nur samba-3.0.20.orig/source/include/debug.h samba-3.0.20/source/include/debug.h
+--- samba-3.0.20.orig/source/include/debug.h	2005-07-28 16:19:49.000000000 +0300
++++ samba-3.0.20/source/include/debug.h	2005-08-23 13:48:45.000000000 +0300
+@@ -155,50 +155,16 @@
+  * will remove the extra conditional test.
+  */
+ 
+-#define DEBUGLVL( level ) \
+-  ( ((level) <= MAX_DEBUG_LEVEL) && \
+-     ((DEBUGLEVEL_CLASS[ DBGC_CLASS ] >= (level))||  \
+-     (!DEBUGLEVEL_CLASS_ISSET[ DBGC_CLASS ] && \
+-      DEBUGLEVEL_CLASS[ DBGC_ALL   ] >= (level))  ) \
+-   && dbghdr( level, __FILE__, FUNCTION_MACRO, (__LINE__) ) )
+-
+-
+-#define DEBUGLVLC( dbgc_class, level ) \
+-  ( ((level) <= MAX_DEBUG_LEVEL) && \
+-     ((DEBUGLEVEL_CLASS[ dbgc_class ] >= (level))||  \
+-     (!DEBUGLEVEL_CLASS_ISSET[ dbgc_class ] && \
+-      DEBUGLEVEL_CLASS[ DBGC_ALL   ] >= (level))  ) \
+-   && dbghdr( level, __FILE__, FUNCTION_MACRO, (__LINE__) ) )
+-
+-
+-#define DEBUG( level, body ) \
+-  (void)( ((level) <= MAX_DEBUG_LEVEL) && \
+-           ((DEBUGLEVEL_CLASS[ DBGC_CLASS ] >= (level))||  \
+-           (!DEBUGLEVEL_CLASS_ISSET[ DBGC_CLASS ] && \
+-            DEBUGLEVEL_CLASS[ DBGC_ALL   ] >= (level))  ) \
+-       && (dbghdr( level, __FILE__, FUNCTION_MACRO, (__LINE__) )) \
+-       && (dbgtext body) )
+-
+-#define DEBUGC( dbgc_class, level, body ) \
+-  (void)( ((level) <= MAX_DEBUG_LEVEL) && \
+-           ((DEBUGLEVEL_CLASS[ dbgc_class ] >= (level))||  \
+-           (!DEBUGLEVEL_CLASS_ISSET[ dbgc_class ] && \
+-	    DEBUGLEVEL_CLASS[ DBGC_ALL   ] >= (level))  ) \
+-       && (dbghdr( level, __FILE__, FUNCTION_MACRO, (__LINE__) )) \
+-       && (dbgtext body) )
+-
+-#define DEBUGADD( level, body ) \
+-  (void)( ((level) <= MAX_DEBUG_LEVEL) && \
+-           ((DEBUGLEVEL_CLASS[ DBGC_CLASS ] >= (level))||  \
+-           (!DEBUGLEVEL_CLASS_ISSET[ DBGC_CLASS ] && \
+-            DEBUGLEVEL_CLASS[ DBGC_ALL   ] >= (level))  ) \
+-       && (dbgtext body) )
+-
+-#define DEBUGADDC( dbgc_class, level, body ) \
+-  (void)( ((level) <= MAX_DEBUG_LEVEL) && \
+-          ((DEBUGLEVEL_CLASS[ dbgc_class ] >= (level))||  \
+-           (!DEBUGLEVEL_CLASS_ISSET[ dbgc_class ] && \
+-            DEBUGLEVEL_CLASS[ DBGC_ALL   ] >= (level))  ) \
+-       && (dbgtext body) )
++#define DEBUGLVL( level )  (0)
++
++#define DEBUGLVLC( dbgc_class, level )  (0)
++
++#define DEBUG( level, body )  ((void)0)
++
++#define DEBUGC( dbgc_class, level, body )  ((void)0)
++
++#define DEBUGADD( level, body )  ((void)0)
++
++#define DEBUGADDC( dbgc_class, level, body )  ((void)0)
+ 
+ #endif
+diff -Nur samba-3.0.20.orig/source/libsmb/clierror.c samba-3.0.20/source/libsmb/clierror.c
+--- samba-3.0.20.orig/source/libsmb/clierror.c	2005-07-28 16:19:46.000000000 +0300
++++ samba-3.0.20/source/libsmb/clierror.c	2005-08-23 13:48:45.000000000 +0300
+@@ -134,7 +134,7 @@
+ 	if (flgs2 & FLAGS2_32_BIT_ERROR_CODES) {
+ 		NTSTATUS status = NT_STATUS(IVAL(cli->inbuf,smb_rcls));
+ 
+-		return nt_errstr(status);
++		return "NT_STATUS_UNSUCCESSFUL";
+         }
+ 
+ 	cli_dos_error(cli, &errclass, &errnum);
+diff -Nur samba-3.0.20.orig/source/Makefile.in samba-3.0.20/source/Makefile.in
+--- samba-3.0.20.orig/source/Makefile.in	2005-08-08 02:09:57.000000000 +0300
++++ samba-3.0.20/source/Makefile.in	2005-08-23 13:48:45.000000000 +0300
+@@ -454,9 +454,7 @@
+ 	$(SECRETS_OBJ) $(LIBSAMBA_OBJ) \
+ 	$(PRINTBASE_OBJ) $(ERRORMAP_OBJ)
+ 
+-SMBTREE_OBJ = utils/smbtree.o $(PARAM_OBJ) \
+-             $(PROFILE_OBJ) $(LIB_NONSMBD_OBJ) $(LIBSMB_OBJ) \
+-	     $(KRBCLIENT_OBJ) $(POPT_LIB_OBJ) $(SECRETS_OBJ) 
++SMBTREE_OBJ = utils/smbtree.o $(POPT_LIB_OBJ) $(SECRETS_OBJ) 
+ 
+ TESTPARM_OBJ = utils/testparm.o \
+                $(PARAM_OBJ) $(LIB_NONSMBD_OBJ) $(POPT_LIB_OBJ) \
+@@ -546,8 +544,7 @@
+ CUPS_OBJ = client/smbspool.o $(PARAM_OBJ) $(LIBSMB_OBJ) \
+ 	  $(LIB_NONSMBD_OBJ) $(KRBCLIENT_OBJ) $(SECRETS_OBJ)
+ 
+-MOUNT_OBJ = client/smbmount.o \
+-             $(PARAM_OBJ) $(LIBSMB_OBJ) $(KRBCLIENT_OBJ) $(LIB_NONSMBD_OBJ) $(SECRETS_OBJ)
++MOUNT_OBJ = client/smbmount.o
+ 
+ MNT_OBJ = client/smbmnt.o $(VERSION_OBJ) $(SNPRINTF_OBJ)
+ 
+@@ -860,9 +857,9 @@
+ 	@echo Linking $@
+ 	@$(CC) $(FLAGS) @PIE_LDFLAGS@ -o $@ $(CUPS_OBJ) $(DYNEXP) $(LDFLAGS) $(LIBS) $(KRB5LIBS) $(LDAP_LIBS)
+ 
+-bin/smbmount@EXEEXT@: $(MOUNT_OBJ) bin/.dummy
++bin/smbmount@EXEEXT@: $(MOUNT_OBJ) bin/libsmbclient.so bin/.dummy
+ 	@echo Linking $@
+-	@$(CC) $(FLAGS) @PIE_LDFLAGS@ -o $@ $(MOUNT_OBJ) $(DYNEXP) $(LDFLAGS) $(LIBS) $(KRB5LIBS) $(LDAP_LIBS)
++	@$(CC) $(FLAGS) @PIE_LDFLAGS@ -o $@ $(MOUNT_OBJ) $(DYNEXP) $(LDFLAGS) $(LIBS) $(KRB5LIBS) $(LDAP_LIBS) -Lbin -lsmbclient
+ 
+ bin/smbmnt@EXEEXT@: $(MNT_OBJ) bin/.dummy
+ 	@echo Linking $@
+@@ -887,9 +884,9 @@
+ 	$(LDFLAGS) $(LIBS) \
+ 	@POPTLIBS@
+ 
+-bin/smbtree@EXEEXT@: $(SMBTREE_OBJ) @BUILD_POPT@ bin/.dummy
++bin/smbtree@EXEEXT@: $(SMBTREE_OBJ) bin/libsmbclient.so @BUILD_POPT@ bin/.dummy
+ 	@echo Linking $@
+-	@$(CC) $(FLAGS) @PIE_LDFLAGS@ -o $@ $(SMBTREE_OBJ) $(LDFLAGS) $(DYNEXP) $(LIBS) @POPTLIBS@ $(KRB5LIBS) $(LDAP_LIBS) 
++	@$(CC) $(FLAGS) @PIE_LDFLAGS@ -o $@ $(SMBTREE_OBJ) $(LDFLAGS) $(DYNEXP) $(LIBS) @POPTLIBS@ $(KRB5LIBS) $(LDAP_LIBS) -Lbin -lsmbclient
+ 
+ bin/smbpasswd@EXEEXT@: $(SMBPASSWD_OBJ) bin/.dummy
+ 	@echo Linking $@
+@@ -994,7 +991,7 @@
+ 
+ bin/libsmbclient.a: $(LIBSMBCLIENT_PICOBJS)
+ 	@echo Linking libsmbclient non-shared library $@
+-	@-$(AR) -rc $@ $(LIBSMBCLIENT_PICOBJS)
++	@-$(AR) -rc $@ $(LIBSMBCLIENT_PICOBJS) $(KRB5LIBS) $(LDAPLIBS)
+ 
+ # This is probably wrong for anything other than the GNU linker. 
+ bin/libbigballofmud.@SHLIBEXT@: $(LIBBIGBALLOFMUD_PICOBJS)

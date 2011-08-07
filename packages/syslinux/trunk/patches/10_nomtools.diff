@@ -1,0 +1,71 @@
+diff -Nur syslinux-3.09.orig/mtools/syslinux.c syslinux-3.09/mtools/syslinux.c
+--- syslinux-3.09.orig/mtools/syslinux.c	Tue Jan  4 05:27:43 2005
++++ syslinux-3.09/mtools/syslinux.c	Wed Aug 10 13:57:51 2005
+@@ -128,12 +128,8 @@
+   static unsigned char sectbuf[512];
+   int dev_fd;
+   struct stat st;
+-  int status;
+   char **argp, *opt;
+   int force = 0;		/* -f (force) option */
+-  char mtools_conf[] = "/tmp/syslinux-mtools-XXXXXX";
+-  int mtc_fd;
+-  FILE *mtc, *mtp;
+   struct libfat_filesystem *fs;
+   libfat_sector_t s, *secp, sectors[65]; /* 65 is maximum possible */
+   int32_t ldlinux_cluster;
+@@ -198,54 +194,6 @@
+   if( (errmsg = syslinux_check_bootsect(sectbuf)) ) {
+     die(errmsg);
+   }
+-
+-  /*
+-   * Create an mtools configuration file
+-   */
+-  mtc_fd = mkstemp(mtools_conf);
+-  if ( mtc_fd < 0 || !(mtc = fdopen(mtc_fd, "w")) ) {
+-    perror(program);
+-    exit(1);
+-  }
+-  fprintf(mtc,
+-	  "MTOOLS_NO_VFAT=1\n"
+-	  "MTOOLS_SKIP_CHECK=1\n" /* Needed for some flash memories */
+-	  "drive s:\n"
+-	  "  file=\"/proc/%lu/fd/%d\"\n"
+-	  "  offset=%llu\n",
+-	  (unsigned long)mypid,
+-	  dev_fd,
+-	  (unsigned long long)filesystem_offset);
+-  fclose(mtc);
+-  
+-  /*
+-   * Run mtools to create the LDLINUX.SYS file
+-   */
+-  if ( setenv("MTOOLSRC", mtools_conf, 1) ) {
+-    perror(program);
+-    exit(1);
+-  }
+-
+-  /* This command may fail legitimately */
+-  system("mattrib -h -r -s s:ldlinux.sys 2>/dev/null");
+-
+-  mtp = popen("mcopy -D o -D O -o - s:ldlinux.sys", "w");
+-  if ( !mtp ||
+-       (fwrite(syslinux_ldlinux, 1, syslinux_ldlinux_len, mtp) 
+-	!= syslinux_ldlinux_len) ||
+-       (status = pclose(mtp), !WIFEXITED(status) || WEXITSTATUS(status)) ) {
+-    die("failed to create ldlinux.sys");
+-  }
+-
+-  status = system("mattrib +r +h +s s:ldlinux.sys");
+-
+-  if ( !WIFEXITED(status) || WEXITSTATUS(status) ) {
+-    fprintf(stderr,
+-	    "%s: warning: failed to set system bit on ldlinux.sys\n",
+-	    program);
+-  }
+-
+-  unlink(mtools_conf);
+ 
+   /*
+    * Now, use libfat to create a block map

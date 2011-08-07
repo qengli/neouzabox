@@ -1,0 +1,204 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+$SCRIPTS/build lirc
+$SCRIPTS/build cdparanoia
+$SCRIPTS/build zlib
+$SCRIPTS/build alsa
+$SCRIPTS/build freetype
+$SCRIPTS/build fribidi
+$SCRIPTS/build iconv-base
+$SCRIPTS/build libdvdnav
+
+setup_toolchain --optimize target
+
+#added by Leo 2007.12.3 
+#oddly the fribidi-config have not exe privilige result in mplayer build can't find lib
+chmod 755 $LIB_PREFIX/bin/fribidi-config
+
+set_option() {
+  OPT="$1"
+  CFG_LIST="$2"
+  PKG="$3"
+  [ "$OPT" = yes ] && CFG=enable || CFG=disable
+  for CFG_NAME in $CFG_LIST; do
+    EXTRA_CONFIG="$EXTRA_CONFIG --$CFG-$CFG_NAME"
+  done
+  [ $CFG = enable -a -n "$PKG" ] && $SCRIPTS/build $PKG
+  return 0
+}
+
+EXTRA_LIBDIR="$LIB_PREFIX/lib"
+EXTRA_INCDIR="$LIB_PREFIX/include"
+[ "$LIVE555" = yes ] && EXTRA_INCDIR="$EXTRA_INCDIR -I$LIB_PREFIX/live/liveMedia/include"
+[ "$LIVE555" = yes ] && EXTRA_LIBDIR="$EXTRA_LIBDIR -I$LIB_PREFIX/live/liveMedia/"
+
+set_option "$DXR3" "dxr3 ossaudio" "em8300"
+set_option "$IVTV" "ivtv pvr" "ivtv"
+set_option "$SDL" "sdl" "SDL"
+set_option "$DIRECTFB" "directfb" "DirectFB"
+set_option "$LIVE555" "live" "live"
+set_option "$FREEVO" "png" "libpng"
+
+if [ "$DIRECTFB" = yes ]; then
+  EXTRA_INCDIR="$EXTRA_INCDIR -I$LIB_PREFIX/include/directfb"
+  EXTRA_LIBDIR="$EXTRA_LIBDIR -L`ls -d $LIB_PREFIX/lib/directfb*`"
+fi
+[ "$LIVE555" = yes ] && EXTRA_CONFIG="$EXTRA_CONFIG --enable-live"
+if [ "$TARGET_ARCH" = i386 ]; then
+  $SCRIPTS/build vesautils
+  ARCH_CONFIG="--enable-win32dll \
+               --enable-real \
+               --realcodecsdir=/codecs \
+               --win32codecsdir=/codecs \
+               --disable-fbdev \
+               --enable-vesa"
+  VIDIX_DRV="cyberblade mach64 mga nvidia pm2 pm3 radeon rage128 unichrome"
+else
+  ARCH_CONFIG="--disable-win32dll \
+               --disable-real \
+               --enable-fbdev \
+               --disable-vesa"
+  VIDIX_DRV="mach64 radeon rage128"
+fi
+
+if [ "$DEBUG" = yes ]; then
+  DEBUG_CONFIG="--disable-decoder=h264 \
+                --disable-decoder=svq3 \
+                --disable-parser=h264"
+fi
+
+CFLAGS="$CFLAGS -ffast-math -DFIXED_POINT -D__USE_EXTERN_INLINES"
+cd $BUILD/$1*
+./configure --prefix=/usr \
+            --confdir=/etc/mplayer \
+            --with-extralibdir="$EXTRA_LIBDIR" \
+            --with-extraincdir="$EXTRA_INCDIR" \
+            --enable-radio \
+            --enable-radio-v4l2 \
+            $ARCH_CONFIG \
+            $EXTRA_CONFIG \
+            --disable-mencoder \
+            --disable-gui \
+            --enable-largefiles \
+            --disable-linux-devfs \
+            --disable-termcap \
+            --disable-langinfo \
+            --enable-lirc \
+            --disable-lircc \
+            --enable-joystick \
+            --disable-xf86keysym \
+            --enable-tv \
+            --disable-tv-v4l1 \
+            --enable-tv-v4l2 \
+            --disable-tv-bsdbt848 \
+            --enable-rtc \
+            --enable-network \
+            --disable-winsock2 \
+            --disable-smb \
+            --disable-dvdread \
+            --enable-dvdnav \
+            --with-dvdnav-config="$LIB_PREFIX/bin/dvdnav-config" \
+            --enable-cdparanoia \
+            --enable-freetype \
+            --with-freetype-config="$LIB_PREFIX/bin/freetype-config" \
+            --disable-fontconfig \
+            --enable-fribidi \
+            --with-fribidi-config="$LIB_PREFIX/bin/fribidi-config" \
+            --enable-unrarlib \
+            --enable-menu \
+            --disable-sortsub \
+            --disable-enca \
+            --disable-macosx \
+            --disable-inet6 \
+            --disable-gethostbyname2 \
+            --disable-ftp \
+            --disable-vstream \
+            --disable-gif \
+            --disable-jpeg \
+            --disable-libcdio \
+            --disable-liblzo \
+            --disable-qtx \
+            --disable-xanim \
+            --disable-xvid \
+            --disable-x264 \
+            --disable-demuxer=matroska \
+            --disable-libavcodec_so \
+            --disable-libavformat_so \
+            --disable-libpostproc_so \
+            --disable-speex \
+            --disable-tremor-internal \
+            --disable-tremor-low \
+            --disable-tremor-external \
+            --disable-libvorbis \
+            --disable-theora \
+            --disable-faad-external \
+            --enable-faad-internal \
+            --disable-faac \
+            --disable-ladspa \
+            --disable-libdv \
+            --disable-mad \
+            --disable-toolame \
+            --disable-xmms \
+            --enable-mp3lib \
+            --enable-liba52 \
+            --disable-libmpeg2 \
+            --disable-musepack \
+            --enable-vidix-internal \
+            --with-vidix-drivers="$VIDIX_DRV" \
+            --disable-vidix-external \
+            --disable-gl \
+            --disable-dga \
+            --disable-svga \
+            --disable-aa \
+            --disable-caca \
+            --disable-ggi \
+            --disable-ggiwmh \
+            --disable-directx \
+            --disable-dxr2 \
+            --disable-dvb \
+            --enable-dvbhead \
+            --disable-mga \
+            --disable-xmga \
+            --disable-xv \
+            --disable-xvmc \
+            --disable-vm \
+            --disable-xinerama \
+            --disable-x11 \
+            --disable-mlib \
+            --disable-3dfx \
+            --disable-tdfxfb \
+            --disable-zr \
+            --disable-bl \
+            --disable-tdfxvid \
+            --disable-tga \
+            --disable-pnm \
+            --disable-md5sum \
+            --disable-arts \
+            --disable-esd \
+            --disable-polyp \
+            --disable-jack \
+            --disable-openal \
+            --enable-alsa \
+            --disable-sgiaudio \
+            --disable-sunaudio \
+            --disable-nas \
+            --disable-win32waveout \
+            --disable-select \
+            --enable-runtime-cpudetection \
+            --enable-cross-compile \
+            --target="$TARGET_ARCH-linux" \
+            --as=$AS \
+            --cc=$CC \
+            --host-cc=$HOST_CC \
+            --language=en \
+            --disable-shm \
+            --disable-dynamic-plugins \
+            $DEBUG_CONFIG
+sed -i s/-lnsl// config.mak
+sed -i 's/.*HAVE_LRINTF.*/#define HAVE_LRINTF 1/' config.h
+sed -i 's/.*HAVE_ROUND.*/#undef HAVE_ROUND/' config.h
+[ "$DEBUG" = yes ] && sed -i 's/.*MP_DEBUG.*/#define MP_DEBUG 1/' config.h
+make

@@ -1,0 +1,90 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build genext2fs
+
+export INSTALL=$BUILD/$1/mnt
+
+rm -rf $INSTALL
+mkdir -p $INSTALL
+rm -f $BUILD/$1/$1 $BUILD/$1/$1.gz
+
+mkdir $INSTALL/bin
+mkdir $INSTALL/etc
+mkdir $INSTALL/ramfs
+mkdir $INSTALL/sbin
+mkdir $INSTALL/usr
+mkdir $INSTALL/usr/bin
+
+$SCRIPTS/install $TARGET_LIBC 
+$SCRIPTS/install busybox
+
+cp $PACKAGES/$1/$VERSION/scripts/linuxrc $INSTALL/sbin/init
+chmod 755 $INSTALL/sbin/init
+
+cp $ROOT/$BUILD/toolchain/mipsel-unknown-linux-uclibc/lib/libgcc_s.so.1 $INSTALL/lib
+cp $ROOT/$BUILD/toolchain/mipsel-unknown-linux-uclibc/lib/libstdc++.so.6 $INSTALL/lib
+
+cp $BUILD/bftpd*/bftpd $INSTALL/sbin
+cp $PACKAGES/bftpd/config/bftpd.conf $INSTALL/etc
+
+cp $PACKAGES/$1/$VERSION/scripts/console $INSTALL/sbin
+cp $PACKAGES/$1/$VERSION/scripts/nosystem $INSTALL/sbin
+cp $PACKAGES/$1/$VERSION/scripts/r[ow] $INSTALL/usr/bin
+
+ln -s /bin/busybox $INSTALL/bin/sh
+
+mkdir -p $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libgthread-2.0.so.0 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libiconv.so.2 $INSTALL/usr/lib
+if [ $X11 = "yes" ]; then
+cp $LIB_PREFIX/lib/libgtk-x11-2.0.so.0 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libgdk-x11-2.0.so.0 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libX11.so.6 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libXrender.so.1 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libXt.so.6 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libXft.so.2 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libpangoxft-1.0.so.0 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libXrandr.so.2 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libXext.so.6 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libSM.so.6 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libICE.so.6 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libpangox-1.0.so.0 $INSTALL/usr/lib
+fi
+
+cp $LIB_PREFIX/lib/libatk-1.0.so.0 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libgdk_pixbuf-2.0.so.0 $INSTALL/usr/lib
+#cp $LIB_PREFIX/lib/libpng12.so.0 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libjpeg.so.62 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libpangocairo-1.0.so.0 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libz.so.1 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libpango-1.0.so.0 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libcairo.so.2 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libgobject-2.0.so.0 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libgmodule-2.0.so.0 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libglib-2.0.so.0 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libfreetype.so.6 $INSTALL/usr/lib
+cp $LIB_PREFIX/lib/libpangoft2-1.0.so.0 $INSTALL/usr/lib
+#cp $LIB_PREFIX/lib/libexpat.so.1 $INSTALL/usr/lib
+
+cp $LIB_PREFIX/lib/libfontconfig.so.1 $INSTALL/usr/lib
+
+cp $ROOT/$BUILD/toolchain/bin/ldd $INSTALL/usr/bin
+
+cp $LIB_PREFIX/lib/libncurses.so.5 $INSTALL/usr/lib
+cp $ROOT/$BUILD/gdb-*/objdir/gdb/gdb $INSTALL/usr/bin
+cp $ROOT/$BUILD/gdb-*/objdir/gdb/gdbserver/gdbserver $INSTALL/usr/bin
+
+
+
+mkdir -p $INSTALL/etc/pango/modules
+find $ROOT/$BUILD/pango-*/modules/ -name '*.so' -exec cp {} $INSTALL/etc/pango/modules/ \;
+
+cp $ROOT/$PACKAGES/pango/config/pango.modules $INSTALL/etc/pango/
+cp $ROOT/$PACKAGES/gale/gale/fonts $INSTALL/etc -r
+
+mkdir -p $INSTALL/usr/share
+cp $ROOT/$SOURCES/fonts/ $INSTALL/usr/share -r 
+  
+

@@ -1,0 +1,94 @@
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/include/linux/kmalloc_sizes.h linux-2.6.15/include/linux/kmalloc_sizes.h
+--- linux-2.6.15.ref/include/linux/kmalloc_sizes.h	2006-12-27 16:39:06.000000000 -0800
++++ linux-2.6.15/include/linux/kmalloc_sizes.h	2006-12-27 16:44:20.000000000 -0800
+@@ -19,10 +19,10 @@
+ 	CACHE(32768)
+ 	CACHE(65536)
+ 	CACHE(131072)
+-#ifndef CONFIG_MMU
+ 	CACHE(262144)
+ 	CACHE(524288)
+ 	CACHE(1048576)
++#ifndef CONFIG_MMU
+ #ifdef CONFIG_LARGE_ALLOCS
+ 	CACHE(2097152)
+ 	CACHE(4194304)
+@@ -30,4 +30,25 @@
+ 	CACHE(16777216)
+ 	CACHE(33554432)
+ #endif /* CONFIG_LARGE_ALLOCS */
++#else
++#ifdef MAX_KMALLOC_ORDER
++#if (MAX_KMALLOC_ORDER > 8)
++	CACHE(2097152)
++#endif
++#if (MAX_KMALLOC_ORDER > 9)
++	CACHE(4194304)
++#endif
++#if (MAX_KMALLOC_ORDER > 10)
++	CACHE(8388608)
++#endif
++#if (MAX_KMALLOC_ORDER > 11)
++	CACHE(16777216)
++#endif
++#if (MAX_KMALLOC_ORDER > 12)
++	CACHE(33554432)
++#endif
++#if (MAX_KMALLOC_ORDER > 13)
++#error MAX_KMALLOC_ORDER is too big!
++#endif
++#endif
+ #endif /* CONFIG_MMU */
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/include/linux/slab.h linux-2.6.15/include/linux/slab.h
+--- linux-2.6.15.ref/include/linux/slab.h	2006-12-27 16:39:06.000000000 -0800
++++ linux-2.6.15/include/linux/slab.h	2006-12-27 16:43:17.000000000 -0800
+@@ -76,6 +76,8 @@
+ extern struct cache_sizes malloc_sizes[];
+ extern void *__kmalloc(size_t, gfp_t);
+ 
++#define MAX_KMALLOC_ORDER    8  /* 2^8 pages max */
++
+ static inline void *kmalloc(size_t size, gfp_t flags)
+ {
+ 	if (__builtin_constant_p(size)) {
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/mm/slab.c linux-2.6.15/mm/slab.c
+--- linux-2.6.15.ref/mm/slab.c	2006-12-27 16:39:06.000000000 -0800
++++ linux-2.6.15/mm/slab.c	2006-12-27 16:45:20.000000000 -0800
+@@ -551,8 +551,13 @@
+ #define	MAX_OBJ_ORDER	13	/* up to 32Mb */
+ #define	MAX_GFP_ORDER	13	/* up to 32Mb */
+ #elif defined(CONFIG_MMU)
+-#define	MAX_OBJ_ORDER	5	/* 32 pages */
+-#define	MAX_GFP_ORDER	5	/* 32 pages */
++#ifdef MAX_KMALLOC_ORDER
++#define	MAX_OBJ_ORDER   MAX_KMALLOC_ORDER
++#define	MAX_GFP_ORDER   MAX_KMALLOC_ORDER
++#else
++#define	MAX_OBJ_ORDER	8	/* 256 pages */
++#define	MAX_GFP_ORDER	8	/* 256 pages */
++#endif
+ #else
+ #define	MAX_OBJ_ORDER	8	/* up to 1Mb */
+ #define	MAX_GFP_ORDER	8	/* up to 1Mb */
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/README.1016.kmalloc.patch linux-2.6.15/README.1016.kmalloc.patch
+--- linux-2.6.15.ref/README.1016.kmalloc.patch	1969-12-31 16:00:00.000000000 -0800
++++ linux-2.6.15/README.1016.kmalloc.patch	2006-12-27 16:46:33.000000000 -0800
+@@ -0,0 +1,18 @@
++Feature:
++--------
++Increase maximum kmalloc size from 128KB to 1MB.
++
++Prerequisite patch numbers:
++---------------------------
++none
++
++Primary author:
++---------------
++YH Lin
++
++Related to which chip version SMP86xx xx=?
++-----------------------------------------
++all
++
++(linux patches) which CONFIG_... are provided:
++----------------------------------------------

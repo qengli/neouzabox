@@ -1,0 +1,78 @@
+<HTML>
+<BODY style="overflow: hidden">
+
+<p>
+    <input type= 'text' id= 'MRL' size= '50' value='chrome://mnt/sd/test/content/test.mpg'>  </input>
+    <input type= 'button' value= 'Go!' onclick= 'Go()'> </input>
+</p>
+
+<embed 
+    type="application/x-vlc-plugin" 
+    id="player" 
+    width= "400" 
+    height="300"
+    loop="yes"
+/> 
+
+<p> 
+    
+    <a href="#" onclick='Play()'>Play</a> 
+    <a href="#" onclick='Pause()'>Pause</a> 
+    <a href="#" onclick='Stop()'>Stop</a> 
+    <a href="#" onclick='FullScreen()'>Fullscreen</a>
+    <a href="#" onclick='test()'>Test</a>
+
+</p>
+
+
+<SCRIPT type=text/javascript>
+
+    var vlc = document.getElementById ('player');
+    
+	function test ()
+	{
+		alert (vlc.versionInfo ());
+	}
+
+	function Play()
+	{
+		vlc.play();
+	}
+
+	function Pause()
+	{
+		vlc.pause();
+	}
+
+	function Stop()
+	{
+		vlc.stop();
+	}
+	
+	function Go()
+	{
+		var mrl = document.getElementById ('MRL').value;
+        //alert ('about to play: ' + mrl );
+		vlc.clear_playlist ();
+        vlc.add_item (mrl);
+        vlc.next ();
+        vlc.play ();
+	}
+
+	function FullScreen ()
+	{
+		vlc.fullscreen ();
+	}
+	
+    // just for debug,DisplayPropertyNames
+    function D(obj) 
+    {
+        var names = "\r\n" + obj + "'s all Property:\r\n";
+        for(var name in obj) names += name + "  ";
+        alert (names);
+    }
+    
+</script> 
+</BODY>
+</HTML>
+

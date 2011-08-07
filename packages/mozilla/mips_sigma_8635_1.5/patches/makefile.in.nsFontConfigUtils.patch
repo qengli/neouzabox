@@ -1,0 +1,16 @@
+--- mozilla/gfx/src/shared/Makefile.in.orig	2008-09-04 15:18:58.000000000 +0800
++++ mozilla/gfx/src/shared/Makefile.in	2008-09-04 15:07:22.000000000 +0800
+@@ -72,11 +72,11 @@
+ LOCAL_INCLUDES = -I$(srcdir)/.. \
+                  $(NULL)
+ 
+-ifdef MOZ_ENABLE_XFT
++#ifdef MOZ_ENABLE_XFT
+ REQUIRES	+= pref
+ CPPSRCS += nsFontConfigUtils.cpp
+ LOCAL_INCLUDES += $(MOZ_XFT_CFLAGS)
+-endif
++#endif
+ 
+ include $(topsrcdir)/config/rules.mk
+ 

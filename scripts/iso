@@ -1,0 +1,47 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/checkdeps build
+$SCRIPTS/checkdeps iso
+
+export INSTALL=$BUILD/iso/NEOUBOX 
+
+rm -rf $BUILD/iso
+$SCRIPTS/$GENTREE iso
+echo "|||||||||||||||||||||||||| mkzftree ||||||||||||||||||||||||"
+rm -rf $BUILD/ziso
+mkdir -p $BUILD/ziso
+mkzftree $INSTALL $BUILD/ziso/NEOUBOX
+echo "||||||||||||||||||||||||| $GENTREE iso boot ||||||||||||||||"
+export INSTALL=$BUILD/ziso/NEOUBOX
+$SCRIPTS/$GENTREE iso boot
+
+case $TARGET_ARCH in
+  i386)
+    MKISOFS_ARCH="-no-emul-boot \
+                  -boot-info-table \
+                  -boot-load-size 4 \
+                  -b NEOUBOX/boot/isolinux.bin \
+                  -c NEOUBOX/boot/boot.catalog"
+    ;;
+  ppc)
+    MKISOFS_ARCH="-hfs \
+                  -part \
+                  -no-desktop \
+                  -map $CONFIG/maps \
+                  -hfs-volid NEOUBOX \
+                  -hfs-bless $BUILD/ziso/NEOUBOX/boot"
+    ;;
+esac
+echo "|||||||||||||||||||||||||makeisofs|||||||||||||||||||||||||||"
+if [ $TARGET_CPU = x86_64 ]; then
+mv $BUILD/iso/NEOUBOX/usr/lib $BUILD/iso/NEOUBOX/usr/lib64 
+mv $BUILD/ziso/NEOUBOX/usr/lib $BUILD/ziso/NEOUBOX/usr/lib64 
+fi
+mkisofs -quiet -no-pad -V NeouzaBox -volset NeouzaBox \
+        -publisher "The Neouza Soft (www.neouza.com)" \
+        -p "The Neouza Soft (www.neouza.com)" \
+        -A "MKISOFS ISO 9660/HFS FILESYSTEM BUILDER" \
+        -z -D -r -J -sort $CONFIG/sort $MKISOFS_ARCH \
+        $BUILD/ziso > $ISO

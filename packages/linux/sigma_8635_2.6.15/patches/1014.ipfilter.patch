@@ -1,0 +1,102 @@
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/arch/mips/Kconfig linux-2.6.15/arch/mips/Kconfig
+--- linux-2.6.15.ref/arch/mips/Kconfig	2006-08-09 11:45:40.000000000 -0700
++++ linux-2.6.15/arch/mips/Kconfig	2006-08-09 13:26:49.000000000 -0700
+@@ -739,6 +739,7 @@
+ 	select DMA_TANGOX
+ 	select DMA_NONCOHERENT
+ 	select HW_HAS_PCI
++ 	select SD_IPFILTER
+ 	help
+ 	  Add support for Sigma Designs SMP863x board. Say Y here to
+ 	  support this machine type.
+@@ -759,6 +760,7 @@
+ 	select DMA_TANGOX
+ 	select DMA_NONCOHERENT
+ 	select HW_HAS_PCI
++ 	select SD_IPFILTER
+ 	help
+ 	  Add support for Sigma Designs SMP86xx board. Say Y here to
+ 	  support this machine type.
+@@ -866,6 +868,9 @@
+ 	bool
+ 	select DMA_NEED_PCI_MAP_STATE
+ 
++config SD_IPFILTER
++	bool
++ 
+ config DMA_NONCOHERENT
+ 	bool
+ 	select DMA_NEED_PCI_MAP_STATE
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/net/core/dev.c linux-2.6.15/net/core/dev.c
+--- linux-2.6.15.ref/net/core/dev.c	2006-01-25 20:52:05.000000000 -0800
++++ linux-2.6.15/net/core/dev.c	2006-08-09 13:20:57.000000000 -0700
+@@ -210,6 +210,9 @@
+ #define	netdev_unregister_sysfs(dev)	do { } while(0)
+ #endif
+ 
++#ifdef CONFIG_SD_IPFILTER
++void *(*sd_ipfilter)(unsigned char *, int) = NULL;
++#endif
+ 
+ /*******************************************************************************
+ 
+@@ -1396,6 +1399,13 @@
+ 	struct softnet_data *queue;
+ 	unsigned long flags;
+ 
++#ifdef CONFIG_SD_IPFILTER
++	if ((sd_ipfilter != NULL) && (((*sd_ipfilter)(skb->data, skb->len)) == NULL)) {
++		kfree_skb(skb);
++		return NET_RX_SUCCESS;
++	}
++#endif
++
+ 	/* if netpoll wants it, pretend we never saw it */
+ 	if (netpoll_rx(skb))
+ 		return NET_RX_DROP;
+@@ -1583,6 +1593,13 @@
+ 	int ret = NET_RX_DROP;
+ 	unsigned short type;
+ 
++#ifdef CONFIG_SD_IPFILTER
++	if ((sd_ipfilter != NULL) && (((*sd_ipfilter)(skb->data, skb->len)) == NULL)) {
++		kfree_skb(skb);
++		return NET_RX_SUCCESS;
++	}
++#endif
++
+ 	/* if we've gotten here through NAPI, check netpoll */
+ 	if (skb->dev->poll && netpoll_rx(skb))
+ 		return NET_RX_DROP;
+@@ -3312,4 +3329,8 @@
+ EXPORT_SYMBOL(dev_load);
+ #endif
+ 
++#ifdef CONFIG_SD_IPFILTER
++EXPORT_SYMBOL(sd_ipfilter);
++#endif
++
+ EXPORT_PER_CPU_SYMBOL(softnet_data);
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/README.1014.ipfilter.patch linux-2.6.15/README.1014.ipfilter.patch
+--- linux-2.6.15.ref/README.1014.ipfilter.patch	1969-12-31 16:00:00.000000000 -0800
++++ linux-2.6.15/README.1014.ipfilter.patch	2006-08-09 13:31:43.000000000 -0700
+@@ -0,0 +1,19 @@
++Feature:
++--------
++Hooks for Sigma's IP filter.
++
++Prerequisite patch numbers:
++---------------------------
++0000
++1000
++
++Primary author:
++---------------
++YH Lin
++
++Related to which chip version SMP86xx xx=?
++-----------------------------------------
++all
++
++(linux patches) which CONFIG_... are provided:
++----------------------------------------------

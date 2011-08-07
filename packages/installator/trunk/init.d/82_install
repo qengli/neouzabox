@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# start NeouzaBox installator
+#
+# runlevels: install
+
+export UID=0
+sleep 3
+/bin/sh /sbin/installator neouzabox
+
+exit 0

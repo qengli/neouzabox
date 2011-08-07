@@ -1,0 +1,256 @@
+
+This document explains how to use this package to sign bootloaders,
+cpu applications, and xtask with your own keys, as well as building binding 
+tokens for your own certificates.
+
+This package does not provide the necessary tools to develop your own xtask.
+For that you'll need to request the XSDK package. 
+
+Target environment:
+===================
+
+ You need to have an SMP8634 based board up and running, with XOS version
+ greater or equal to Ma6. The XOS version should be one of the first message
+ printed on the serial output during boot.
+
+ If you need to update your xos version please use the update.xos.tgz package 
+ (can be found on Sigma Designs developer web site)
+
+ For binding your certificates, you also need a program 
+ (hereafter refered to as xrpc) that sends out XRPC (Xos Remote Procedure Calls)
+ to the XOS.
+
+ Sigma Designs provide such "xrpc" tool for the following supported target
+ environment:
+
+  Linux (standalone and withhost):
+  --------------------------------
+
+  xrpc and ruaxrpc utilities are provided in the mrua development
+  packages. 
+ 
+  Windows Ce (standalone):
+  ------------------------
+
+  The xrpc utility is part of the sample apps distributed in the
+  SMP8634 Windows CE BSP.
+
+  Yamon (standalone):
+  -------------------
+ 
+  Yamon provide an xrpc command (Yamon is part of the smp86xx_boot_loader package)
+
+ Refer to the documentation for your target environment for specific details.
+
+Development Environment:
+=======================
+
+ This packages is supported on Linux platform and Windows 2000/XP platforms.
+
+ This XSDK need the following to be available on your host
+ development platform :
+ - bash
+ - perl 
+ - openssl : version 0.9.8a is recommended.
+
+ Linux Environment:
+ ------------------
+
+  All required software should be available with your linux distribution.
+  Please consult the documentation for your specific distribution.
+
+
+ Windows/Cygwin Environment:
+ --------------------------
+
+  Cygwin can be found at http://www.cygwin.com/. Follow the instructions on Cygwin
+  website for installation. 
+  During installation make sure to select these additional packages:
+	- lib/openssl
+	- interpreters/perl
+
+  All the following steps are done in Cygwin's bash shell.
+
+
+Content of the package:
+=======================
+
+ README.cpu_keys : This file
+ 
+ CPU_KEYS.env    : To setup your bash environment
+
+ xbin/           : Scripts for signing.
+ 
+ signed_items/   : Repository for keys, certificates,
+                   signatures, and other security elements.
+
+ doc/            : Documentation.
+
+
+Using the CPU_SDK_KEYS:
+=======================
+
+Prepare your environment
+------------------------
+
+ First untar the xsdk package and go in the XSDK_release directory:
+  $ tar xzf CPU_KEYS_release_name.tar.gz
+  $ cd CPU_KEYS_release_name
+
+ Before doing any work, setup the bash environment by sourcing
+ the CPU_KEYS.env file:
+  $ source CPU_KEYS.env
+
+ This will add the xbin directory to your PATH and set up
+ the XSDK_ROOT variable to the signed_items directory included in
+ this package. You may need to change this XSDK_ROOT to your own key
+ repository or add your own keys and certificate to this directory.
+
+Signing a bootloader:
+--------------------
+
+ Helper scripts in the xbin can be used to sign a bootloader with your
+ own key. Those helper scripts expect to find the bootloader binary at
+ a specific place in your $XSDK_ROOT repository.
+
+ The bootloader should have a base name, ${ZBOOT} and the binary should be
+ named ${ZBOOT}.bin and placed in the $XSDK_ROOT/items/zboot/ directory.
+
+  Then you create a zboot xrpc in 3 steps:
+
+ 1/ You sign the clear bootloader binary with the private key of 
+    your bootloader certificate.
+ 2/ You create the xload package, eventually including encryption
+    using the certificate AES keys.
+ 3/ Package it into an xrpc packet, which include the load address
+    of the bootloader. (This step does not requires any key)
+
+ Using the xbin script, and assuming you have the certificates and keys
+ at the right places in you $XSDK_ROOT, that your bootloader is named
+ 'stage0' here is an example of how to create the zboot xrpc using
+ certificate ID 0x000a for development chips:
+
+ 0/ Copy the bootloader binary in the repository:
+ $ cp /path/to/stage0.bin $XSDK_ROOT/items/zboot/stage0.bin
+ 
+ 1/ Create the signature (and move it in the XSDK_ROOT repository)
+ $ xsign.bash $XSDK_ROOT/items/zboot/stage0.bin 000a ES4_dev
+ $ mv stage0.bin.8634_ES4_dev_000a.bin $XSDK_ROOT/signatures/zboot/
+
+ 2/ Create the xload (and move it in the XSDK_ROOT repository)
+ $ build_zboot_xload.bash stage0 000a ES4_dev
+ $ mv stage0_8634_ES4_dev_0008.xload $XSDK_ROOT/xloads/zboot/
+
+ 3/ Create the xrpc packet:
+ $ build_zboot_xload_xrpc.bash stage0 000a ES4_dev 0x10800000
+  
+ (cf also zboot2_protocol.txt)
+
+Building binding tokens:
+-----------------------
+
+  cf doc/xtokens.txt
+  
+
+signed_item repository
+======================
+
+Organization:
+-------------
+ 
+ The signed_item repository is organized as follows:
+
+ dummy_private_keys/ :
+   This directory contains the private key for the facsimile certificates.
+ 
+ dummy_private_keys/sekaes : 
+   This directory contains the SEK AES keys for the facsimile certificates.
+ 
+ public_keys/ :
+   This directory contains the Sigma Root Public key as well as public keys
+   for all the certificate provided.
+ 
+ items/ :
+   This directory contains all the binary items destined to be signed
+ 
+ items/xtasks/ : xtasks binaries
+ items/tokens/ : tokens binaries
+ items/xload_certificates/ : certificates
+
+ signatures/ :
+   This directory contains signatures of the files in the items/ directory
+
+ signatures/xtasks/ : xtasks signatures
+ signatures/tokens/ : tokens signatures
+ signatures/xload_certificates : certificates signatures
+
+   The signatures are named with the following pattern: {item.bin}.{key.bin},
+   where item.bin is the name of the binary file, and key.bin is the name of
+   the key.
+ 
+ xloads/ :
+   This directory contains xload files build from the binaries in the items/
+   directory and the signatures in the signatures/ directory.
+
+ xloads/xtasks/ : xtask xloads
+ xloads/tokens/ : token xloads
+ 
+ 
+Certificates and other files provided in this package:
+------------------------------------------------------
+ 
+ For development purpose, this package provides several valid certificates, 
+ in "signed_items/items/xload_certificates/" directory, as well as the
+ private keys associated with them.  This package also provide binding tokens for
+ Sigma owned certificates and a sample xtask
+
+
+ The cg_display_cert.bash script can be used to get information about the
+ available certificates:
+
+  $ cd signed_items/
+  $ find items/xload_certificates/ -name "*.bin" | xargs -l1 cg_display_cert.bash -s
+
+  Certificate items/xload_certificates/xload_certificate_8634_ES4_dev_000a.bin
+  ID             = 000a
+  Type           = 00 (cpu bootloader (zboot), cpu zone)
+  XOSKEYId       = 0c (session key encrypted with XOSAESSymmetricKey(5))
+
+  Certificate items/xload_certificates/xload_certificate_8634_ES4_dev_000b.bin
+  ID             = 000b
+  Type           = 01 (cpu code, cpu zone (cpu kernels and applications))
+  XOSKEYId       = 0a (session key encrypted with XOSAESSymmetricKey(3))
+
+ ...
+
+ You should NOT use those certificates for production, as the private keys are not protected.
+
+ 
+ 
+
+
+
+
+Additional documentations:
+==========================
+
+ Additional documents are available in the doc/ directory.
+
+ FRM-CR8634-A-03.pdf:
+ 	Form and instructions on how to request your own certificate
+	
+ slideshow_smp8634security.pdf
+ 	Overview of the SMP8634 security architecture.
+
+ dram_map.pdf:
+ 	SMP8634 DRAM map.
+ 
+ signing_env.txt: 
+ 	Documents the use of the scripts in xbin/
+
+ xtokens.txt:
+ 	How to build "binding" and "unload" tokens.
+
+ zboot2_protocol.txt:
+ 	Details on the cpu boot process.
+	

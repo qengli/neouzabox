@@ -1,0 +1,17 @@
+--- mplayerplug-in/Source/plugin-threads.orig.cpp	2007-07-30 12:54:38.000000000 +0800
++++ mplayerplug-in/Source/plugin-threads.cpp	2007-07-30 12:53:42.000000000 +0800
+@@ -566,12 +566,12 @@
+ 	snprintf(buffer, 1024, "%i", instance->mc);
+ 	instance->td->argv[i++] = strdup(buffer);
+     }
+-
++/*
+     snprintf(buffer, 1024, "-osdlevel");
+     instance->td->argv[i++] = strdup(buffer);
+     snprintf(buffer, 1024, "%i", instance->osdlevel);
+     instance->td->argv[i++] = strdup(buffer);
+-
++*/
+     /* some extra flags for mplayer */
+     snprintf(buffer, 1024, "-nojoystick");	/* annoying... */
+     instance->td->argv[i++] = strdup(buffer);

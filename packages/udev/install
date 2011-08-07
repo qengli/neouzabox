@@ -1,0 +1,21 @@
+#!/bin/sh
+
+. config/options
+
+if [ $VERSION = "sigma_8635" ]; then
+INSTALL=$ROOT/$BUILD/rootfs
+fi
+
+mkdir -p $INSTALL/sbin
+cp $BUILD/$1*/udev $INSTALL/sbin
+cp $BUILD/$1*/udevd $INSTALL/sbin
+cp $BUILD/$1*/udevsend $INSTALL/sbin
+cp $BUILD/$1*/udevstart $INSTALL/sbin
+cp $BUILD/$1*/extras/firmware/firmware_helper $INSTALL/sbin
+
+mkdir -p $INSTALL/etc/udev/rules.d
+cp $PACKAGES/$1/config/udev.conf $INSTALL/etc/udev
+cp $PACKAGES/$1/config/rules.d/* $INSTALL/etc/udev/rules.d
+
+mkdir -p $INSTALL/etc/udev/scripts
+cp $PACKAGES/$1/scripts/* $INSTALL/etc/udev/scripts

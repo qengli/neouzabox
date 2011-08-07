@@ -1,0 +1,29 @@
+#!/bin/sh
+
+. config/options
+
+BUSYBOX_VERSION=`sed -n 's/^.*-\([0-9]\.[0-9]*\)\.tar\..*$/\1/p' $ROOT/$PACKAGES/$VDIR/url`
+cd $BUILD/$1-$BUSYBOX_VERSION
+
+sed -i s,^CONFIG_PREFIX=.*,CONFIG_PREFIX=\"$ROOT/$BUILD/rootfs\", .config ;
+#if ($(BR2_ENABLE_LOCALE),y)
+#	sed -i "s/^.*CONFIG_LOCALE_SUPPORT.*/CONFIG_LOCALE_SUPPORT=y/;" .config
+#else
+sed -i "s/^.*CONFIG_LOCALE_SUPPORT.*/CONFIG_LOCALE_SUPPORT=n/;" .config
+#endif
+sed -i "s/^.*CONFIG_LFS.*/CONFIG_LFS=y/;" .config
+	
+make CC=$TARGET_CC \
+  CROSS_COMPILE=$ROOT/$TOOLCHAIN/bin/$TARGET_NAME- \
+  CROSS=$ROOT/$TOOLCHAIN/bin/$TARGET_NAME- \
+  oldconfig
+
+make CC=$TARGET_CC \
+  CROSS_COMPILE=$ROOT/$TOOLCHAIN/bin/$TARGET_NAME- \
+  CROSS=$ROOT/$TOOLCHAIN/bin/$TARGET_NAME- \
+  PREFIX=$ROOT/$BUILD/rootfs \
+  EXTRA_CFLAGS="$TARGET_CFLAGS"
+
+
+
+

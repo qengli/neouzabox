@@ -1,0 +1,71 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/unpack linux-libc-header
+
+VERSION=2
+PATCHLEVEL=6
+SUBLEVEL=11
+LINUX_VERSION=$VERSION.$PATCHLEVEL.$SUBLEVEL
+ 
+case $TARGET_ARCH in
+  i386)
+    HEADERS=$SYSROOT_PREFIX/usr/include
+    if [ $TARGET_CPU = "x86_64" ]; then
+       EXTRA_DIRECTORIES="asm-x86_64 asm"
+    else
+       EXTRA_DIRECTORIES="asm-i386 asm"
+    fi
+    ;;
+
+  mips)
+    HEADERS=$SYSROOT_PREFIX/usr/include
+    EXTRA_DIRECTORIES="asm-mips"
+    ;;
+
+  arm)
+    cd $BUILD/linux-*
+    make ARC=$TARGET_ARCH include/linux/version.h
+    HEADERS=$SYSROOT_PREFIX/usr/include
+    EXTRA_DIRECTORIES="asm-arm linux sound mtd scsi"
+    ;;
+
+
+  powerpc)
+    HEADERS=$SYSROOT_PREFIX/include
+    EXTRA_DIRECTORIES="asm-powerpc asm-ppc asm"
+    ;;
+esac
+
+mkdir -p $HEADERS
+
+if [ $TARGET_ARCH = "mips" ]; then
+  cd $BUILD/$1*
+  #make ARC=$TARGET_ARCH include/linux/version.h
+  VERSION=2
+ if [ ! -f Makefile ] ; then \
+      echo -e "VERSION = $VERSION\nPATCHLEVEL = $PATCHLEVEL\n" > \
+        $HEADERS/../Makefile; \
+      echo -e "SUBLEVEL = $SUBLEVEL\nEXTRAVERSION =\n" >> \
+        $HEADERS/../Makefile; \
+      echo -e "KERNELRELEASE=\$$VERSION.\$$PATCHLEVEL.\$$SUBLEVEL\$$EXTRAVERSION" >> \
+         $HEADERS/../Makefile; \
+  fi
+  cp -a -rf ./include/asm-mips $HEADERS/asm
+  cp -a -rf ./include/linux $HEADERS/linux
+  touch  $HEADERS/linux/autoconf.h
+  cp -a -rf ./include/sound $HEADERS/sound
+  cp -a -rf ./include/scsi $HEADERS/scsi
+else
+
+  for d in linux asm-generic $EXTRA_DIRECTORIES; do
+    cp -pPR $(kernel_path)/include/$d $HEADERS/
+  done
+
+if [ $TARGET_ARCH = "arm" ]; then
+   rm -fr $HEADERS/asm
+   mv $HEADERS/asm-arm $HEADERS/asm
+fi 
+fi
+

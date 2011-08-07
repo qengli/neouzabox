@@ -1,0 +1,6 @@
+#!/bin/sh
+#this file is added by Leo 2006-03-02
+. config/options
+mkdir -p $INSTALL/usr/lib
+#cp $BUILD/$1*/objs/.libs/libfreetype.so.6 $SYSROOT_PREFIX/usr/lib
+cp -f $ROOT/$BUILD/$1-*/objs/.libs/libfreetype.so.6 $INSTALL/usr/lib

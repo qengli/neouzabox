@@ -1,0 +1,6 @@
+#!/bin/sh 
+
+. config/options
+
+
+exit 0

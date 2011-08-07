@@ -1,0 +1,66 @@
+#!/bin/sh
+
+. config/options
+
+#setup_toolchain host
+#CWD=`pwd`
+
+#cd $BUILD/$1*/ncurses-host
+#./configure
+##make -C include
+#make -C progs tic
+#cd "$CWD"
+#
+setup_toolchain target
+
+cd $BUILD/$1*
+
+sed -i 's~\$$srcdir/shlib tic\$$suffix~/usr/bin/tic~' \
+      misc/run_tic.in
+
+#BUILD_CC="$TARGET_CC" HOSTCC="$HOST_CC" \ 
+	./configure \
+		--host=$TARGET_NAME \
+		--build=$HOST_NAME  \
+		--prefix=/usr \
+		--exec-prefix=/usr \
+		--bindir=/usr/bin \
+		--sbindir=/usr/sbin \
+		--sysconfdir=/etc \
+		--datadir=/usr/share \
+		--localstatedir=/var \
+		--mandir=/usr/man \
+		--infodir=/usr/info \
+		--with-terminfo-dirs=/usr/share/terminfo \
+		--with-default-terminfo-dir=/usr/share/terminfo \
+		--libdir=$LIB_PREFIX/lib \
+		--with-shared --without-cxx --without-cxx-binding \
+		--without-ada --without-progs --disable-nls \
+		--without-profile --without-debug --disable-rpath \
+		--enable-echo --enable-const --enable-overwrite \
+		--enable-broken_linker 
+#make -C include
+#make -C ncurses
+#$AR cru lib/libncurses.a obj_s/*.o
+##make -C include install
+#make -C ncurses install
+#cd $LIB_PREFIX/include/ncurses
+#cp curses.h term.h ../
+make DESTDIR=$LIB_PREFIX libs panel menu form headers
+
+make \
+    prefix=$LIB_PREFIX \
+    exec_prefix=$LIB_PREFIX \
+    bindir=$LIB_PREFIX/bin \
+    sbindir=$LIB_PREFIX/sbin \
+    libexecdir=$LIB_PREFIX/lib \
+    datadir=$LIB_PREFIX/usr/share \
+    sysconfdir=$LIB_PREFIX/etc \
+    localstatedir=$LIB_PREFIX/var \
+    libdir=$LIB_PREFIX/lib \
+    infodir=$LIB_PREFIX/info \
+    mandir=$LIB_PREFIX/man \
+    includedir=$LIB_PREFIX/include \
+    gxx_include_dir=$LIB_PREFIX/include/c++ \
+    ticdir=$LIB_PREFIX/usr/share/terminfo \
+ install

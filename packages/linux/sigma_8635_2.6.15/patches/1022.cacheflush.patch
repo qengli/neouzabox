@@ -1,0 +1,40 @@
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/arch/mips/mm/cache.c linux-2.6.15/arch/mips/mm/cache.c
+--- linux-2.6.15.ref/arch/mips/mm/cache.c	2006-11-30 14:59:02.000000000 -0800
++++ linux-2.6.15/arch/mips/mm/cache.c	2006-11-30 15:00:30.000000000 -0800
+@@ -61,7 +61,13 @@
+ 	if (!access_ok(VERIFY_WRITE, (void __user *) addr, bytes))
+ 		return -EFAULT;
+ 
+-	flush_icache_range(addr, addr + bytes);
++	if (cache & ICACHE)
++		flush_icache_range(addr, addr + bytes);
++	if (cache & DCACHE) {
++		unsigned long start_addr;
++		for (start_addr = addr; start_addr < (addr + bytes); start_addr += PAGE_SIZE)
++			flush_data_cache_page(start_addr);
++	}
+ 
+ 	return 0;
+ }
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/README.1022.cacheflush.patch linux-2.6.15/README.1022.cacheflush.patch
+--- linux-2.6.15.ref/README.1022.cacheflush.patch	1969-12-31 16:00:00.000000000 -0800
++++ linux-2.6.15/README.1022.cacheflush.patch	2006-11-30 15:01:29.000000000 -0800
+@@ -0,0 +1,18 @@
++Feature:
++--------
++More optimization on cacheflush system call.
++
++Prerequisite patch numbers:
++---------------------------
++none
++
++Primary author:
++---------------
++YH Lin
++
++Related to which chip version SMP86xx xx=?
++------------------------------------------
++Tango2 ES6/RevA or above, or Tango3 ES1 or above
++
++(linux patches) which CONFIG_... are provided:
++----------------------------------------------

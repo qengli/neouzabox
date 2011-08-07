@@ -1,0 +1,7 @@
+#!/bin/sh
+
+. config/options
+mkdir -p $INSTALL/usr/local
+rm -fr $INSTALL/usr/local/jre
+cp -fr $BUILD/jre*/ $INSTALL/usr/local/jre 
+cp $BUILD/glibc-*/objdir-glibc/nis/libnsl.so.1 $INSTALL/usr/lib

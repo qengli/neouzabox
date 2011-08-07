@@ -1,0 +1,9 @@
+#!/bin/sh
+#
+# setup lirc
+#
+# runlevels: neouzabox, debug
+
+echo "### Starting gale ###"
+mkdir -p /.vlc
+cp /etc/vlcrc /.vlc/

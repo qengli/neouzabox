@@ -1,0 +1,39 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+setup_toolchain --optimize target
+#export LD_LIBRARY_PATH=/lib/libpthread.so.0:${SYSROOT_PREFIX}/usr/local/lib:${SYSROOT_PREFIX}/lib
+cd $BUILD/xc
+#sed s/'\[SYSROOT\]'/${SYSROOT_PREFIX//\//'\/'}/ $ROOT/packages/$1/$VERSION/config/cross.def > config/cf/cross.def.tmp
+#sed s/'\[TARGET_PREFIX\]'/${TARGET_PREFIX//\//'\/'}/ config/cf/cross.def.tmp > config/cf/cross.def
+#sed s/'\[SYSROOT\]'/${SYSROOT_PREFIX//\//'\/'}/ $ROOT/packages/$1/$VERSION/config/host.def > config/cf/host.def.tmp
+#sed s/'\[TARGET_PREFIX\]'/${TARGET_PREFIX//\//'\/'}/ config/cf/host.def.tmp > config/cf/host.def
+#the following is added by Leo 2007-06-25 to make imake work
+cp $ROOT/packages/$1/$VERSION/config/cross.def  config/cf/cross.def
+cp $ROOT/packages/$1/$VERSION/config/host.def  config/cf/host.def
+
+sed -i -e "s@\(\[SYSROOT\]\)@\ ${SYSROOT_PREFIX}@g" config/cf/cross.def
+sed -i -e "s@\(\[TARGET_PREFIX\]\)@\ ${TARGET_PREFIX}@g" config/cf/cross.def
+sed -i -e "s@\(\[SYSROOT\]\)@\ ${SYSROOT_PREFIX}@g" config/cf/host.def
+sed -i -e "s@\(\[TARGET_PREFIX\]\)@\ ${TARGET_PREFIX}@g" config/cf/host.def
+
+
+unset CC
+unset CXX
+unset LDFLAGS
+unset CFLAGS
+unset LD_LIBRARY_PATH
+unset CCACHE_DIR
+unset TARGET_CC
+unset TARGET_CXX
+unset RANLIB
+unset LIB_PREFIX
+unset CCFLAGS
+make World 
+#make install
+cp $ROOT/$BUILD/xc/lib/Xft/xft.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig 
+#mkdir -p ${SYSROOT_PREFIX}/usr/X11R6
+#cp -frL  $ROOT/$BUILD/xc/lib ${SYSROOT_PREFIX}/usr/X11R6
+#cp -frL $ROOT/$BUILD/xc/lib ${SYSROOT_PREFIX}/usr/X11R6

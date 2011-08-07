@@ -1,0 +1,118 @@
+--- gtk+-2.10.1/gdk/directfb/gdkdrawable-directfb.c.orig	2008-06-18 14:41:19.000000000 +0800
++++ gtk+-2.10.1/gdk/directfb/gdkdrawable-directfb.c	2008-06-18 14:58:16.000000000 +0800
+@@ -583,56 +583,66 @@
+   WARN_UNIMPLEMENTED (G_GNUC_FUNCTION);
+ }
+ 
+-static void
+-gdk_directfb_draw_drawable (GdkDrawable *drawable,
+-                            GdkGC       *gc,
+-                            GdkDrawable *src,
+-                            gint         xsrc,
+-                            gint         ysrc,
+-                            gint         xdest,
+-                            gint         ydest,
+-                            gint         width,
+-                            gint         height)
+-{
+-  GdkDrawableImplDirectFB *impl;
+-  GdkDrawableImplDirectFB *src_impl;
+-  GdkRegion               *clip;
+-  GdkRectangle             dest_rect = { xdest,
+-                                         ydest,
+-                xdest + width ,
+-                ydest + height};
+-
+-  DFBRectangle rect = { xsrc, ysrc, width, height };
+-  gint i;
+-
+-  impl = GDK_DRAWABLE_IMPL_DIRECTFB (drawable);
+-
+-  if (!impl->surface)
+-    return;
++static void 
++gdk_directfb_draw_drawable (GdkDrawable *drawable, 
++                            GdkGC       *gc, 
++                            GdkDrawable *src, 
++                            gint         xsrc, 
++                            gint         ysrc, 
++                            gint         xdest, 
++                            gint         ydest, 
++                            gint         width, 
++                            gint         height) 
++{ 
++  GdkDrawableImplDirectFB *impl; 
++  GdkDrawableImplDirectFB *src_impl; 
++  GdkRegion               *clip; 
++  GdkRectangle             dest_rect = { xdest, 
++                                         ydest, 
++                                         xdest + width, 
++                                         ydest + height }; 
++  GdkGCValues values = {0}; 
++  gdk_gc_get_values(gc, &values); 
++
++  DFBRectangle rect = { xsrc, ysrc, width, height }; 
++  gint i; 
++
++  impl = GDK_DRAWABLE_IMPL_DIRECTFB (drawable); 
++
++  if (!impl->surface) 
++    return; 
++
++  if (GDK_IS_PIXMAP (src)) 
++    src_impl = GDK_DRAWABLE_IMPL_DIRECTFB (GDK_PIXMAP_OBJECT (src)->impl); 
++  else if (GDK_IS_WINDOW (src)) 
++    src_impl = GDK_DRAWABLE_IMPL_DIRECTFB (GDK_WINDOW_OBJECT (src)->impl); 
++  else if (GDK_IS_DRAWABLE_IMPL_DIRECTFB (src)) 
++    src_impl = GDK_DRAWABLE_IMPL_DIRECTFB (src); 
++  else 
++    return; 
++
++  clip = gdk_directfb_clip_region (drawable, gc, &dest_rect); 
++
++  for (i = 0; i < clip->numRects; i++) 
++  { 
++      DFBRegion reg = { clip->rects[i].x1,     clip->rects[i].y1, 
++                        clip->rects[i].x2 - 1, clip->rects[i].y2 - 1 }; 
++
++      impl->surface->SetClip (impl->surface, &reg); 
++
++      if(values.clip_mask != NULL) 
++      {
++        impl->surface->SetBlittingFlags(impl->surface, DSBLIT_SRC_COLORKEY); 
++        impl->surface->SetSrcColorKey(impl->surface, 0, 0, 0);         
++      } 
++
++      impl->surface->Blit (impl->surface, src_impl->surface, &rect, 
++                           xdest, ydest); 
++  } 
++  impl->surface->SetClip (impl->surface, NULL); 
+ 
+-  if (GDK_IS_PIXMAP (src))
+-    src_impl = GDK_DRAWABLE_IMPL_DIRECTFB (GDK_PIXMAP_OBJECT (src)->impl);
+-  else if (GDK_IS_WINDOW (src))
+-    src_impl = GDK_DRAWABLE_IMPL_DIRECTFB (GDK_WINDOW_OBJECT (src)->impl);
+-  else if (GDK_IS_DRAWABLE_IMPL_DIRECTFB (src))
+-    src_impl = GDK_DRAWABLE_IMPL_DIRECTFB (src);
+-  else
+-    return;
+-
+-  clip = gdk_directfb_clip_region (drawable, gc, &dest_rect);
+-
+-  for (i = 0; i < clip->numRects; i++)
+-    {
+-      DFBRegion reg = { clip->rects[i].x1,     clip->rects[i].y1,
+-                        clip->rects[i].x2 , clip->rects[i].y2 };
+-
+-      impl->surface->SetClip (impl->surface, &reg);
+-      impl->surface->Blit (impl->surface, src_impl->surface, &rect,
+-                           xdest, ydest);
+-    }
+-  impl->surface->SetClip (impl->surface, NULL);
+-  gdk_directfb_update_region (impl, clip);
+-  gdk_region_destroy (clip);
++  gdk_directfb_update_region (impl, clip); 
++  gdk_region_destroy (clip); 
+ }
+ 
+ static void

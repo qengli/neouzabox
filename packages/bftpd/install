@@ -1,0 +1,11 @@
+#!/bin/sh
+
+. config/options
+
+mkdir -p $INSTALL/usr/bin
+mkdir -p $INSTALL/etc
+cp $BUILD/$1*/$1 $INSTALL/usr/bin
+cp $PACKAGES/$1/config/$1.conf $INSTALL/etc
+
+#Leo added 2008-02-18
+cp -f $PACKAGES/$1*/init.d/* $INSTALL/etc/init.d/

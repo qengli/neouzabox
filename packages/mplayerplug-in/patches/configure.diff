@@ -1,0 +1,11 @@
+--- mplayerplug-in/configure.orig	2007-07-30 10:47:15.000000000 +0800
++++ mplayerplug-in/configure	2007-07-30 10:51:30.000000000 +0800
+@@ -6296,7 +6296,7 @@
+   echo $ECHO_N "(cached) $ECHO_C" >&6
+ else
+   if test "$cross_compiling" = yes; then
+-  ac_cv_func_malloc_0_nonnull=no
++  ac_cv_func_malloc_0_nonnull=yes
+ else
+   cat >conftest.$ac_ext <<_ACEOF
+ /* confdefs.h.  */

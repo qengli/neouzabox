@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE window SYSTEM "chrome://gale/locale/galeBrowser.dtd">
+<?xml-stylesheet href="chrome://gale/skin/messages.css" type="text/css"?> 
+
+<window id="messages-window"
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        windowtype="navigator:msgbrowser"
+        hidechrome="true"
+        sizemode="normal"
+        width= "640"
+        height= "480"
+        onload="onStart();">
+
+    <script type="application/x-javascript" src="message.js"/>
+    <script type="application/x-javascript" src="chrome://gale/content/common/keyboard.js"/>
+    <script type="application/x-javascript" src="chrome://gale/content/common/inf.js"/>
+        
+    <browser name="messages" 
+            id="messages" 
+            disablesecurity="true"
+            autoscroll="false"
+            type="content-primary"
+            flex="1" /> 
+                    
+</window>

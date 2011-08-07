@@ -1,0 +1,8 @@
+#!/bin/sh
+
+. config/options
+
+STAMP=$STAMPS/$1/unpack
+
+
+exit 0

@@ -1,0 +1,9 @@
+#!/bin/sh
+
+. config/options
+cd $ROOT/$INSTALL/lib/modules/*/
+#echo "/lib/modules/*/kernel/drivers/video/viafb.ko:" >> modules.dep
+#cd -
+mkdir -p kernel/drivers/video
+cp $ROOT/$BUILD/$1*/viafb.ko kernel/drivers/video/
+cp $ROOT/$BUILD/$1*/viafb.modes $ROOT/$INSTALL/etc/

@@ -1,0 +1,22 @@
+#main-window 
+{
+        background-color : black;
+        border-color     : black; 
+        border-style     : none; 
+        border-width     : 0px;
+        padding          : 0px;
+        margin           : 0px;
+        position         : absolute;
+}
+
+
+tabpanels{
+    background-color : black;
+    -moz-opacity     : 1;
+    border-color     : black !important; 
+    border-style     : none; 
+    border-width     : 0px;
+    padding          : 0px;
+    margin           : 0px;
+}
+

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+. config/options
+
+cp $PACKAGES/$1/$VERSION/scripts/libstrip $TOOLCHAIN/bin

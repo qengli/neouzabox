@@ -1,0 +1,25 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+cd $BUILD/$1*
+setup_toolchain target
+env 
+./configure \
+  --cross-compile \
+  --cc=$CC \
+--prefix=$LIB_PREFIX \
+            --enable-static \
+	    --disable-shared \
+ 	    --enable-gpl \
+            --enable-pp \
+            --enable-pthreads \
+            --disable-ffserver \
+            --disable-ffplay \
+            --extra-cflags=-I${LIB_PREFIX}/include \
+	    --extra-ldflags=-L${LIB_PREFIX}/lib
+
+make
+make install

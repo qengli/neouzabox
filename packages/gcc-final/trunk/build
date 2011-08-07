@@ -1,0 +1,46 @@
+#!/bin/sh
+
+. config/options
+
+#$SCRIPTS/install ccache toolchain #comment by Leo 2008.04.29 no need 
+#$SCRIPTS/install binutils toolchain #comment by Leo 2008.04.29 no need 
+#$SCRIPTS/install $TARGET_LIBC toolchain #comment by Leo 2008.04.29 no need 
+
+#$SCRIPTS/unpack gcc
+
+
+setup_toolchain host
+
+cd $BUILD/gcc*
+mkdir -p objdir-$1
+cd objdir-$1
+
+if [ $TARGET_CPU = "x86_64" ]; then
+../configure --host=$HOST_NAME \
+             --build=$HOST_NAME \
+             --target=$TARGET_NAME \
+             --prefix=$ROOT/$TOOLCHAIN \
+             --with-sysroot=$SYSROOT_PREFIX \
+             --with-local-prefix=${LIB_PREFIX#$SYSROOT_PREFIX} \
+             --enable-languages=${TOOLCHAIN_LANGUAGES} \
+             --disable-__cxa_atexit \
+             --disable-libmudflap \
+             --disable-libssp \
+             --disable-shared \
+             --disable-multilib \
+             --disable-nls
+else
+../configure --host=$HOST_NAME \
+             --build=$HOST_NAME \
+             --target=$TARGET_NAME \
+             --prefix=$ROOT/$TOOLCHAIN \
+             --with-sysroot=$SYSROOT_PREFIX \
+             --with-local-prefix=${LIB_PREFIX#$SYSROOT_PREFIX} \
+             --enable-languages=${TOOLCHAIN_LANGUAGES} \
+             --disable-__cxa_atexit \
+             --disable-libmudflap \
+             --disable-libssp \
+             --disable-shared \
+             --disable-nls
+fi
+make

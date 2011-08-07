@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE window SYSTEM "chrome://gale/locale/galeBrowser.dtd">
+<?xml-stylesheet href="chrome://gale/skin/plusBrowser.css" type="text/css"?> 
+
+<window id="plus-window"
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        windowtype="navigator:plusBrowser"
+        sizemode="normal"
+        hidechrome="true"
+        width= "0"
+        height= "0"
+        onload="onStart();">
+
+    <script type="application/x-javascript" src="plusBrowser.js"/>
+    <script type="application/x-javascript" src="chrome://gale/content/common/keyboard.js"/>
+    <script type="application/x-javascript" src="chrome://gale/content/common/inf.js"/>
+        
+    <browser name="content" 
+            id="content" 
+            disablesecurity="true"
+            autoscroll="false"
+            type="content-primary"
+            flex="1" /> 
+</window>

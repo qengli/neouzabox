@@ -1,0 +1,51 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+echo "|||||||||||||||||||| prepareing to build qte |||||||||||||||||||||||"
+
+#Leo added 2006-03-02
+#qt dependency qconfig-qpe.h
+if [ ! -d $BUILD/qtopia* ]; then
+   echo "||||||||||||||||||||| qtopia source not exists,extract it first |||||||||||||||||"
+   $SCRIPTS/unpack qtopia 
+fi
+
+cd $BUILD/qt-*
+
+export QTDIR=`pwd`
+export QTEDIR=`pwd`
+
+cd -
+cd $BUILD/qtop*
+export QPEDIR=`pwd`
+
+export PATH=$QPEDIR/bin:$PATH
+export PATH=$QTDIR/bin:$PATH 
+export LD_LIBRARY_PATH=$QTDIR/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$QPEDIR/lib:$LD_LIBRARY_PATH
+
+cp -f $QPEDIR/src/qt/qconfig-qpe.h $QTEDIR/src/tools/
+
+
+cd $QTDIR
+./configure -qconfig qpe \
+	-no-sm \
+	-no-thread \
+	-depths 4,8,16,32 \
+	-platform linux-x86-g++ \
+	-xplatform linux-uclibc-g++ \
+	-static \
+	-qt-libpng \
+	-gif 
+make
+
+#----------------------------------------------------
+#for qtopia
+#make sub-src
+#make sub-tools
+#cd $QPEDIR/src/
+#./configure -xplatform linux-uclibc-g++ -static
+#make libraries

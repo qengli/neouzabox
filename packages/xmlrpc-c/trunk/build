@@ -1,0 +1,24 @@
+#!/bin/sh
+
+. config/options
+
+setup_toolchain --optimize target
+
+cp $BUILD/expat-*/lib/nametab.h $LIB_PREFIX/include/
+cd $BUILD/$1*
+
+CFLAGS="$TARGET_CFLAGS" \
+CXXFLAGS="$TARGET_CXXFLAGS" \
+./configure \
+	--host=$TARGET_NAME \
+	--build=$HOST_NAME \
+	--target=$TARGET_NAME \
+	--prefix=$LIB_PREFIX \
+  --enable-libxml2-backend \
+  --disable-libwww-client \
+  --enable-shared=yes
+
+make
+exit 2
+make install
+

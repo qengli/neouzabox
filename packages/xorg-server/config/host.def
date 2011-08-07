@@ -1,0 +1,22 @@
+#define KDriveXServer YES
+#define Freetype2Dir  /home/leo/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/sysroot/usr/local
+#define TinyXServer YES
+#define BuildFreeType YES
+#define FontServerAccess YES 
+#define XfbdevServer		YES
+#define CrossCompiling		YES
+#define ProjectRoot             /usr/X11R6
+#define XInputDrivers		mouse keyboard
+
+#define HasFreetype2		YES
+#define HasFontconfig		YES
+#define HasLibpng		YES
+#define HasZlib			YES
+#define IncRoot /home/leo/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/sysroot/usr/include
+#define LibDir /home/leo/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/sysroot/usr/lib
+
+#define SystemUsrIncDir = /home/leo/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/sysroot/usr/include
+#define SystemUsrLibDir = /home/leo/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/sysroot/usr/lib
+
+#define BuildFonts	NO
+#define BuildGLULibrary NO

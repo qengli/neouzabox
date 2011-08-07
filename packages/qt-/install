@@ -1,0 +1,9 @@
+#!/bin/sh
+
+. config/options
+
+mkdir -p $INSTALL/usr/local/qt-embedded/lib/
+echo "||||||||||||| copy qt fonts dir ... |||||||||||||"
+cp -fr $BUILD/$1*/lib/fonts $INSTALL/usr/local/qt-embedded/lib/
+
+exit 0

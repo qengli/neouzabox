@@ -1,0 +1,259 @@
+2006-03-02
+**1**
+modified freetype's build type by shared output for reducing the size of img.
+
+2006-03-05
+**2**
+error message
+-------------------------------------------------------------------------------
+checking for i686-pc-linux-gnu-gcc... /home/leo/neouzabox-bak-20060302/build.i386/toolchain/bin/i386-pc-linux-uclibc-gcc
+checking for C compiler default output file name... a.out
+checking whether the C compiler works... configure: error: cannot run C compiled programs.
+If you meant to cross compile, use `--host'.
+See `config.log' for more details.
+make[1]: *** [configure-gcc] Error 1
+make[1]: Leaving directory `/mnt/sda10/home/leo/neouzabox-bak-20060302/build.i386/gcc-3.4.4/objdir'
+make: *** [iso] Error 2
+
+
+-------------------------------------------------------------------------------
+Can't build the full support gcc 
+To build a full gcc (include g++) ,I must create link symbols in libs for libc.so.0,ld-uClibc.so.o and libm.so.0 or the configure and build will fails.
+There is another solution to this problem, we can modified the specs file by replacing the '/lib/ld-uClibc.so.0' with '/home/leo/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/sysroot/lib/ld-uClibc-0.9.28.so' in the first built gcc . then we use that gcc to build the full gcc.
+2006-03-07 added the the another solution is --host="$TARGET_NAME" so the configure scripts know we use the cross compiler
+
+
+2006-03-06
+**3**
+Today I met the problem ,I can't build the gcc bootstrap.
+I get many error message about sed .
+The binutils make method is 
+////////////////////////////////
+make configure-host
+make LDFLAGS="-all-static"
+///////////////////////////////
+
+
+the gcc configure is 
+////////////////////////////////////
+../configure --host=$HOST_NAME \
+             --build=$HOST_NAME \
+             --target=$TARGET_NAME \
+             --prefix=$ROOT/$TOOLCHAIN \
+             --with-sysroot=$SYSROOT_PREFIX \
+             --with-local-prefix=${LIB_PREFIX#$SYSROOT_PREFIX} \
+             --enable-languages=c \
+             --enable-shared \
+             --disable-nls
+
+
+make BOOT_LDFLAGS="-static"  bootstrap
+///////////////////////////////////////
+At last ,I found the problem is related to bootstrap building method.
+
+**4**
+after resolved the **3** problem by comment "bootstrap"
+I met the new error message when configure the full gcc
+----------------------------------------------------------------------------
+|-|-|-|-|-|-|-|-|-|-|-| build full gcc CC=/home/leo/neouzabox/build.i386/toolchain/bin/i386-pc-linux-uclibc-gcc |-|-|--|-|-|-|-|-|-|-|-|-|-|-|
+creating cache ./config.cache
+checking host system type... i686-pc-linux-gnu
+checking target system type... i386-pc-linux-uclibc
+checking build system type... i686-pc-linux-gnu
+checking for a BSD compatible install... /usr/bin/install -c
+/mnt/sda10/home/leo/neouzabox/build.i386/toolchain/bin/../lib/gcc/i386-pc-linux-uclibc/3.4.4/../../../../i386-pc-linux-uclibc/bin/ld: warning: ld-uClibc.so.0, needed by /mnt/sda10/home/leo/neouzabox/build.i386/toolchain/bin/../i386-pc-linux-uclibc/sysroot/usr/lib/libc.so, not found (try using -rpath or -rpath-link)
+/mnt/sda10/home/leo/neouzabox/build.i386/toolchain/bin/../i386-pc-linux-uclibc/sysroot/usr/lib/libc.so: undefined reference to `__libc_stack_end'
+collect2: ld returned 1 exit status
+*** The command '/home/leo/neouzabox/build.i386/toolchain/bin/i386-pc-linux-uclibc-gcc -o conftest -O2 -Wall -pipe -mmmx -msse -mfpmath=sse  -s -fomit-frame-pointer -march=i686  -L/home/leo/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/sysroot/usr/local/lib  -s  conftest.c' failed.
+*** You must set the environment variable CC to a working compiler.
+make: *** [iso] Error 1
+_______________________________________________________________________________
+
+
+**5**
+gcc bootstrap build fail
+-------------------------------------------------------------------------------
+/home/leo/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/bin/ld: crti.o: No such file: No such file or directory
+collect2: ld returned 1 exit status
+make[3]: *** [libgcc_s.so] Error 1
+make[3]: Leaving directory `/mnt/sda10/home/leo/neouzabox/build.i386/gcc-3.4.4/objdir/gcc'
+make[2]: *** [libgcc.a] Error 2
+make[2]: Leaving directory `/mnt/sda10/home/leo/neouzabox/build.i386/gcc-3.4.4/objdir/gcc'
+make[1]: *** [all-gcc] Error 2
+make[1]: Leaving directory `/mnt/sda10/home/leo/neouzabox/build.i386/gcc-3.4.4/objdir'
+make: *** [iso] Error 2
+-------------------------------------------------------------------------------
+reason:
+configure option must have --disable-shared
+
+**6**
+2006-03-07
+build full gcc ,got the error message in libstdc++ 
+with --host=$TARGET_NAME
+_________________________________________________________________________________________
+configure: loading cache ./config.cache
+checking how to run the C++ preprocessor... /lib/cpp
+loading cache ./config.cache within ltconfig
+checking host system type... i386-pc-linux-uclibc
+checking build system type... i686-pc-linux-gnu
+ltcf-cxx.sh: error: problem compiling test program
+checking for objdir... .libs
+checking for i386-pc-linux-uclibc-c++ option to produce PIC...  -DPIC
+checking if i386-pc-linux-uclibc-c++ PIC flag  -DPIC works... no
+checking if i386-pc-linux-uclibc-c++ static flag  works... no
+finding the maximum length of command line arguments... (cached) 49153
+checking if i386-pc-linux-uclibc-c++ supports -c -o file.o... (cached) yes
+checking whether the linker (i386-pc-linux-uclibc-ld) supports shared libraries... 
+checking how to hardcode library paths into programs... unsupported
+checking whether stripping libraries is possible... yes
+checking dynamic linker characteristics... uClibc ld.so
+checking command to parse i386-pc-linux-uclibc-nm output... failed
+checking if libtool supports shared libraries... no
+checking whether to build shared libraries... no
+checking whether to build static libraries... yes
+appending configuration tag "CXX" to libtool
+checking for exception model to use... configure: error: unable to detect exception model
+make: *** [configure-target-libstdc++-v3] Error 1
+__________----------------------------------------------------------------------------------
+
+2006-03-07
+**7**
+_______________________________________________________________________________________________
+make: /home/leo/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/sysroot/lib/libpthread.so.0: no version information available (required by /lib/librt.so.1)
+make: /home/leo/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/sysroot/lib/libpthread.so.0: no version information available (required by /lib/librt.so.1)
+make: /home/leo/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/sysroot/lib/libpthread.so.0: no version information available (required by /lib/librt.so.1)
+make: /home/leo/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/sysroot/lib/libpthread.so.0: no version information available (required by /lib/librt.so.1)
+make: relocation error: /lib/librt.so.1: symbol __pthread_clock_settime, version GLIBC_PRIVATE not defined in file libpthread.so.0 with link time reference
+make: *** [iso] Error 127
+________________________________________________________________________________________________
+solution: we comment the line LD_LIBRARY_PATH=$LIB_PREFIX/lib:$SYSROOT_PREFIX/lib #Added by Leo 20060303 in config/path
+or LD_LIBRARY_PATH MUST not contain $SYSROOT_PREFIX/lib
+
+
+
+2006-03-08
+**8**
+How to build glib
+First we build a glib in host system and install .then we can get the glib tools which is needed in the cross build process.
+
+$build pkgconfig
+$build gettext
+
+add -ldl at configure 5503line
+
+create a uclibc.cache file which contains some cross build config.
+BUILD GLIB configure fail "can't run cross compile..."
+I must create a cross compile file . for example it is named uclibc.cache.
+and put it into the glib source directry.
+then we can call the configure with ./configure --cache-file=uclibc 
+Note: the "--cache-file" must be the first argument.
+
+after compiling, the link process may be fail. because it can't find dlopen()...
+so we add LDFLAGS on the ./configure commond line.
+
+2006-03-09
+$build expat
+$build fontconfig
+$build cairo
+$build pango --only build with --disable-shared
+$build atk --must with --disable-glibtest
+
+**9** 
+build gtk fail , can't find gdk-pixbuf-csource 
+so firt build in host and copy gdk-pixbuf-csource $box/hostool
+ln -s $sr/lib/libdl.so.0 /lib
+ln -s $sr/usr/local/lib/libiconv.so.2 /lib
+ln -s $sr/usr/local/lib/libintl.so.3 /lib
+
+another solution. find the libgdk_pixbuf2.0_0-devel-2.0.6-8mdk.i586.rpm from cd 
+and install rpm copy the gdk-pixbuf-csource $box/hosttool
+
+**100**
+can't build gtkfb
+Get the following error
+----------------------------------------------------------------------------------------
+gdkdrawable-fb2.c: In function `gdk_fb_clip_region':
+gdkdrawable-fb2.c:454: warning: passing arg 1 of `_gdk_gc_get_clip_region' from incompatible pointer type
+gdkdrawable-fb2.c:456: error: `clip_region' undeclared (first use in this function)
+gdkdrawable-fb2.c:456: error: (Each undeclared identifier is reported only once
+gdkdrawable-fb2.c:456: error: for each function it appears in.)
+----------------------------------------------------------------------------------------
+
+**11**
+build tinyx can't get libX11
+because const variable
+at lib/X11/
+edit lcEuc.c line 1087 remove const
+
+
+**101**
+Can't build tinyx with xft
+because freetype lib include file need a macro
+so just open xc/config/cf/cross.def and add the -DFT-FREETYPE macro as below
+#define StandardDefines      -DFT_FREETYPE
+
+**102**
+I have suceeded in runing xclock in Xfbdev :) ^_^
+furthermore the gtk is built succeed 
+the good  version of XFree86 is 4.3.0
+built the XFree86
+then use -DFT-FREETYPE build pango cairo
+before to run xclock ,we must set DISPLAY enviroment first
+export DISPLAY=:0
+So happy,Now It is time to sleep.
+
+**103**
+20006-03-22
+How run the Xfbdev as the XServer and accept the remote X application's connect?
+the key is use -ac ,in another words we should run Xfbdev as Xfbdev -ac
+otherwise ,the Xserver will refuse the connections from other host
+by the way, refer to some document, we can use xhost to add some host to the list .
+but in the neouzabox xhost is not effect. it is very wiered.
+
+**104**
+2006-03-23
+I found if I run the firefox by simply run the firefox-bin.
+I should add the enviroment variant LD_LIBRARY_PATH
+like this:
+export LD_LIBRARY_PATH 'firefox-bin directory'
+
+now I get another problem when I run the firefox
+the error message is following
+---------------------------------------------------------------------------------
+###!!! ASSERTION: nsTDependentString must wrap only null-terminated strings: 'mData[mLength] == 0', file ../../dist/include/string/nsTDependentString.h, line 67
+Break: at file ../../dist/include/string/nsTDependentString.h, line 67
+###!!! ASSERTION: nsTDependentString must wrap only null-terminated strings: 'mData[mLength] == 0', file ../../dist/include/string/nsTDependentString.h, line 67
+Break: at file ../../dist/include/string/nsTDependentString.h, line 67
+No Persistent Registry Found.
+Type Manifest File: /mnt/hd/fx/components/xpti.dat
+*** Registering Apprunner components (all right -- a generic module!)
+nsNativeComponentLoader: autoregistering begins.
+###!!! ASSERTION: no native to utf-16 converter: 'gNativeToUnicode != INVALID_ICONV_T', file ../../../xpcom/io/nsNativeCharsetUtils.cpp, line 359
+Break: at file ../../../xpcom/io/nsNativeCharsetUtils.cpp, line 359
+###!!! ASSERTION: no utf-16 to native converter: 'gUnicodeToNative != INVALID_ICONV_T', file ../../../xpcom/io/nsNativeCharsetUtils.cpp, line 360
+Break: at file ../../../xpcom/io/nsNativeCharsetUtils.cpp, line 360
+*** Registering PKI components (all right -- a generic module!)
+*** Registering NSS components (all right -- a generic module!)
+*** Registering BOOT components (all right -- a generic module!)
+*** Registering appshell components (all right -- a generic module!)
+*** Registering nsPermissionsModule components (all right -- a generic module!)
+*** Registering necko_secondary_protocols components (all right -- a generic module!)
+*** Registering necko_core_and_primary_protocols components (all right -- a generic module!)
+*** Registering nsFindComponent components (all right -- a generic module!)
+*** Registering nsMorkModule components (all right -- a generic module!)
+*** Registering JavaScript_Debugger components (all right -- a generic module!)
+*** Registering nsJarModule components (all right -- a generic module!)
+*** Registering nsInspectorModule components (all right -- a generic module!)
+*** Registering nsImageLib2Module components (all right -- a generic module!)
+*** Registering xpcomObsoleteModule components (all right -- a generic module!)
+*** Registering nsI18nModule components (all right -- a generic module!)
+*** Registering nsParserModule components (all right -- a generic module!)
+*** Registering nsXMLExtrasModule components (all right -- a generic module!)
+*** Registering nsPluginModule components (all right -- a generic module!)
+*** Registering nsWidgetGtk2Module components (all right -- a generic module!)
+*** Registering nsUCvMathModule components (all right -- a generic module!)
+*** Registering nsWebServicesModule components (all right -- a generic module!)
+./firefox-bin: can't resolve symbol '_ZTV18NativeUConvService'
+---------------------------------------------------------------------------------------------
+
+

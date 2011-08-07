@@ -1,0 +1,31 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+setup_toolchain --optimize target
+
+cd $BUILD/$1*
+cp -f $ROOT/packages/$1/$VERSION/config/cross.def config/cf
+cp -f $ROOT/packages/$1/$VERSION/config/host.def config/cf
+
+sed -i -e "s@\(\[SYSROOT\]\)@\ ${SYSROOT_PREFIX}@g" config/cf/cross.def
+sed -i -e "s@\(\[TARGET_PREFIX\]\)@\ ${TARGET_PREFIX}@g" config/cf/cross.def
+sed -i -e "s@\(\[SYSROOT\]\)@\ ${SYSROOT_PREFIX}@g" config/cf/host.def
+sed -i -e "s@\(\[TARGET_PREFIX\]\)@\ ${TARGET_PREFIX}@g" config/cf/host.def
+unset CC
+unset CXX
+unset LDFLAGS
+unset CFLAGS
+unset LD_LIBRARY_PATH
+unset CCACHE_DIR
+unset TARGET_CC
+unset TARGET_CXX
+unset RANLIB
+unset LIB_PREFIX
+unset CCFLAGS
+
+make World 
+#make install
+cp $ROOT/$BUILD/xc/lib/Xft/xft.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig 
+

@@ -1,0 +1,17 @@
+#!/bin/sh
+#this file is added by Leo 2007-06-11
+. config/options
+#added by Leo 2006-6-13 copy to iso directory
+mkdir -p $INSTALL/usr/lib
+mkdir -p $INSTALL/usr/bin
+if [ $TARGET_ARCH = i386 ]; then
+  cp -f $ROOT/$BUILD/$1-*/src/.libs/libfontconfig.so.1 $INSTALL/usr/lib
+fi
+if [ $TARGET_ARCH = mips ]; then #added by Leo 2008-8-17
+  mkdir -p $LIB_PREFIX/lib/.libs
+  cp -f $ROOT/$BUILD/$1-*/src/.libs/libfontconfig.so $LIB_PREFIX/lib/.libs/
+  cp -f $ROOT/$BUILD/$1-*/src/.libs/libfontconfig.so.1 $LIB_PREFIX/lib
+fi
+
+cp -fr $SYSROOT_PREFIX/etc/fonts $INSTALL/etc 
+cp -fr $SYSROOT_PREFIX/usr/local/bin/fc-*  $INSTALL/usr/bin

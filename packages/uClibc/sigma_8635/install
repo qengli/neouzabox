@@ -1,0 +1,31 @@
+#!/bin/sh
+
+. config/options
+
+#the following be execute in the initrd install stage
+
+mkdir -p $INSTALL/lib
+
+cp $BUILD/$1*/lib/ld-uClibc.so.0 $INSTALL/lib
+cp $BUILD/$1*/lib/libc.so.0 $INSTALL/lib
+cp $BUILD/$1*/lib/libdl.so.0 $INSTALL/lib
+cp $BUILD/$1*/lib/libpthread.so.0 $INSTALL/lib
+[ "$GDB" = yes ] && cp $BUILD/$1*/lib/libthread_db.so.1 $INSTALL/lib
+cp $BUILD/$1*/lib/libm.so.0 $INSTALL/lib
+cp $BUILD/$1*/lib/libutil.so.0 $INSTALL/lib
+[ "$FREEVO" = yes ] && cp $BUILD/$1*/lib/librt.so.0 $INSTALL/lib
+[ "$NETWORK" = yes ] && cp $BUILD/$1*/lib/libcrypt.so.0 $INSTALL/lib
+[ "$NETWORK" = yes ] && cp $BUILD/$1*/lib/libresolv.so.0 $INSTALL/lib
+
+mkdir -p $INSTALL/bin
+[ "$DEVTOOLS" = yes ] && cp $BUILD/$1*/utils/ldd $INSTALL/bin
+
+#added by Leo 20070803
+#mplayer plugin used it
+cp -f $BUILD/$1*/lib/libnsl.so.0 $INSTALL/lib
+
+#added by Leo 2008-08-12
+if [ "$DEBUG" = "yes" -a "$2" = "full" ]; then
+  cp $BUILD/$1*/utils/ldd $INSTALL/usr/bin
+fi
+exit 0

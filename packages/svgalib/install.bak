@@ -1,0 +1,10 @@
+#!/bin/sh
+
+. config/options
+
+make -C $BUILD/$1* install
+
+mkdir -p $INSTALL/lib
+echo "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+cp $SYSROOT_PREFIX/usr/local/lib/libvga.so $SYSROOT_PREFIX/lib/libvga.so.1
+exit 0

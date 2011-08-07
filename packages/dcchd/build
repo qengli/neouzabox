@@ -1,0 +1,11 @@
+#!/bin/sh
+
+. config/options
+
+
+cd $BUILD/$1_*
+export RUA_ROOT_DIR=$ROOT/$BUILD/mrua_SMP8634_2.8.3.0_dev.mips
+export SMP86XX_TOOLCHAIN_PATH=$ROOT/$BUILD/$TOOLCHAINI/
+source $RUA_ROOT_DIR/MRUA.env
+source DCCHD.env
+make $2

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+. config/options
+
+cd $BUILD/$1*
+#--host=$TARGET_NAME \
+#            --build=$HOST_NAME \
+
+#export CFLAG="-I$LIB_PREFIX/include -L$LIB_PREFIX/lib"
+setup_toolchain host
+./configure   --prefix="`ls -d $ROOT/$BUILD/$1*`/build" \
+            --disable-shared \
+            --without-curses \
+            --enable-graphics
+make
+make install
+#--host=$TARGET_NAME \
+#            --build=$HOST_NAME \
+

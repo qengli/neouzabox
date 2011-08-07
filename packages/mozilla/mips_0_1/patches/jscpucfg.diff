@@ -1,0 +1,55 @@
+--- mozilla/js/src/jscpucfg.c.orig	2007-07-02 14:19:15.000000000 +0800
++++ mozilla/js/src/jscpucfg.c	2007-07-02 13:59:23.000000000 +0800
+@@ -44,6 +44,8 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ 
++#define CROSS_COMPILE
++
+ #ifdef CROSS_COMPILE
+ #include <prtypes.h>
+ #define INT64 PRInt64
+@@ -178,6 +180,7 @@
+     printf("/* AUTOMATICALLY GENERATED - DO NOT EDIT */\n\n");
+ 
+ #ifdef CROSS_COMPILE
++
+ #if defined(IS_LITTLE_ENDIAN)
+     printf("#define IS_LITTLE_ENDIAN 1\n");
+     printf("#undef  IS_BIG_ENDIAN\n\n");
+@@ -191,23 +194,23 @@
+     sizeof_char         = PR_BYTES_PER_BYTE;
+     sizeof_short        = PR_BYTES_PER_SHORT;
+     sizeof_int          = PR_BYTES_PER_INT;
+-    sizeof_int64        = PR_BYTES_PER_INT64;
+-    sizeof_long         = PR_BYTES_PER_LONG;
+-    sizeof_float        = PR_BYTES_PER_FLOAT;
+-    sizeof_double       = PR_BYTES_PER_DOUBLE;
+-    sizeof_word         = PR_BYTES_PER_WORD;
+-    sizeof_dword        = PR_BYTES_PER_DWORD;
++    sizeof_int64        = 4L; //PR_BYTES_PER_INT64;
++    sizeof_long         = 4L; //PR_BYTES_PER_LONG;
++    sizeof_float        = 4L; //PR_BYTES_PER_FLOAT;
++    sizeof_double       = 4L; //PR_BYTES_PER_DOUBLE;
++    sizeof_word         = 4L; //PR_BYTES_PER_WORD;
++    sizeof_dword        = 4L; //PR_BYTES_PER_DWORD;
+ 
+     bits_per_int64_log2 = PR_BITS_PER_INT64_LOG2;
+ 
+     align_of_short      = PR_ALIGN_OF_SHORT;
+     align_of_int        = PR_ALIGN_OF_INT;
+-    align_of_long       = PR_ALIGN_OF_LONG;
+-    align_of_int64      = PR_ALIGN_OF_INT64;
+-    align_of_float      = PR_ALIGN_OF_FLOAT;
+-    align_of_double     = PR_ALIGN_OF_DOUBLE;
+-    align_of_pointer    = PR_ALIGN_OF_POINTER;
+-    align_of_word       = PR_ALIGN_OF_WORD;
++    align_of_long       = 4L; //PR_ALIGN_OF_LONG;
++    align_of_int64      = 4L; //PR_ALIGN_OF_INT64;
++    align_of_float      = 4L; //PR_ALIGN_OF_FLOAT;
++    align_of_double     = 4L; //PR_ALIGN_OF_DOUBLE;
++    align_of_pointer    = 4L; //PR_ALIGN_OF_POINTER;
++    align_of_word       = 4L; //PR_ALIGN_OF_WORD;
+ 
+ #else /* !CROSS_COMPILE */
+ 

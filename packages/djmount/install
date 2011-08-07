@@ -1,0 +1,10 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/install fuse
+
+mkdir -p $INSTALL/usr/bin
+cp $BUILD/$1*/djmount/djmount $INSTALL/usr/bin
+#Leo added 2008-02-18
+cp -f $PACKAGES/$1*/init.d/* $INSTALL/etc/init.d/

@@ -1,0 +1,65 @@
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/arch/mips/kernel/time.c linux-2.6.15/arch/mips/kernel/time.c
+--- linux-2.6.15.ref/arch/mips/kernel/time.c	2007-07-03 10:15:41.000000000 -0700
++++ linux-2.6.15/arch/mips/kernel/time.c	2007-07-03 10:19:20.000000000 -0700
+@@ -457,6 +457,9 @@
+ 	if ((jiffies % HZ) == 0) { /* Update CPU heart beat conunter per second */
+ 		gbus_write_uint32(pGBus, REG_BASE_cpu_block + LR_HB_CPU, 
+ 				gbus_read_uint32(pGBus, REG_BASE_cpu_block + LR_HB_CPU) + 1);
++#if defined(CONFIG_PRINTK_TIME)
++		printk("*** time marker ***\n");
++#endif
+ 	}
+ 
+ #ifndef CONFIG_TANGOX_FIXED_FREQUENCIES
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/include/asm-mips/bug.h linux-2.6.15/include/asm-mips/bug.h
+--- linux-2.6.15.ref/include/asm-mips/bug.h	2007-07-03 10:16:04.000000000 -0700
++++ linux-2.6.15/include/asm-mips/bug.h	2007-07-03 10:17:16.000000000 -0700
+@@ -7,8 +7,15 @@
+ 
+ #include <asm/break.h>
+ 
++#ifdef CONFIG_PRINTK
++int printk(const char * fmt, ...) __attribute__ ((format (printf, 1, 2)));
++#else
++static inline int printk(const char *s, ...) __attribute__ ((format (printf, 1, 2)));
++#endif
++
+ #define BUG()								\
+ do {									\
++	printk("<0> BUG on %s:%d (%s).\n", __FILE__, __LINE__, __FUNCTION__); \
+ 	__asm__ __volatile__("break %0" : : "i" (BRK_BUG));		\
+ } while (0)
+ 
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/include/linux/jiffies.h linux-2.6.15/include/linux/jiffies.h
+--- linux-2.6.15.ref/include/linux/jiffies.h	2006-01-25 20:52:01.000000000 -0800
++++ linux-2.6.15/include/linux/jiffies.h	2007-07-03 10:18:28.000000000 -0700
+@@ -122,7 +122,11 @@
+  * Have the 32 bit jiffies value wrap 5 minutes after boot
+  * so jiffies wrap bugs show up earlier.
+  */
++#if defined(CONFIG_PRINTK_TIME)
++#define INITIAL_JIFFIES 0
++#else
+ #define INITIAL_JIFFIES ((unsigned long)(unsigned int) (-300*HZ))
++#endif
+ 
+ /*
+  * Change timeval to jiffies, trying to avoid the
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/README.1024.bug.patch linux-2.6.15/README.1024.bug.patch
+--- linux-2.6.15.ref/README.1024.bug.patch	1969-12-31 16:00:00.000000000 -0800
++++ linux-2.6.15/README.1024.bug.patch	2007-07-03 10:19:51.000000000 -0700
+@@ -0,0 +1,14 @@
++Feature:
++--------
++
++Prerequisite patch numbers:
++---------------------------
++
++Primary author:
++---------------
++
++Related to which chip version SMP86xx xx=?
++-----------------------------------------
++
++(linux patches) which CONFIG_... are provided:
++----------------------------------------------

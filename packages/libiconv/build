@@ -1,0 +1,26 @@
+#!/bin/sh
+
+. config/options
+
+#when version = mips_sigma_8635 the libiconv will conflict with iconv_base, because the libiconv.la which 
+#generate from libiconv package will be use in glib's process,but it don't contain iconv_open symbol , 
+#the iconv_open is one of symbols in libiconv.so which generate by iconv_base package. so this package must not used 
+if [ $VERSION != mips_sigma_8635 ]; then
+
+$SCRIPTS/build toolchain
+$SCRIPTS/build gettext
+
+cd $BUILD/$1*
+./configure --target=$TARGET_NAME \
+            --host=$HOST_NAME \
+            --prefix=`ls -d $ROOT/$BUILD/$1*`/objdir \
+            --enable-static \
+            --disable-shared \
+            --disable-nls \
+            --enable-extra-encodings
+make
+make install
+cp $ROOT/$BUILD/libiconv*/objdir/lib/libiconv.la $LIB_PREFIX/lib
+cp $ROOT/$BUILD/libiconv*/objdir/lib/libiconv.a $LIB_PREFIX/lib
+fi
+

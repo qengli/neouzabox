@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# start http daemon
+#
+# runlevels: neoubox, debug
+
+# get options
+test -f /etc/network || exit 1
+. /etc/network
+
+if test "$HTTP_SERVER" = "yes"; then
+  echo "### Starting http daemon ###"
+
+  if test -x /usr/bin/freevo-webserver; then
+    /usr/bin/freevo-webserver >/dev/null 2>&1 &
+  else
+    /usr/sbin/httpd -h /var/www >/dev/null 2>&1 &
+  fi
+fi
+
+exit 0

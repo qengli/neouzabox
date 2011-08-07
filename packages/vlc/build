@@ -1,0 +1,58 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+$SCRIPTS/build mpeg2dec
+$SCRIPTS/build libmad
+$SCRIPTS/build libdvbpsi
+$SCRIPTS/build live
+$SCRIPTS/build ffmpeg
+
+LDFLAGS=-L$SYSROOT_PREFIX/lib:$LIB_PREFIX/lib
+
+
+cd $BUILD/$1*
+rm -fr config.cache
+./configure --host=$TARGET_NAME \
+            --build=$HOST_NAME \
+            --prefix=`ls -d $ROOT/$BUILD/$1*`/objdir \
+        --enable-mad \
+        --enable-dvbpsi \
+        --enable-static \
+        --disable-shared \
+        --disable-wxwidgets \
+        --disable-skins2 \
+        --with-mozilla \
+        --disable-glx \
+        --disable-opengl \
+        --with-libmpeg2 \
+        --with-mozilla-sdk-path=$ROOT/$BUILD/mozilla/objdir/xulrunner/dist/sdk/\
+        --enable-mozilla \
+        --enable-mostly-builtin \
+        --enable-live555  \
+        --with-live555-tree=$ROOT/$BUILD/live \
+        --disable-httpd \
+        --disable-vlm \
+        --enable-release \
+        --disable-sout \
+        --disable-dvdnav \
+        --disable-smb \
+        --disable-ogg \
+        --disable-vcd \
+        --disable-cdda \
+        --disable-screen \
+        --disable-gnomevfs \
+        --disable-libcdio \
+        --enable-alsa \
+        --disable-sdl \
+        --disable-mpc \
+        --disable-mod \
+        --disable-mkv \
+        --disable-a52 \
+        --disable-dts \
+        --with-libiconv-prefix=$LIB_PREFIX  #added by Leo 2008.5.5 to enable in uClibc
+                                                
+
+make
+make install

@@ -1,0 +1,10 @@
+#plus-window
+{
+    background-color : black;
+    -moz-opacity     : 1;
+    border-color     : #ff0000; 
+    border-style     : solid; 
+    border-width     : 0px;
+    padding          : 0px;
+    margin           : 0px;
+}

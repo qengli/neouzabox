@@ -1,0 +1,52 @@
+#!/bin/sh
+
+. config/options
+
+#the following moved to build scripts 
+#may due to some ploblem 
+#2008.04.29
+#if [ "$2" = toolchain ]; then
+#  rm -rf "$SYSROOT_PREFIX/lib" "$SYSROOT_PREFIX/usr/lib" "$SYSROOT_PREFIX/usr/include"
+#  $SCRIPTS/install linux-headers
+#
+#  cd $BUILD/$1*/objdir-$1
+#  cat >configparms <<EOF
+#install_root=$SYSROOT_PREFIX
+##EOF
+#  make install
+#  exit 0
+#fi
+
+#INSTALL=$BUILD/iso/NEOUBOX Leo comment 2008.5.5
+mkdir -p $INSTALL/lib
+mkdir -p $INSTALL/usr/bin
+
+cp $BUILD/$1*/objdir-$1/elf/ld*.so.* $INSTALL/lib
+cp $BUILD/$1*/objdir-$1/libc.so.6 $INSTALL/lib
+cp $BUILD/$1*/objdir-$1/dlfcn/libdl.so.2 $INSTALL/lib
+cp $BUILD/$1*/objdir-$1/nptl/libpthread.so.0 $INSTALL/lib
+[ "$GDB" = yes ] && cp $BUILD/$1*/objdir-$1/nptl_db/libthread_db.so.1 $INSTALL/lib
+cp $BUILD/$1*/objdir-$1/math/libm.so.6 $INSTALL/lib
+cp $BUILD/$1*/objdir-$1/login/libutil.so.1 $INSTALL/lib
+[ "$NETWORK" = yes ] && cp $BUILD/$1*/objdir-$1/crypt/libcrypt.so.1 $INSTALL/lib
+[ "$NETWORK" = yes ] && cp $BUILD/$1*/objdir-$1/resolv/libresolv.so.2 $INSTALL/lib
+
+#added by Lee 2009.10.14
+[ "$TARGET_CPU" = x86_64 ] && cp $BUILD/$1*/objdir-$1/rt/librt.so.1 $INSTALL/lib
+
+#Leo added 2008-08-20 without this lib we can't resolve dns name
+[ "$NETWORK" = yes ] && cp $BUILD/$1*/objdir-$1/resolv/libnss_dns.so.2 $INSTALL/lib
+
+#added by Lee 2009.10.14
+[ "$NETWORK" = yes ] && cp $BUILD/$1*/objdir-$1/nss/libnss_files.so.2 $INSTALL/lib
+
+#Added by Leo 2008-08-12
+if [ "$DEBUG_TOOLS" = "yes" ]; then
+  sed -i s/"set\ \-o\ pipefail\ 2>\ \/dev\/null"/"false"/ $BUILD/glibc-2.5/objdir-glibc/elf/ldd
+  cp -f $BUILD/$1*/objdir-$1/elf/ldd $INSTALL/usr/bin
+  if [ "$TARGET_CPU" = "i386" ]; then
+    cp -f $BUILD/$1*/objdir-$1/elf/lddlibc4 $INSTALL/usr/bin
+  fi
+fi
+
+exit 0

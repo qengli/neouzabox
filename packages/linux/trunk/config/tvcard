@@ -1,0 +1,35 @@
+#
+# TV Card Options
+#
+
+# TV card model (AUTO for autodetection or look at the following urls)
+# http://linuxtv.org/hg/v4l-dvb?cmd=file;file=linux/Documentation/video4linux/CARDLIST.bttv;filenode=-1;style=raw
+# http://linuxtv.org/hg/v4l-dvb?cmd=file;file=linux/Documentation/video4linux/CARDLIST.cx88;filenode=-1;style=raw
+# http://linuxtv.org/hg/v4l-dvb?cmd=file;file=linux/Documentation/video4linux/CARDLIST.saa7134;filenode=-1;style=raw
+TV_CARD=AUTO
+
+# TV tuner (AUTO for autodetection or look at the following url)
+# http://linuxtv.org/hg/v4l-dvb?cmd=file;file=linux/Documentation/video4linux/CARDLIST.tuner;filenode=-1;style=raw
+TV_TUNER=AUTO
+
+# TV Input Standard (ntsc/ntsc-m/ntsc-jp/pal/pal-bg/pal-dk/pal-i/pal-m/pal-n/
+#                    pal-nc/pal-60/secam/secam-l/secam-dk)
+# Some card (SAA7134) need a special way to set the sub-mode.
+# Example for using secam-dk
+#TVIN_STANDARD=secam
+#TVIN_SUB_STANDARD=d
+#
+TVIN_STANDARD=pal
+
+# TV Channels
+# Syntax : CHAN="Channel Frequency:Channel Title"
+# Example:
+#CHAN="29:France 2"
+#CHAN="K08:Canal +"
+
+# TV Channels List
+# Available : us-bcast, us-cable, us-cable-hrc, japan-bcast, japan-cable,
+#             europe-west, europe-east, italy, newzealand, australia,
+#             ireland, france, china-bcast, southafrica, argentina,
+#             australia-optus, russia
+CHANLIST=europe-west

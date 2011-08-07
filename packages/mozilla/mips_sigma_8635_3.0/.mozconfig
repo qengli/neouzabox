@@ -1,0 +1,111 @@
+# sh
+# Build configuration script
+#
+# See http://www.mozilla.org/build/unix.html for build instructions.
+#
+
+CROSS_COMPILE=1
+GLIB_CONFIG=${SYSROOT_PREFIX}/usr/local/bin/glib-config 
+GMODULE_CONFIG=${SYSROOT_PREFIX}/usr/local/bin/gmodule-config 
+GTK_CONFIG=${SYSROOT_PREFIX}/usr/local/bin/gtk-config 
+LIBIDL_CONFIG=${SYSROOT_PREFIX}/usr/local/bin/libIDL-config-2
+HOST_LIBIDL_CONFIG=/usr/bin/libIDL-config-2
+PKG_CONFIG=${TOOLCHAIN_PREFIX}/bin/pkg-config
+
+#the following is modified by Leo 2008-9-2 
+#CFLAGS="-DFT_FREETYPE_H -I${SYSROOT_PREFIX}/usr/local/include/freetype2 -I${LIB_PREFIX}/include"
+#CXXFLAGS="-DFT_FREETYPE_H -I${SYSROOT_PREFIX}/usr/local/include/freetype2 -I${LIB_PREFIX}/include"
+COMPILE_CFLAGS="-mips32r2 -Wall -pipe -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE  -I${LIB_PREFIX}/include ${ADDFLAGS}"
+COMPILE_CXXFLAGS="-mips32r2 -Wall -pipe -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE  -I${LIB_PREFIX}/include ${ADDFLAGS}"
+
+
+#mk_add_options MOZ_MAKE_FLAGS=-j8
+ac_add_options --prefix=${SYSROOT_PREFIX}/usr/local/mozilla 
+ac_add_options --target=${TARGET_NAME}
+
+#if the version is 2.0.0.1 and want to build installer , the following needed
+ac_add_options --enable-static --disable-shared  #commented by Leo 2007-07-04
+#ac_add_options --disable-static --enable-shared #uncomment this will make firefox crash on target
+
+ac_add_options  --x-includes=${SYSROOT_PREFIX}/usr/local/include 
+ac_add_options  --x-libraries=${SYSROOT_PREFIX}/usr/local/lib
+
+############################################
+
+ac_add_options --enable-necko-small-buffers
+ac_add_options --disable-necko-disk-cache
+ac_add_options --disable-xft
+ac_add_options --disable-freetype2
+#########################################
+
+# Options for client.mk.
+mk_add_options MOZ_CO_PROJECT="browser"
+mk_add_options MOZ_BUILD_PROJECTS="browser"
+
+mk_add_options MOZ_OBJDIR=@TOPSRCDIR@/objdir-firefox
+
+ac_add_options --disable-libxul #3.0 added
+#ac_add_options --enable-libxul
+#8ac_add_options --enable-default-toolkit=cairo-gtk2 
+ac_add_options --enable-application=browser
+#8ac_add_options --enable-pango
+ac_add_options --enable-image-decoders=png,gif,jpeg
+ac_add_options --with-system-jpeg=$LIB_PREFIX
+
+
+#important for 3.0 ! 
+#jemalloc use TLS (thread local storage) but uClibc can't support it
+#so I disable it
+ac_add_options --disable-jemalloc
+
+
+#for reduce size
+ac_add_options --disable-mathml #Mathematical Markup Language support
+ac_add_options --disable-jsd  #javascript debug support
+ac_add_options --disable-dtd-debug #
+ac_add_options --disable-dbus #3.0 added
+ac_add_options --disable-libIDLtest
+ac_add_options --disable-tests
+ac_add_options --disable-pedantic
+ac_add_options --disable-gtktest 
+ac_add_options --disable-glibtest
+ac_add_options --disable-updater
+ac_add_options --disable-view-source 
+ac_add_options --disable-mailnews
+ac_add_options --disable-ldap
+ac_add_options --disable-postscript
+ac_add_options --disable-xprint
+ac_add_options --disable-printing 
+ac_add_options --disable-airbag 
+ac_add_options --disable-profilesharing
+ac_add_options --disable-profilelocking
+ac_add_options --disable-gnomeui
+ac_add_options --disable-gnomevfs 
+
+ac_add_options --disable-update-packaging
+
+############################################
+#  added after 2008-9-5
+#add_options PROFILE_GEN_SCRIPT=/home/user/run-firefox.sh #profile guide optimize see document
+#ac_add_options --enable-js-static-build
+ac_add_options  --disable-accessibility #Disable accessibility support (off by default on OS X)]
+ac_add_options  --disable-xpcom-obsolete #Disable XPCOM Obsolete Library]
+ac_add_options  --disable-permissions  #Disable permissions (popup and cookie blocking)]
+ac_add_options --disable-svg           # Disable SVG support]
+ac_add_options --disable-svg-foreignobject # Disable SVG <foreignObject> support]
+ac_add_options --disable-logging   #    Disable logging facilities]
+ac_add_options --disable-necko-protocols_ftp # [={http,ftp,default,all,none}] Enable/disable specific protocol handlers],
+ac_add_options --disable-safe-browsing 
+ac_add_options --disable-trace-malloc 
+ac_add_options --disable-startup-notification 
+ac_add_options --disable-xpctools  #     Build JS profiling tool]
+#ac_add_options --enable-system-cairo need cairo>1.6.0
+###ac_add_options --disable-crypto #Disable crypto support (Personal Security Manager)]
+ac_add_options --enable-plaintext-editor-only
+ac_add_options  --disable-inspector-apis #Disable the DOM inspection APIs ]
+ac_add_options  --disable-pref-extensions #Disable pref extensions such as autoconfig and system-pref]
+ac_add_options --disable-mochitest     #   Disable mochitest harness]
+ac_add_options  --disable-composer #Disable building of Composer]
+
+
+

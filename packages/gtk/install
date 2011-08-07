@@ -1,0 +1,61 @@
+#!/bin/sh 
+
+. config/options
+
+#added by Leo 2007-6-30
+if [ $GTK_FB != yes ] ;then
+	find $ROOT/$BUILD/$1*/ -name *.so -exec cp -f {} $SYSROOT_PREFIX/usr/local/lib \;
+	find $ROOT/$BUILD/$1*/ -name *.so.* -exec cp -f {} $SYSROOT_PREFIX/usr/local/lib \;
+	cp -f $ROOT/$BUILD/$1*/gdk-x11-2.0.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+	cp -f $ROOT/$BUILD/$1*/contrib/gdk-pixbuf-xlib/gdk-pixbuf-xlib-2.0.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+	cp -f $ROOT/$BUILD/$1*/gtk+-x11-2.0.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+	cp -f $ROOT/$BUILD/$1*/gtk+-2.0.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+	cp -f $ROOT/$BUILD/$1*/gdk-2.0.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+	cp -f $ROOT/$BUILD/$1*/gdk-pixbuf-2.0.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+	cp -f $ROOT/$BUILD/$1*/gtk+-unix-print-2.0.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+
+
+	mkdir -p $SYSROOT_PREFIX/usr/local/include/gtk
+	find $ROOT/$BUILD/$1*/gtk -maxdepth 1 -name *.h -exec cp -f {} $SYSROOT_PREFIX/usr/local/include/gtk \;
+	mkdir -p $SYSROOT_PREFIX/usr/local/include/gdk
+	find $ROOT/$BUILD/$1*/gdk -maxdepth 1 -name *.h -exec cp -f {} $SYSROOT_PREFIX/usr/local/include/gdk \;
+	mkdir -p $SYSROOT_PREFIX/usr/local/include/gdk-pixbuf
+	find $ROOT/$BUILD/$1*/gdk-pixbuf -name *.h -exec cp -f {} $SYSROOT_PREFIX/usr/local/include/gdk-pixbuf \;
+	mkdir -p $SYSROOT_PREFIX/usr/local/include/gdk/x11
+	find $ROOT/$BUILD/$1*/gdk -maxdepth 1 -name *.h -exec cp -f {} $SYSROOT_PREFIX/usr/local/include/gdk/x11 \;
+	cp -f $ROOT/$BUILD/$1*/gdk/gdkconfig.h  $SYSROOT_PREFIX/usr/local/include
+	cp -f $ROOT/$BUILD/$1*/gdk/x11/gdkx.h $SYSROOT_PREFIX/usr/local/include/gdk/
+
+fi
+
+mkdir -p $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libgdk_pixbuf-2.0.so.0 $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libpangoft2-1.0.so.0 $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libpango-1.0.so.0 $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libatk-1.0.so.0 $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libgobject-2.0.so.0 $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libgmodule-2.0.so.0 $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libglib-2.0.so.0 $INSTALL/usr/lib
+
+#if [ "$TARGET_LIBC" = uClibc ]; then #Leo add 20080805 glibc based system don't have this file
+#  cp -f $SYSROOT_PREFIX/usr/local/lib/libintl.so.3 $INSTALL/usr/lib
+#fi
+if [ $TARGET_ARCH = i386 ]; then
+cp -f $SYSROOT_PREFIX/usr/local/lib/libfontconfig.so.1 $INSTALL/usr/lib
+fi
+#cp -f $SYSROOT_PREFIX/usr/local/lib/libexpat.so.1 $INSTALL/usr/lib
+cp -f $SYSROOT_PREFIX/usr/local/lib/libfreetype.so.6 $INSTALL/usr/lib
+mkdir -p $INSTALL/usr/bin
+cp -f $SYSROOT_PREFIX/usr/local/bin/gtk*  $INSTALL/usr/bin
+
+if [ $GTK_FB = yes ]; then 
+if [ $DIRECTFB = yes ]; then
+	cp -f $SYSROOT_PREFIX/usr/local/lib/libgdk-directfb-2.0.so.0 $INSTALL/usr/lib
+	cp -f $SYSROOT_PREFIX/usr/local/lib/libgtk-directfb-2.0.so.0 $INSTALL/usr/lib
+else
+	cp -f $SYSROOT_PREFIX/usr/local/lib/libgdk-linux-fb-2.0.so.0 $INSTALL/usr/lib
+	cp -f $SYSROOT_PREFIX/usr/local/lib/libgtk-linux-fb-2.0.so.0 $INSTALL/usr/lib
+fi
+fi
+
+exit 0

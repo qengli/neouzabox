@@ -1,0 +1,138 @@
+diff -Nur orig-konqueror/configure konqueror-embedded-snapshot-20030705/configure
+--- orig-konqueror/configure	2006-03-01 13:21:47.000000000 +0800
++++ konqueror-embedded-snapshot-20030705/configure	2006-03-01 14:20:43.000000000 +0800
+@@ -9,7 +9,6 @@
+ ## --------------------- ##
+ ## M4sh Initialization.  ##
+ ## --------------------- ##
+-
+ # Be Bourne compatible
+ if test -n "${ZSH_VERSION+set}" && (emulate sh) >/dev/null 2>&1; then
+   emulate sh
+@@ -3825,7 +3824,7 @@
+   if test "$GXX" = "yes" || test "$CXX" = "KCC"; then
+     if test "$kde_use_debug_code" != "no"; then
+       if test "$CXX" = "KCC"; then
+-        CXXFLAGS="+K0 -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings $CXXFLAGS"
++        CXXFLAGS="+K0 -Wall -W -Wpointer-arith -Wwrite-strings $CXXFLAGS"
+       else
+         if test "$kde_use_debug_code" = "full"; then
+           CXXFLAGS="-g3 $CXXFLAGS"
+@@ -4094,11 +4093,11 @@
+       if test "$GCC" = "yes"; then
+         case $host in
+           *-*-linux-gnu)
+-            CFLAGS="-ansi -W -Wall -pedantic -Wshadow -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -D_XOPEN_SOURCE=500 -D_BSD_SOURCE $CFLAGS"
++            CFLAGS="-ansi -W -Wall -Wshadow -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -D_XOPEN_SOURCE=500 -D_BSD_SOURCE $CFLAGS"
+             CXXFLAGS="-ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion $CXXFLAGS"
+           ;;
+         esac
+-        CXXFLAGS="-Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings $CXXFLAGS"
++        CXXFLAGS="-Wall -W -Wpointer-arith -Wwrite-strings $CXXFLAGS"
+ 
+ echo "$as_me:$LINENO: checking whether $CXX supports -Wundef" >&5
+ echo $ECHO_N "checking whether $CXX supports -Wundef... $ECHO_C" >&6
+@@ -12187,8 +12186,8 @@
+   fi
+   shlibpath_var=LD_LIBRARY_PATH
+   shlibpath_overrides_runpath=no
+-  sys_lib_dlsearch_path_spec="/lib${libsuff} /usr/lib${libsuff}"
+-  sys_lib_search_path_spec="/lib${libsuff} /usr/lib${libsuff} /usr/local/lib${libsuff}"
++  sys_lib_dlsearch_path_spec="${SYSROOT_PREFIX}/lib${libsuff} ${SYSROOT_PREFIX}/usr/lib${libsuff}" #modified by Leo 20060301
++  sys_lib_search_path_spec="${SYSROOT_PREFIX}/lib${libsuff} ${SYSROOT_PREFIX}/usr/lib${libsuff} ${LIB_PREFIX}/lib${libsuff}" #modified by Leo 20060301
+   # This implies no fast_install, which is unacceptable.
+   # Some rework will be needed to allow for fast_install
+   # before this can be enabled.
+@@ -18478,7 +18477,7 @@
+ kde_safe_LIBS="$LIBS"
+ LIBS="$LIBS $X_EXTRA_LIBS"
+ if test "$GCC" = "yes"; then
+-CXXFLAGS="$CXXFLAGS -pedantic-errors"
++CXXFLAGS="$CXXFLAGS "
+ fi
+ cat >conftest.$ac_ext <<_ACEOF
+ #line $LINENO "configure"
+@@ -24319,7 +24318,7 @@
+ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+ 
+-ac_link='rm -rf SunWS_cache; ${CXX-g++} -o conftest${ac_exeext} $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
++ac_link='rm -rf SunWS_cache; ${CXX-g++} -o conftest${ac_exeext} $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS -ldl 1>&5'
+ 
+ 
+ 
+@@ -27002,7 +27001,7 @@
+ kde_safe_LIBS="$LIBS"
+ LIBS="$LIBS $X_EXTRA_LIBS"
+ if test "$GCC" = "yes"; then
+-CXXFLAGS="$CXXFLAGS -pedantic-errors"
++CXXFLAGS="$CXXFLAGS "
+ fi
+ cat >conftest.$ac_ext <<_ACEOF
+ #line $LINENO "configure"
+@@ -27206,7 +27205,7 @@
+ kde_safe_LIBS="$LIBS"
+ LIBS="$LIBS $X_EXTRA_LIBS"
+ if test "$GCC" = "yes"; then
+-CXXFLAGS="$CXXFLAGS -pedantic-errors"
++CXXFLAGS="$CXXFLAGS "
+ fi
+ cat >conftest.$ac_ext <<_ACEOF
+ #line $LINENO "configure"
+@@ -27410,7 +27409,7 @@
+ kde_safe_LIBS="$LIBS"
+ LIBS="$LIBS $X_EXTRA_LIBS"
+ if test "$GCC" = "yes"; then
+-CXXFLAGS="$CXXFLAGS -pedantic-errors"
++CXXFLAGS="$CXXFLAGS "
+ fi
+ cat >conftest.$ac_ext <<_ACEOF
+ #line $LINENO "configure"
+@@ -27610,7 +27609,7 @@
+ kde_safe_LIBS="$LIBS"
+ LIBS="$LIBS $X_EXTRA_LIBS"
+ if test "$GCC" = "yes"; then
+-CXXFLAGS="$CXXFLAGS -pedantic-errors"
++CXXFLAGS="$CXXFLAGS "
+ fi
+ cat >conftest.$ac_ext <<_ACEOF
+ #line $LINENO "configure"
+@@ -27809,7 +27808,7 @@
+ kde_safe_LIBS="$LIBS"
+ LIBS="$LIBS $X_EXTRA_LIBS"
+ if test "$GCC" = "yes"; then
+-CXXFLAGS="$CXXFLAGS -pedantic-errors"
++CXXFLAGS="$CXXFLAGS "
+ fi
+ cat >conftest.$ac_ext <<_ACEOF
+ #line $LINENO "configure"
+diff -Nur orig-konqueror/konq-embed/dropin/kglobalsettings.cpp konqueror-embedded-snapshot-20030705/konq-embed/dropin/kglobalsettings.cpp
+--- orig-konqueror/konq-embed/dropin/kglobalsettings.cpp	2006-03-01 13:21:48.000000000 +0800
++++ konqueror-embedded-snapshot-20030705/konq-embed/dropin/kglobalsettings.cpp	2006-03-01 15:12:38.000000000 +0800
+@@ -36,7 +36,8 @@
+     if ( s_generalFont )
+         return *s_generalFont;
+ 
+-    s_generalFont = new QFont( "helvetica", 12 );
++    //s_generalFont = new QFont( "helvetica", 12 ); //modified by Leo 20060301
++    s_generalFont = new QFont( "unifont", 12 );
+     s_generalFont->setPixelSize( 12 );
+     s_generalFont->setStyleHint( QFont::SansSerif );
+ 
+diff -Nur orig-konqueror/konq-embed/kdesrc/kjs/ustring.h konqueror-embedded-snapshot-20030705/konq-embed/kdesrc/kjs/ustring.h
+--- orig-konqueror/konq-embed/kdesrc/kjs/ustring.h	2006-03-01 13:21:48.000000000 +0800
++++ konqueror-embedded-snapshot-20030705/konq-embed/kdesrc/kjs/ustring.h	2006-03-01 13:30:53.000000000 +0800
+@@ -154,11 +154,11 @@
+     /**
+      * @return Lower byte.
+      */
+-    unsigned char& low() const { return ref().lo; }
++    unsigned char low() const { return ref().lo; }
+     /**
+      * @return Higher byte.
+      */
+-    unsigned char& high() const { return ref().hi; }
++    unsigned char high() const { return ref().hi; }
+     /**
+      * @return Character converted to lower case.
+      */

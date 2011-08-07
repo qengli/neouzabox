@@ -1,0 +1,45 @@
+#!/bin/sh
+
+. config/options
+
+#add fonts dir
+sed -i -e s/'<dir>\~\/\.fonts'/"<dir>\/usr\/local\/gale\/fonts"/ $INSTALL/etc/fonts/fonts.conf 
+
+cp -fr $PACKAGES/$1/$1 $INSTALL/usr/local/
+mkdir -p $INSTALL/usr/local/
+
+#$SCRIPTS/install vlc $2
+$SCRIPTS/build vlc $2
+$SCRIPTS/install icewm $2
+$SCRIPTS/build liveclient $2
+
+#vlc plugin need it
+if [ $TARGET_LIBC = glibc ]; then #added by Leo 2008.5.5
+  cp -fL $SYSROOT_PREFIX/lib/librt.so.1 $INSTALL/usr/lib/
+fi
+cp -fr $LIB_PREFIX/lib/libXext.so $INSTALL/usr/lib/
+cp -fr $LIB_PREFIX/lib/libXt.so $INSTALL/usr/lib/
+
+#vlc
+cp -fr $ROOT/$BUILD/vlc*/modules/codec/liblibmpeg2_plugin.so $INSTALL/usr/local/$1/browser/plugins/
+cp -fr $ROOT/$BUILD/vlc*/modules/audio_output/libalsa_plugin.so $INSTALL/usr/local/$1/browser/plugins/
+cp -fr $ROOT/$BUILD/vlc*/modules/demux/libts_plugin.so $INSTALL/usr/local/$1/browser/plugins/
+cp -fr $ROOT/$BUILD/vlc*/mozilla/libvlcplugin.so $INSTALL/usr/local/$1/browser/plugins/ 
+cp -fr $ROOT/$BUILD/vlc*/modules/video_output/x11/libx11_plugin.so $INSTALL/usr/local/$1/browser/plugins/ 
+cp -fr $ROOT/$BUILD/vlc*/modules/audio_filter/converter/libmpgatofixed32_plugin.so $INSTALL/usr/local/$1/browser/plugins/ 
+
+cp $PACKAGES/vlc/config/vlcrc $INSTALL/etc
+cp $ROOT/$BUILD/vlc*/objdir/bin/vlc $INSTALL/usr/bin
+
+
+#LiveClient
+cp -fr $ROOT/$BUILD/liveclient/ILiveClient.xpt $INSTALL/usr/local/$1/browser/components/
+cp -fr $ROOT/$BUILD/liveclient/LiveClient.so $INSTALL/usr/local/$1/browser/components/
+
+
+[ "$JAVA" = yes ] && ln -s /usr/local/jre/plugin/i386/ns7/libjavaplugin_oji.so $INSTALL/usr/local/$1/browser/plugins/
+
+#Leo added 2008-02-18
+cp -f $PACKAGES/$1*/init.d/* $INSTALL/etc/init.d/
+
+exit 0

@@ -1,0 +1,28 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+$SCRIPTS/build ncurses
+$SCRIPTS/build alsa-lib
+
+cd $BUILD/$1*
+
+if [ $TARGET_ARCH = mips ]; then
+./configure --host=$TARGET_NAME \
+            --build=$HOST_NAME \
+            --disable-dependency-tracking \
+            --with-alsa-prefix=$SYSROOT_PREFIX/usr/local/lib \
+            --with-alsa-inc-prefix=$SYSROOT_PREFIX/usr/local/include/
+else
+./configure --host=$TARGET_NAME \
+            --build=$HOST_NAME \
+            --disable-dependency-tracking 
+
+fi
+          
+            # --disable-alsamixer enabled by Leo 2008-1-11
+make -C amixer
+[ "$DEVTOOLS" = yes ] && make -C iecset
+
+exit 0

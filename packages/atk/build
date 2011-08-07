@@ -1,0 +1,19 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+cd $BUILD/$1*
+if [ -f $SYSROOT_PREFIX/usr/local/bin/glib-genmarshal ]; then
+	mv -f $SYSROOT_PREFIX/usr/local/bin/glib-genmarshal $SYSROOT_PREFIX/usr/local/bin/glib-genmarshal.bak
+fi
+#export LD_LIBRARY_PATH=$SYSROOT_PREFIX/usr/local/lib 
+./configure --build=$HOST_NAME \
+	--host=$TARGET_NAME \
+	--target=$TARGET_NAME \
+	--disable-glibtest \
+	--prefix=$LIB_PREFIX
+make
+make install
+

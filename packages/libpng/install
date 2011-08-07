@@ -1,0 +1,11 @@
+#!/bin/sh 
+
+. config/options
+if [ "$TARGET_LIBC" = "glibc" ]; then 
+  cp -f $ROOT/$BUILD/$1*/.libs/libpng12.so.0 $INSTALL/usr/lib #glibc firefox-bin needed
+  cd $INSTALL/usr/lib 
+  ln -fs libpng12.so.0 libpng.so.3
+  cd -
+fi
+
+exit 0

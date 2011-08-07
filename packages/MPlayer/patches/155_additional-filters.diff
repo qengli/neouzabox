@@ -1,0 +1,109 @@
+diff -r 9fdb997b3020 configure
+--- a/configure	Sun Apr 30 16:54:28 2006 +0200
++++ b/configure	Sun Apr 30 16:54:29 2006 +0200
+@@ -638,6 +638,7 @@ _inet6=auto
+ _inet6=auto
+ _gethostbyname2=auto
+ _ftp=yes
++_additional_filters=yes
+ _musepack=auto
+ _vstream=auto
+ _pthreads=auto
+@@ -1108,6 +1108,8 @@ for ac_option do
+   --disable-sighandler) _sighandler=no   ;;
+   --enable-win32dll) _win32dll=yes ;;
+   --disable-win32dll) _win32dll=no ;;
++  --enable-additional-filters) _additional_filters=yes ;;
++  --disable-additional-filters) _additional_filters=no ;;
+ 
+   --enable-sse)	_sse=yes ;;
+   --disable-sse) _sse=no ;;
+@@ -6998,6 +6998,11 @@ fi
+ fi
+ echores "$_gethostbyname2"
+ 
++if test "$_additional_filters" = yes ; then
++  _def_additional_filters='#define USE_ADDITIONAL_FILTERS 1'
++else
++  _def_additional_filters='#undef USE_ADDITIONAL_FILTERS'
++fi
+ 
+ # --------------- GUI specific tests begin -------------------
+ echocheck "GUI"
+@@ -7646,6 +7646,7 @@ CONFIG_LIBAVFORMAT_SO = $_libavformat_so
+ LIBPOSTPROC = $_libpostproc
+ LIBPOSTPROC_A = $_libpostproc_a
+ LIBPOSTPROC_SO = $_libpostproc_so
++ADDITIONAL_FILTERS = $_additional_filters
+ ZORAN = $_zr
+ LIBLZO = $_liblzo
+ LIBDV = $_libdv
+@@ -8044,6 +8044,9 @@ int setenv(const char *name, const char 
+ $_def_win32dll
+ #define WIN32_PATH "$_win32codecsdir"
+ 
++/* Additionnal filters support */
++$_def_additional_filters
++
+ /* Mac OS X specific features */
+ $_def_macosx
+ $_def_macosx_finder_support
+diff -r 9fdb997b3020 libmpcodecs/Makefile
+--- a/libmpcodecs/Makefile	Sun Apr 30 16:54:28 2006 +0200
++++ b/libmpcodecs/Makefile	Sun Apr 30 16:54:29 2006 +0200
+@@ -29,12 +29,18 @@ VIDEO_SRCS=dec_video.c \
+               vd_raw.c \
+               vd_sgi.c \
+               vf.c \
+-              pullup.c \
++              vf_crop.c \
++              vf_expand.c \
++              vf_format.c \
++              vf_scale.c \
++              vf_vo.c \
++
++ifeq ($(ADDITIONAL_FILTERS),yes)
++SRCS_COMMON +=pullup.c \
+               vf_1bpp.c \
+               vf_2xsai.c \
+               vf_blackframe.c \
+               vf_boxblur.c \
+-              vf_crop.c \
+               vf_cropdetect.c \
+               vf_decimate.c \
+               vf_delogo.c \
+@@ -47,12 +47,10 @@ VFILTER_SRCS=vf.c \
+               vf_dvbscale.c \
+               vf_eq2.c \
+               vf_eq.c \
+-              vf_expand.c \
+               vf_field.c \
+               vf_fil.c \
+               vf_filmdint.c \
+               vf_flip.c \
+-              vf_format.c \
+               vf_framestep.c \
+               vf_halfpack.c \
+               vf_harddup.c \
+@@ -76,7 +76,6 @@ VFILTER_SRCS=vf.c \
+               vf_rgbtest.c \
+               vf_rotate.c \
+               vf_sab.c \
+-              vf_scale.c \
+               vf_smartblur.c \
+               vf_softpulldown.c \
+               vf_softskip.c \
+@@ -87,11 +87,12 @@ VFILTER_SRCS=vf.c \
+               vf_tile.c \
+               vf_tinterlace.c \
+               vf_unsharp.c \
+-              vf_vo.c \
+               vf_yadif.c \
+               vf_yuvcsp.c \
+               vf_yuy2.c \
+               vf_yvu9.c \
++
++endif
+ 
+ # These filters use private headers and do not work with shared libavcodec.
+ SRCS_COMMON-$(LIBAVCODEC_A)          += vf_fspp.c \

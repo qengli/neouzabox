@@ -1,0 +1,20 @@
+HYÖDYLLISIÄ KOMENTOJA
+m  : Näytä/piilota valikko
+o  : Näytä OSD-ajastin
+s  : Vaihda TV-ulostulo päälle/pois
+v  : Näytä/piilota tekstitykset
+Vasen : Peru / mene takaisin
+Oikea : Ok / mene eteenpäin
+Alas : 1 minute takaisinpäin
+Ylös : 1 minute eteenpäin
++/-  : Äänen viive +/- 100ms
+O/9 : Äänenvoimakkuus +/- 1
+
+KOMENNOT TIEDOSTOVALIKOIMASSA
+d  : aseta kohdehakemisto
+c  : kopioi kohteeseen
+r  : kysy tiedoston poisto
+o  : vahvista tiedoston poisto
+p  : toista/katso koko hakemisto
+l  : katso hakemisto rekursiivisesti
+

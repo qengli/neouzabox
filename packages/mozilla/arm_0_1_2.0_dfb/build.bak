@@ -1,0 +1,95 @@
+#!/bin/sh
+
+. config/options
+#exit 2
+#to avoid /usr/bin/libIDL2-config output uncorrect result
+export PATH=/usr/bin:/bin:$ROOT/hosttool
+
+$SCRIPTS/build toolchain
+
+cd $BUILD/$1*
+export CFLAGS="$CFLAGS -lexpat -gstabs+"
+export CXXFLAGS="$CXXFLAGS -lexpat -gstabs+"
+
+
+#added by Leo 2008-5-25 
+#when build mozilla in mips arch , the nss build system can't detemain the TARGET_CPU , it use the 'uname -m' to get the cpu type , it is incorrectly obviously. the simplest way to correct it is replash the 'uname -m' shell comannd with 'mips' string.
+#echo $LIB_PREFIX 
+
+sed -i s/"OS_TEST\ \:=\ \$(shell\ uname\ -m)"/"OS_TEST\ \:=\ ${TARGET_ARCH}"/g $ROOT/$BUILD/$1/security/coreconf/arch.mk 
+#export LDFLAGS="$LDFLAGS -lexpat -lXft -lpangoxft-1.0 "
+mkdir -p objdir-$MOZ_APP
+cd objdir-$MOZ_APP
+
+if [ $DIRECTFB = yes ]; then
+   CONFIG_EXT=.directfb 
+fi
+
+if [ "$MOZ_APP" = "xulrunner" ]; then
+	cp $ROOT/packages/$VDIR/.mozconfig.xulrunner${CONFIG_EXT} $ROOT/$BUILD/$1/.mozconfig
+else
+        cp $ROOT/packages/$VDIR/.mozconfig${CONFIG_EXT} $ROOT/$BUILD/$1/.mozconfig
+fi
+
+sed -i -e "s@\${SYSROOT_PREFIX}@${SYSROOT_PREFIX}@g" $ROOT/$BUILD/$1/.mozconfig
+sed -i -e "s@\${TARGET_NAME}@${TARGET_NAME}@g" $ROOT/$BUILD/$1/.mozconfig
+sed -i -e "s@\${HOST_NAME}@${HOST_NAME}@g" $ROOT/$BUILD/$1/.mozconfig
+sed -i -e "s@\${ROOT}@${ROOT}@g" $ROOT/$BUILD/$1/.mozconfig
+sed -i -e "s@\${LIB_PREFIX}@${LIB_PREFIX}@g" $ROOT/$BUILD/$1/.mozconfig
+sed -i -e "s@\${TOOLCHAIN}@${TOOLCHAIN}@g" $ROOT/$BUILD/$1/.mozconfig
+sed -i -e "s@\${BUILD_NAME}@${BUILD_NAME}@g" $ROOT/$BUILD/$1/.mozconfig
+
+if [ "$JAVA" = "yes" ]; then
+        export JAVA_HOME=$ROOT/$BUILD/jdk1.5.0_14/
+        echo "ac_add_options --with-java-include-path=$JAVA_HOME/include" >>  $ROOT/$BUILD/$1/.mozconfig
+else
+        echo "ac_add_options --disable-oji" >>  $ROOT/$BUILD/$1/.mozconfig
+        echo "ac_add_options --disable-javaxpcom" >> $ROOT/$BUILD/$1/.mozconfig
+        echo "ac_add_options --without-java" >>  $ROOT/$BUILD/$1/.mozconfig
+fi    
+DEBUG=yes
+if [ "$DEBUG" = yes ]; then
+export CFLAGS="$CFLAGS "
+export CXXFLAGS="$CXXFLAGS "
+
+#        echo "ac_add_options --enable-debug " >> $ROOT/$BUILD/$1/.mozconfig
+        echo "ac_add_options --enable-dtrace " >> $ROOT/$BUILD/$1/.mozconfig
+
+else
+        echo "ac_add_options --enable-optimize" >> $ROOT/$BUILD/$1/.mozconfig
+fi
+
+#../configure 
+#make -f ${MOZDIR}/client.mk Makefile config.status
+#  rm -rf ${MOZDIR}/js/jsautocfg.h
+#`  cp -rf ${MOZDIR}/../jsautocfg.h ${MOZDIR}/js/src/
+#Leo added 20070708 xulrunner needed
+if [ "$MOZ_APP" = "xulrunner" ]; then
+	# make -f client.mk build MOZ_CURRENT_PROJECT=browser only build browser
+	cd ..
+	#make -f client.mk  
+	cp $ROOT/$PACKAGES/$VDIR/jsautocfg.h objdir-$MOZ_APP/xulrunner/js/src/ -f
+        make -f client.mk build 
+else
+        cd ..
+        #make -f client.mk
+        mkdir objdir-$MOZ_APP/browser/js/src -p
+        cp $ROOT/$PACKAGES/$VDIR/jsautocfg.h objdir-$MOZ_APP/browser/js/src/ -f
+	make -f client.mk build
+fi 
+
+
+#to let make use host_xpt_link
+if [ "$MOZ_APP" = "xulrunner" ]; then
+	cp -f $ROOT/$BUILD/mozilla/objdir-$MOZ_APP/xulrunner/xpcom/typelib/xpt/tools/host_xpt_dump $ROOT/$BUILD/mozilla/objdir-$MOZ_APP/xulrunner/xpcom/typelib/xpt/tools/xpt_dump
+	cp -f $ROOT/$BUILD/mozilla/objdir-$MOZ_APP/xulrunner/xpcom/typelib/xpt/tools/host_xpt_link $ROOT/$BUILD/mozilla/objdir-$MOZ_APP/xulrunner/xpcom/typelib/xpt/tools/xpt_link
+	make -C objdir/xulrunner/xulrunner/installer #leo added 20070708
+else
+#	cp -f $ROOT/$BUILD/mozilla/objdir-$MOZ_APP/xpcom/typelib/xpt/tools/host_xpt_dump $ROOT/$BUILD/mozilla/objdir-$MOZ_APP/xpcom/typelib/xpt/tools/xpt_dump
+#	cp -f $ROOT/$BUILD/mozilla/objdir-$MOZ_APP/xpcom/typelib/xpt/tools/host_xpt_link $ROOT/$BUILD/mozilla/objdir-$MOZ_APP/xpcom/typelib/xpt/tools/xpt_link
+	make -C objdir-$MOZ_APP/browser/installer #leo commentted 20070630
+fi
+
+#build browser installer need enable-static option 
+#but build xulrunner cannot use enable-static options
+

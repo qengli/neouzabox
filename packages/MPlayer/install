@@ -1,0 +1,49 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/install lirc $2
+$SCRIPTS/install autoplay $2
+$SCRIPTS/install mptvscan $2
+$SCRIPTS/install dvb-apps $2
+$SCRIPTS/unpack theme-$THEME
+
+mkdir -p $INSTALL/etc/mplayer
+mkdir -p $INSTALL/usr/bin
+mkdir -p $INSTALL/usr/share/mplayer
+
+cp $BUILD/$1*/mplayer $INSTALL/usr/bin
+cp $PACKAGES/$1/config/mplayer.conf $INSTALL/etc/mplayer
+cp $PACKAGES/$1/config/menu.conf $INSTALL/etc/mplayer
+cp $PACKAGES/$1/scripts/mp_set_option $INSTALL/usr/bin
+cp $PACKAGES/$1/scripts/mp_loader $INSTALL/usr/bin
+cp $PACKAGES/$1/scripts/mp_wrapper $INSTALL/usr/bin
+cp $PACKAGES/$1/scripts/cpd $INSTALL/usr/bin
+cp $PACKAGES/$1/scripts/playdir $INSTALL/usr/bin
+cp $PACKAGES/$1/config/input.conf $INSTALL/etc/mplayer
+cp $PACKAGES/$1/config/dvd $INSTALL/etc
+cp $PACKAGES/$1/config/radio $INSTALL/etc
+
+cat <<EOF > $INSTALL/etc/mplayer/no_nvidia_vidix
+You can enable nvidia vidix driver simply by removing this file.
+Vidix should give you better performance especially with low-end hardware.
+This feature is not very well tested. That's why it is not enabled by
+default. And that's also why you should help us, testing this feature
+and reporting your results if you own nvidia hardware.
+EOF
+
+mkdir -p $INSTALL/codecs
+
+cp $BUILD/$1*/etc/codecs.conf $INSTALL/etc/mplayer
+
+if [ "$2" != generator ]; then
+  if [ "$FREEVO" = no ]; then
+    cp $BUILD/theme-$THEME/background.avi $INSTALL/usr/share/mplayer
+    [ -f $BUILD/theme-$THEME/background-audio.avi ] && cp $BUILD/theme-$THEME/background-audio.avi $INSTALL/usr/share/mplayer
+  fi
+fi
+
+#Leo added 2008-02-18
+cp -f $PACKAGES/$1*/init.d/* $INSTALL/etc/init.d/
+
+exit 0

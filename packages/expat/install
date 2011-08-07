@@ -1,0 +1,9 @@
+#!/bin/sh 
+
+. config/options
+
+#if [ "$TARGET_LIBC" = uClibc ]; then 
+#fi
+
+cp -f $ROOT/$BUILD/$1-*/.libs/libexpat.so.1 $INSTALL/usr/lib
+exit 0

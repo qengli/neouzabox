@@ -1,0 +1,17 @@
+find build.arm.glibc/toolchain/ -name 'libdirect*' -exec rm {} \;
+rm -fr build.arm.glibc/toolchain/arm-unknown-linux-gnu/sysroot/usr/local/share/directfb-examples
+rm build.arm.glibc/toolchain/arm-unknown-linux-gnu/sysroot/usr/local/include/directfb -fr
+rm -fr build.arm.glibc/toolchain/arm-unknown-linux-gnu/sysroot/usr/local/include/directfb-internal
+rm -fr build.arm.glibc/toolchain/arm-unknown-linux-gnu/sysroot/usr/local/share/directfb*
+rm -fr build.arm.glibc/toolchain/arm-unknown-linux-gnu/sysroot/usr/local/lib/directfb*
+rm -f build.arm.glibc/toolchain/arm-unknown-linux-gnu/sysroot/usr/local/lib/pkgconfig/directfb.pc
+rm -f build.arm.glibc/toolchain/arm-unknown-linux-gnu/sysroot/usr/local/lib/pkgconfig/directfb-internal.pc
+rm -f build.arm.glibc/toolchain/arm-unknown-linux-gnu/sysroot/usr/local/lib/pkgconfig/direct.pc
+rm -f build.arm.glibc/toolchain/arm-unknown-linux-gnu/sysroot/usr/local/lib/pkgconfig/fusion.pc
+rm build.arm.glibc/toolchain/arm-unknown-linux-gnu/sysroot/usr/local/lib/nm-n.libdirect-1.2.so.0
+rm build.arm.glibc/toolchain/arm-unknown-linux-gnu/sysroot/usr/local/lib/nm-n.libdirectfb-1.2.so.0
+rm -fr build.arm.glibc/toolchain/arm-unknown-linux-gnu/sysroot/share/directfb-examples
+
+
+
+

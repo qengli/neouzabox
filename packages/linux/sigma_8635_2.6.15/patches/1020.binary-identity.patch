@@ -1,0 +1,147 @@
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/init/Kconfig linux-2.6.15/init/Kconfig
+--- linux-2.6.15.ref/init/Kconfig	2006-01-25 20:52:03.000000000 -0800
++++ linux-2.6.15/init/Kconfig	2006-02-22 19:43:10.000000000 -0800
+@@ -93,6 +93,14 @@
+ 	  Note: This requires Perl, and a git repository, but not necessarily
+ 	  the git or cogito tools to be installed.
+ 
++config IGNORE_COMPILE_INFO
++	bool "Ignore non constant compile time info"
++	default n
++	help
++	  This options makes  linux binary invariant across successive
++	  compilation by disabling inclusions of variant compile time
++	  data (build user, build_hostname, ...).
++
+ config SWAP
+ 	bool "Support for paging of anonymous memory (swap)"
+ 	depends on MMU
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/init/Makefile linux-2.6.15/init/Makefile
+--- linux-2.6.15.ref/init/Makefile	2006-01-25 20:52:03.000000000 -0800
++++ linux-2.6.15/init/Makefile	2006-02-22 19:43:10.000000000 -0800
+@@ -23,7 +23,10 @@
+ # mkcompile_h will make sure to only update the
+ # actual file if its content has changed.
+ 
++mkcompile-y := $(srctree)/scripts/mkcompile_h
++mkcompile-$(CONFIG_IGNORE_COMPILE_INFO) := $(srctree)/scripts/mkcompile_fixed_h
++
+ include/linux/compile.h: FORCE
+ 	@echo '  CHK     $@'
+-	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkcompile_h $@ \
++	$(Q)$(CONFIG_SHELL) $(mkcompile-y) $@ \
+ 	"$(UTS_MACHINE)" "$(CONFIG_SMP)" "$(CONFIG_PREEMPT)" "$(CC) $(CFLAGS)"
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/init/version.c linux-2.6.15/init/version.c
+--- linux-2.6.15.ref/init/version.c	2006-01-25 20:52:03.000000000 -0800
++++ linux-2.6.15/init/version.c	2006-02-22 19:43:10.000000000 -0800
+@@ -28,6 +28,11 @@
+ 
+ EXPORT_SYMBOL(system_utsname);
+ 
++#ifndef CONFIG_IGNORE_COMPILE_INFO
+ const char linux_banner[] =
+ 	"Linux version " UTS_RELEASE " (" LINUX_COMPILE_BY "@"
+ 	LINUX_COMPILE_HOST ") (" LINUX_COMPILER ") " UTS_VERSION "\n";
++#else
++const char linux_banner[] =
++	"Linux version " UTS_RELEASE " (" LINUX_COMPILER ") (compile infos ignored)\n";
++#endif
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/mkcompile_fixed_h linux-2.6.15/mkcompile_fixed_h
+--- linux-2.6.15.ref/mkcompile_fixed_h	1969-12-31 16:00:00.000000000 -0800
++++ linux-2.6.15/mkcompile_fixed_h	2006-02-22 19:43:10.000000000 -0800
+@@ -0,0 +1,34 @@
++TARGET=$1
++ARCH=$2
++SMP=$3
++PREEMPT=$4
++CC=$5
++
++# Generate a temporary compile.h
++
++( echo /\* This file is auto generated \*/
++
++  echo \#define UTS_MACHINE \"$ARCH\"
++
++  echo \#define UTS_VERSION \"\"
++
++  echo \#define LINUX_COMPILE_TIME \"\"
++  echo \#define LINUX_COMPILE_BY \"\"
++  echo \#define LINUX_COMPILE_HOST \"\"
++
++  echo \#define LINUX_COMPILE_DOMAIN \"\"
++
++  echo \#define LINUX_COMPILER \"`$CC -v 2>&1 | tail -n 1`\"
++) > .tmpcompile
++
++# Only replace the real compile.h if the new one is different,
++# in order to preserve the timestamp and avoid unnecessary
++# recompilations.
++
++if [ -r $TARGET ] && cmp -s .tmpcompile $TARGET; then
++   rm -f .tmpcompile
++else
++   echo "  UPD     $TARGET"
++   mv -f .tmpcompile $TARGET
++fi
++rm -f .tmpver.1 .tmpver.2
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/README.1020.binary-identity.patch linux-2.6.15/README.1020.binary-identity.patch
+--- linux-2.6.15.ref/README.1020.binary-identity.patch	1969-12-31 16:00:00.000000000 -0800
++++ linux-2.6.15/README.1020.binary-identity.patch	2006-02-22 19:44:11.000000000 -0800
+@@ -0,0 +1,19 @@
++Feature:
++--------
++Removal of timing sensitive information of the build to ensure the
++binary identity doesn't change.
++
++Prerequisite patch numbers:
++---------------------------
++none
++
++Primary author:
++---------------
++Emmanuel Michon
++
++Related to which chip version SMP86xx xx=?
++------------------------------------------
++Tango2 ES6/RevA or above, or Tango3 ES1 or above
++
++(linux patches) which CONFIG_... are provided:
++----------------------------------------------
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/scripts/mkcompile_fixed_h linux-2.6.15/scripts/mkcompile_fixed_h
+--- linux-2.6.15.ref/scripts/mkcompile_fixed_h	1969-12-31 16:00:00.000000000 -0800
++++ linux-2.6.15/scripts/mkcompile_fixed_h	2006-02-22 19:43:10.000000000 -0800
+@@ -0,0 +1,34 @@
++TARGET=$1
++ARCH=$2
++SMP=$3
++PREEMPT=$4
++CC=$5
++
++# Generate a temporary compile.h
++
++( echo /\* This file is auto generated \*/
++
++  echo \#define UTS_MACHINE \"$ARCH\"
++
++  echo \#define UTS_VERSION \"\"
++
++  echo \#define LINUX_COMPILE_TIME \"\"
++  echo \#define LINUX_COMPILE_BY \"\"
++  echo \#define LINUX_COMPILE_HOST \"\"
++
++  echo \#define LINUX_COMPILE_DOMAIN \"\"
++
++  echo \#define LINUX_COMPILER \"`$CC -v 2>&1 | tail -n 1`\"
++) > .tmpcompile
++
++# Only replace the real compile.h if the new one is different,
++# in order to preserve the timestamp and avoid unnecessary
++# recompilations.
++
++if [ -r $TARGET ] && cmp -s .tmpcompile $TARGET; then
++   rm -f .tmpcompile
++else
++   echo "  UPD     $TARGET"
++   mv -f .tmpcompile $TARGET
++fi
++rm -f .tmpver.1 .tmpver.2

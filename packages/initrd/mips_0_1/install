@@ -1,0 +1,37 @@
+#!/bin/sh
+
+. config/options
+
+test "$2" != installator && INSTALL="$INSTALL/boot"
+mkdir -p $INSTALL
+
+if [ "installed" = "$2" ]; then
+  FILE_NAME=$1.installed.gz
+else
+  FILE_NAME=$1.gz
+fi
+
+$SCRIPTS/clean initrd
+
+if [ "installed" = "$2" ]; then
+  $SCRIPTS/build initrd installed
+  cp $BUILD/$1/$FILE_NAME $INSTALL/../installator/
+else
+  $SCRIPTS/build initrd 
+  cp $BUILD/$1/$FILE_NAME $INSTALL
+fi
+
+
+if [ "$2" != generator ]; then
+  $SCRIPTS/build bootsplash
+  $SCRIPTS/unpack theme-$THEME
+
+  cd $BUILD/theme-$THEME
+  if [ "installed" = "$2" ]; then
+    $ROOT/$BUILD/bootsplash*/Utilities/splash -s -f bootsplash-800x600.cfg >> $ROOT/$INSTALL/../installator/$FILE_NAME
+  else
+    $ROOT/$BUILD/bootsplash*/Utilities/splash -s -f bootsplash-800x600.cfg >> $ROOT/$INSTALL/$FILE_NAME
+  fi
+fi
+
+exit 0

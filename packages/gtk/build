@@ -1,0 +1,157 @@
+#!/bin/sh
+
+. config/options
+
+
+echo "|||||||||||||||||||| prepareing to build $1 |||||||||||||||||||||||"
+
+cd $BUILD/$1*
+export CFLAGS="$CFLAGS -I/home/leo/make/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/sysroot/usr/local/include/freetype2"
+export CPPFLAGS="$CPPFLAGS -I/home/leo/make/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/sysroot/usr/local/include/freetype2"
+
+cat > ${SYSROOT_PREFIX}/usr/local/bin/xft-config <<EOF
+#!/bin/sh
+${SYSROOT_PREFIX}/usr/local/bin/pkg-config xft \$*
+EOF
+chmod 755 ${SYSROOT_PREFIX}/usr/local/bin/xft-config
+
+#added by Leo 20090302
+#cd gtk
+#gtk-update-icon-cache --force --ignore-theme-index  --source builtin_icons stock-icon > gtkbuiltincache.h
+#cd -
+cp $ROOT/hosttool/gtkbuiltincache.h gtk/
+touch gtk/gtkbuiltincache.h
+
+if [ $GTK_FB = yes ] ;then
+    if [ $DIRECTFB = yes ]; then
+
+        sed s/"_gdk_windowing_window_destroy_foreign (window);"/"; \/\/_gdk_windowing_window_destroy_foreign (window); commentted by Leo "/ gdk/gdkwindow.c > gdkwindow.tmp
+        mv -f gdkwindow.tmp gdk/gdkwindow.c
+        echo -------------------build gtk withoutx
+
+        #2008.6.3
+        #see http://www.mail-archive.com/gtk-list@gnome.org/msg24670.html
+        sed -i s@"gdk_colormap_change (colormap, ncolors)"@"//Leo gdk_colormap_change (colormap, ncolors)"@ gdk/gdkcolor.c
+
+        #Added by Leo 20070621
+        if [ -f $SYSROOT_PREFIX/usr/local/bin/glib-genmarshal ]; then
+            mv -f $SYSROOT_PREFIX/usr/local/bin/glib-genmarshal $SYSROOT_PREFIX/usr/local/bin/glib-genmarshal.bak
+        fi
+        
+        if [ $TARGET_ARCH != i386 ]; then
+            export LD_LIBRARY_PATH=${SYSROOT_PREFIX}/usr/local/lib:${SYSROOT_PREFIX}/lib:$ROOT/hosttool #hosttool is added by Leo 2008.5.5
+        fi
+        LDFLAGS="$LDFLAGS -lexpat" ./configure --build=$HOST_NAME \
+        --host=$TARGET_NAME \
+        --disable-glibtest \
+        --target=$TARGET_NAME \
+        --without-libtiff \
+        --with-gdktarget=directfb \
+        --without-x \
+        --disable-glibtest \
+        --enable-fbmanager \
+        --disable-xim \
+        --disable-xkb \
+        --disable-modules \
+        --prefix=$LIB_PREFIX \
+        --without-query-immodules 
+        #	--without-libjpeg
+
+
+    else
+        export LD_LIBRARY_PATH=${SYSROOT_PREFIX}/usr/local/lib:${SYSROOT_PREFIX}/lib:$ROOT/hosttool #hosttool is added by Leo 2008.5.5
+        ./configure --build=$HOST_NAME \
+        --host=$TARGET_NAME \
+        --disable-glibtest \
+        --target=$TARGET_NAME \
+        --without-libtiff \
+        --with-gdktarget=linux-fb \
+        --disable-glibtest \
+        --enable-fbmanager \
+        --disable-xim \
+        --disable-xkb \
+        --disable-modules \
+        --prefix=$LIB_PREFIX \
+        --without-query-immodules \
+        --without-libjpeg
+
+    fi
+    make
+    make install #uncomment by Leo 20070613
+
+
+else
+    echo -------------------build gtk with x
+
+    #Leo added 2008.04.29 enable build gtk with libjpeg not depending on mplayer
+    cd $ROOT 
+    $SCRIPTS/build jpeg
+    cd -
+
+    #added by Leo 2008.04.29
+    #hosttool/gtk-update-icon-cache runtime need libiconv.so.2
+    LD_LIBRARY_PATH=$ROOT/hosttool
+
+    CFLAGS=-DFT_FREETYPE_H
+    if [ "$TARGET_LIBC" = "uClibc" ]; then
+        echo LDFLAGS="-lintl " #20090227 lee
+    fi
+    if [ ! "$TARGET_ARCH" = "i386" ]; then
+        LDFLAGS="${LDFLAGS} -lexpat "
+    fi
+    ./configure --build=$HOST_NAME \
+    --host=$TARGET_NAME \
+    --target=$TARGET_NAME \
+    --disable-glibtest \
+    --without-libtiff \
+    --disable-glibtest \
+    --disable-xim \
+    --disable-xkb \
+    --prefix=$LIB_PREFIX \
+    --disable-modules \
+    --with-included-loaders=png,xpm,jpeg \
+    --without-query-immodules \
+    --sysconfdir=/etc \
+    --with-gdktarget=x11 
+    #--with-libjpeg \
+    #--with-libpng \
+    #	--without-libjpeg
+    sleep 5
+    touch $ROOT/$BUILD/gtk+*/gtk/gtkbuiltincache.h
+    make
+fi
+
+if [ $VERSION = mipsel_sigma_8635 ]; then
+    cp -f $ROOT/$BUILD/$1*/gtk+-unix-print-2.0.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+fi
+
+cat > ${SYSROOT_PREFIX}/usr/local/bin/gtk-config <<EOF
+#!/bin/sh
+${SYSROOT_PREFIX}/usr/local/bin/pkg-config gtk+-2.0 \$*
+EOF
+chmod 755 ${SYSROOT_PREFIX}/usr/local/bin/gtk-config
+
+#added by Leo 2007-6-30
+if [ $GTK_FB != yes ] ;then
+    find $ROOT/$BUILD/$1*/ -name "*.so" -exec cp -f {} $SYSROOT_PREFIX/usr/local/lib \;
+    find $ROOT/$BUILD/$1*/ -name "*.so.*" -exec cp -f {} $SYSROOT_PREFIX/usr/local/lib \;
+    cp -f $ROOT/$BUILD/$1*/gdk-x11-2.0.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+    cp -f $ROOT/$BUILD/$1*/contrib/gdk-pixbuf-xlib/gdk-pixbuf-xlib-2.0.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+    cp -f $ROOT/$BUILD/$1*/gtk+-x11-2.0.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+    cp -f $ROOT/$BUILD/$1*/gtk+-2.0.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+    cp -f $ROOT/$BUILD/$1*/gdk-2.0.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+    cp -f $ROOT/$BUILD/$1*/gdk-pixbuf-2.0.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+
+    mkdir -p $SYSROOT_PREFIX/usr/local/include/gtk
+    find $ROOT/$BUILD/$1*/gtk -maxdepth 1 -name "*.h" -exec cp -f {} $SYSROOT_PREFIX/usr/local/include/gtk \;
+    mkdir -p $SYSROOT_PREFIX/usr/local/include/gdk
+    find $ROOT/$BUILD/$1*/gdk -maxdepth 1 -name "*.h" -exec cp -f {} $SYSROOT_PREFIX/usr/local/include/gdk \;
+    mkdir -p $SYSROOT_PREFIX/usr/local/include/gdk-pixbuf
+    find $ROOT/$BUILD/$1*/gdk-pixbuf -name "*.h" -exec cp -f {} $SYSROOT_PREFIX/usr/local/include/gdk-pixbuf \;
+    mkdir -p $SYSROOT_PREFIX/usr/local/include/gdk/x11
+    find $ROOT/$BUILD/$1*/gdk -maxdepth 1 -name "*.h" -exec cp -f {} $SYSROOT_PREFIX/usr/local/include/gdk/x11 \;
+    cp -f $ROOT/$BUILD/$1*/gdk/gdkconfig.h  $SYSROOT_PREFIX/usr/local/include
+    cp -f $ROOT/$BUILD/$1*/gdk/x11/gdkx.h $SYSROOT_PREFIX/usr/local/include/gdk/
+
+fi
+

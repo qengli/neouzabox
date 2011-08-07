@@ -1,0 +1,6 @@
+#!/bin/sh
+#this file is added by Leo 2006-03-07
+. config/options
+
+mkdir -p $INSTALL/usr/lib
+cp $BUILD/$1*/libz.so.1 $INSTALL/usr/lib

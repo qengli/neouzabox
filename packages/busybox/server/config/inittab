@@ -1,0 +1,2 @@
+::sysinit:/linuxrc
+::respawn:/sbin/getty 38400 tty1

@@ -1,0 +1,21 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+setup_toolchain target
+export LDFLAGS="-L$SYSROOT_PREFIX/usr/lib/ "
+export CFLAGS="-I$SYSROOT_PREFIX/usr/include"
+cd $BUILD/$1*/
+mkdir -p objdir
+cd objdir
+
+export CFLAGS="${CFLAGS} -I${SYSROOT_PREFIX}/usr/local/include/directfb"
+../configure --prefix=/usr/local \
+   --build=$HOST_NAME \
+        --host=$TARGET_NAME \
+        --target=$TARGET_NAME 
+ make
+find . -name Makefile -exec sed -i s@'^prefix =.'@prefix\ =\ ${SYSROOT_PREFIX}/@p {} \;
+make install

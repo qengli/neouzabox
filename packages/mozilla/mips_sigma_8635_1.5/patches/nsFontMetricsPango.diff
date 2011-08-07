@@ -1,0 +1,11 @@
+--- mozilla/gfx/src/gtk/nsFontMetricsPango.orig.cpp	2007-08-10 11:30:43.000000000 +0800
++++ mozilla/gfx/src/gtk/nsFontMetricsPango.cpp	2007-08-10 11:31:56.000000000 +0800
+@@ -1320,7 +1320,7 @@
+ 
+     if (aOrigString) {
+         const gchar *curChar = aText;
+-        bzero(utf8spacing, sizeof(nscoord) * strlen(aText));
++        memset(utf8spacing, 0, sizeof(nscoord) * strlen(aText)); //modifiyed by Leo ,because uClibc has not bzero function
+ 
+         // Covert the utf16 spacing offsets to utf8 spacing offsets
+         for (PRUint32 curOffset=0; curOffset < aLength;

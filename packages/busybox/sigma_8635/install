@@ -1,0 +1,22 @@
+#!/bin/sh
+
+. config/options
+
+cd $BUILD/$1-*
+make CC=$TARGET_CC \
+  CROSS_COMPILE=$ROOT/$TOOLCHAIN/bin/$TARGET_NAME- \
+  CROSS=$ROOT/$TOOLCHAIN/bin/$TARGET_NAME- \
+  PREFIX=$ROOT/$BUILD/rootfs \
+  EXTRA_CFLAGS="$TARGET_CFLAGS" \
+  install 
+
+
+#mkdir -p $ROOT/$BUILD/rootfs/usr/share/udhcpc
+
+#cp $PACKAGES/$VDIR/scripts/udhcp.script $ROOT/$BUILD/rootfs/usr/share/udhcpc/default.script
+
+#mkdir -p $ROOT/$BUILD/rootfs/etc
+#cp $PACKAGES/$VDIR/config/passwd $ROOT/$BUILD/rootfs/etc
+#cp $PACKAGES/$VDIR/config/group $ROOT/$BUILD/rootfs/etc
+#cp -f $PACKAGES/$VDIR/init.d/* $ROOT/$BUILD/rootfs/etc/init.d/
+

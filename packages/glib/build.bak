@@ -1,0 +1,23 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+setup_toolchain --optimize target
+echo "|||||||||||||||||||| prepareing to build $1 |||||||||||||||||||||||"
+
+cd $BUILD/$1*
+LDFLAGS="$LDFLAGS -ldl" && ./configure	--cache-file=uclibc.cache \
+	--build=$HOST_NAME \
+	--host=$TARGET_NAME \
+	--target=$TARGET_NAME \
+	--sysconfdir=$SYSROOT_PREFIX/etc \
+	--prefix=$LIB_PREFIX \
+	--with-libiconv=native \
+	--enable-threads=yes \
+	--disable-man
+
+make
+make install
+

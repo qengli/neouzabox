@@ -1,0 +1,46 @@
+#!/bin/sh
+
+. config/options
+
+case "$2" in
+  binary)
+    mkdir -p $INSTALL/usr/bin
+    mkdir -p $INSTALL/usr/share
+    cp $BUILD/$1*/mtools/$1 $INSTALL/usr/bin
+    cp $BUILD/$1*/ldlinux.sys $INSTALL/usr/share
+    ;;
+
+  installator)
+    cp $PACKAGES/$VDIR/config/boot.msg $INSTALL
+    cp $PACKAGES/$VDIR/config/help.msg $INSTALL
+    [ -f $BUILD/theme-$THEME/splash-isolinux.rle ] && cp $BUILD/theme-$THEME/splash-isolinux.rle $INSTALL/splash.rle
+    cp $PACKAGES/$VDIR/config/isolinux.cfg $INSTALL
+    if [ -n "$BOOT_DEFAULT" ]; then
+      sed -i "s/DEFAULT .*/DEFAULT $BOOT_DEFAULT/" $INSTALL/isolinux.cfg
+    fi
+    ;;
+
+  *)
+    mkdir -p $INSTALL/boot/pxelinux.cfg
+    cp $BUILD/$1*/isolinux.bin $INSTALL/boot
+    cp $PACKAGES/$VDIR/config/isolinux.cfg $INSTALL/boot
+    cp $PACKAGES/$VDIR/config/boot.msg $INSTALL/boot
+    cp $PACKAGES/$VDIR/config/help.msg $INSTALL/boot
+    cp $BUILD/$1*/pxelinux.0 $INSTALL/boot
+    sed "s/boot=[^ ]*/boot=nfs/" $PACKAGES/$VDIR/config/isolinux.cfg > $INSTALL/boot/pxelinux.cfg/default
+    sed -i "s%\(.*APPEND.*\)%\1 nfsroot=$DEFAULT_NFS_SERVER:/tftpboot/NEOUBOX.$TARGET_ARCH%" $INSTALL/boot/pxelinux.cfg/default
+    sed -i s%release-nr%$NEOUBOX_VERSION% $INSTALL/boot/boot.msg
+    if [ -n "$BOOT_DEFAULT" ]; then
+      sed -i "s/DEFAULT .*/DEFAULT $BOOT_DEFAULT/" $INSTALL/boot/isolinux.cfg
+      sed -i "s/DEFAULT .*/DEFAULT $BOOT_DEFAULT/" $INSTALL/boot/pxelinux.cfg/default
+    fi
+
+    if [ "$2" != generator ]; then
+      $SCRIPTS/unpack theme-$THEME
+
+      [ -f $BUILD/theme-$THEME/splash-isolinux.rle ] && cp $BUILD/theme-$THEME/splash-isolinux.rle $INSTALL/boot/splash.rle
+    fi
+    ;;
+esac
+
+exit 0

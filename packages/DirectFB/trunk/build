@@ -1,0 +1,73 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build libpng
+$SCRIPTS/build jpeg
+
+setup_toolchain target
+export LDFLAGS="-L$SYSROOT_PREFIX/usr/lib/ "
+export CFLAGS="-I$SYSROOT_PREFIX/usr/include"
+cd $BUILD/$1*/
+mkdir -p objdir
+cd objdir
+if [ 0 = 0 ]; then
+
+if [ $TARGET_ARCH = i386 ]; then
+ INPUT_LIST=keyboard #,ps2mouse
+else
+ INPUT_LIST=keyboard,linuxinput,ps2mouse
+fi
+
+../configure \
+   --prefix=/usr/local \
+   --sysconfdir=/etc \
+   --build=$HOST_NAME \
+   --host=$TARGET_NAME \
+   --target=$TARGET_NAME \
+   --with-inputdrivers=${INPUT_LIST} \
+   --disable-osx \
+   --disable-mmx \
+   --disable-sse \
+   --enable-fbdev \
+   --disable-sdl \
+   --disable-vnc \
+   --disable-sysfs \
+   --enable-zlib \
+   --disable-video4linux \
+   --with-gfxdrivers=none 
+#   -enable-multi
+make
+
+find . -name Makefile -exec sed -i s@'^prefix =.'@prefix\ =\ ${SYSROOT_PREFIX}/@p {} \;
+make install
+
+
+
+sed -i s@^prefix=/usr/local@prefix=${SYSROOT_PREFIX}/usr/local@ -i $LIB_PREFIX/lib/pkgconfig/direct.pc
+
+sed -i s@^prefix=/usr/local@prefix=${SYSROOT_PREFIX}/usr/local@ -i $LIB_PREFIX/lib/pkgconfig/directfb.pc
+
+sed -i s@^prefix=/usr/local@prefix=${SYSROOT_PREFIX}/usr/local@ -i $LIB_PREFIX/lib/pkgconfig/directfb-internal.pc
+
+sed -i s@^prefix=/usr/local@prefix=${SYSROOT_PREFIX}/usr/local@ -i $LIB_PREFIX/lib/pkgconfig/fusion.pc
+
+rm -f $LIB_PREFIX/lib/libdirectfb.la
+rm -f $LIB_PREFIX/lib/libfusion.la
+rm -f $LIB_PREFIX/lib/libdirect.la
+fi
+
+#the following has been moved to DirectFB-samples
+if [ 0 = 1 ]; then
+cd $ROOT/$BUILD/$1-example*/
+mkdir -p objdir
+cd objdir
+export CFLAGS="${CFLAGS} -I${SYSROOT_PREFIX}/usr/local/include/directfb"
+../configure --prefix=/usr/local \
+   --build=$HOST_NAME \
+        --host=$TARGET_NAME \
+        --target=$TARGET_NAME 
+ make
+find . -name Makefile -exec sed -i s@'^prefix =.'@prefix\ =\ ${SYSROOT_PREFIX}/@p {} \;
+make install
+fi

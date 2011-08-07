@@ -1,0 +1,71 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/install gcc-core toolchain
+
+export BUILD_CC=$HOST_CC 
+
+CFLAGS="$CFLAGS -U_FILE_OFFSET_BITS=64 -U_LARGEFILE_SOURCE"
+
+cd $BUILD/glibc*
+mkdir -p objdir-$1
+cd objdir-$1
+
+
+
+if [ $TARGET_ARCH = "mips" ]; then
+cat >config.cache <<EOF
+libc_cv_forced_unwind=yes
+libc_cv_c_cleanup=yes
+EOF
+
+../configure --host=$TARGET_NAME \
+             --build=$HOST_NAME \
+             --prefix=/usr \
+             --libexecdir=/usr/lib/glibc \
+             --disable-profile \
+             --enable-add-ons \
+             --with-tls \
+             --enable-kernel=2.6.0 \
+             --with-binutils=$BUILD/toolchain/bin \
+             --with-headers=$SYSROOT_PREFIX/usr/include \
+             --cache-file=config.cache \
+             --without-cvs \
+             --without-gd \
+             --with-__thread
+
+#../configure --host=$TARGET_NAME \
+#             --build=$HOST_NAME \
+#             --prefix=$SYSROOT_PREFIX/usr \
+#             --with-tls \
+#             --disable-profile \
+#             --enable-kernel=2.6.0 \
+#             --with-binutils=$BUILD/toolchain/bin \
+#             --with-headers=$SYSROOT_PREFIX/usr/include \
+#	     --enable-add-ons \
+#	     --with-__thread \
+#             --cache-file=config.cache 
+else
+  echo error: unexpected arch
+  exit -1
+fi
+
+#make
+cd $ROOT
+rm -rf "$SYSROOT_PREFIX/lib" "$SYSROOT_PREFIX/usr/lib" "$SYSROOT_PREFIX/usr/include"
+$SCRIPTS/install linux-headers
+
+cd $BUILD/$1*/objdir-$1
+cat >configparms <<EOF
+install_root=$SYSROOT_PREFIX
+EOF
+
+make 
+
+#Leo added 2008-08-19 without this make install will fail , it cannot found ld.so.1 file.
+ln -s dlfcn/libdl.so dlfcn/libdl.so.1
+
+#
+
+make install

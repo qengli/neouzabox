@@ -1,0 +1,92 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build toolchain
+
+echo "|||||||||||||||||||| prepareing to build $1 |||||||||||||||||||||||"
+
+echo $HOST_NAME
+
+if [ $GTK_FB = yes ] ;then
+    echo ---------------------- build pango without x --------------------------
+    cd $BUILD/$1*
+
+    LDFLAGS="$LDFLAGS -lexpat"  CFLAGS=-DFT_FREETYPE_H ./configure --build=$HOST_NAME \
+    --host=$TARGET_NAME \
+    --prefix=$LIB_PREFIX \
+    --sysconfdir=/etc \
+    --without-x 
+    #--disable-shared \
+    make
+
+else
+    echo ----------------------build pango withx --------------------------
+    cd $BUILD/$1*
+
+    if [ $TARGET_ARCH = i386 ]; then
+        export LD_LIBRARY_PATH=/home/leo/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/sysroot/usr/X11R6/lib:/home/leo/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/sysroot/usr/local/lib:/home/leo/neouzabox/build.i386/toolchain/i386-pc-linux-uclibc/sysroot/lib
+        cp $ROOT/${BUILD}/cairo-*/src/cairo-xlib.h $SYSROOT_PREFIX/usr/local/include
+        CFLAGS=-DFT_FREETYPE_H; ./configure --build=$HOST_NAME \
+        --host=$TARGET_NAME \
+        --prefix=$LIB_PREFIX \
+        --with-x \
+        --sysconfdir=/etc \
+        --x-includes=$SYSROOT_PREFIX/usr/X11R6/include \
+        --x-libraries=$SYSROOT_PREFIX/usr/local/lib 
+    else
+        cp $ROOT/${BUILD}/cairo-*/src/cairo-xlib.h $SYSROOT_PREFIX/usr/local/include
+
+        LDFLAGS="$LDFLAGS -lexpat";CFLAGS=-DFT_FREETYPE_H; ./configure --build=$HOST_NAME \
+        --host=$TARGET_NAME \
+        --prefix=$LIB_PREFIX \
+        --with-x \
+        --sysconfdir=/etc \
+        --x-includes=$SYSROOT_PREFIX/usr/X11R6/include \
+        --x-libraries=$SYSROOT_PREFIX/usr/local/lib 
+
+
+    fi
+
+    make
+fi
+
+echo ----------------------install pango lib ,.h and .pc --------------------------
+
+#install .pc
+cp $ROOT/$BUILD/$1*/pango.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+cp $ROOT/$BUILD/$1*/pangoft2.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+cp $ROOT/$BUILD/$1*/pangocairo.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+
+#install lib
+mkdir -p $SYSROOT_PREFIX/usr/local/lib/.libs
+cp -f $ROOT/$BUILD/$1*/pango/.libs/libpango-1.0.la $SYSROOT_PREFIX/usr/local/lib
+cp -f $ROOT/$BUILD/$1*/pango/.libs/libpango-1.0.so.0 $SYSROOT_PREFIX/usr/local/lib
+cp -f $ROOT/$BUILD/$1*/pango/.libs/libpango-1.0.so $SYSROOT_PREFIX/usr/local/lib
+cp -f $ROOT/$BUILD/$1*/pango/.libs/libpango-1.0.so $SYSROOT_PREFIX/usr/local/lib/.libs/
+cp -f $ROOT/$BUILD/$1*/pango/.libs/libpangocairo-1.0.la $SYSROOT_PREFIX/usr/local/lib
+cp -f $ROOT/$BUILD/$1*/pango/.libs/libpangocairo-1.0.so $SYSROOT_PREFIX/usr/local/lib
+cp -f $ROOT/$BUILD/$1*/pango/.libs/libpangocairo-1.0.so $SYSROOT_PREFIX/usr/local/lib/.libs/
+cp -f $ROOT/$BUILD/$1*/pango/.libs/libpangocairo-1.0.so.0 $SYSROOT_PREFIX/usr/local/lib
+#if [ ! $TARGET_ARCH = mips ]; then
+cp -f $ROOT/$BUILD/$1*/pango/.libs/libpangoft2-1.0.la $SYSROOT_PREFIX/usr/local/lib
+cp -f $ROOT/$BUILD/$1*/pango/.libs/libpangoft2-1.0.so $SYSROOT_PREFIX/usr/local/lib
+cp -f $ROOT/$BUILD/$1*/pango/.libs/libpangoft2-1.0.so $SYSROOT_PREFIX/usr/local/lib/.libs/
+cp -f $ROOT/$BUILD/$1*/pango/.libs/libpangoft2-1.0.so.0 $SYSROOT_PREFIX/usr/local/lib
+
+if [ ! $GTK_FB = yes ]; then
+cp $ROOT/$BUILD/$1*/pangoxft.pc $SYSROOT_PREFIX/usr/local/lib/pkgconfig
+cp -f $ROOT/$BUILD/$1*/pango/.libs/libpangoxft-1.0.la $SYSROOT_PREFIX/usr/local/lib
+cp -f $ROOT/$BUILD/$1*/pango/.libs/libpangoxft-1.0.so $SYSROOT_PREFIX/usr/local/lib
+cp -f $ROOT/$BUILD/$1*/pango/.libs/libpangoxft-1.0.so $SYSROOT_PREFIX/usr/local/lib/.libs/
+cp -f $ROOT/$BUILD/$1*/pango/.libs/libpangoxft-1.0.so.0 $SYSROOT_PREFIX/usr/local/lib
+cp -f $ROOT/$BUILD/$1*/pango/.libs/libpangox-1.0.so.0 $SYSROOT_PREFIX/usr/local/lib
+fi
+#fi
+#install .h
+mkdir -p $SYSROOT_PREFIX/usr/local/include/pango
+find $ROOT/$BUILD/$1*/pango -name "*.h" -exec cp -f {} $SYSROOT_PREFIX/usr/local/include/pango \;
+
+
+
+

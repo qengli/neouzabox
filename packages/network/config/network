@@ -1,0 +1,22 @@
+# System's Network Configuration
+
+PHY_TYPE="auto"            # Network physical type (auto|ethernet|wifi)
+WIFI_MODE="managed"        # Wifi working mode (managed|ad-hoc)
+WIFI_WEP=""                # Wifi WEP key
+WIFI_ESSID="any"           # Wifi SSID
+HOST=""                    # NeouzaBox IP ("" for DHCP)
+SUBNET=""                  # NeouzaBox Subnet mask ("" for DHCP)
+GATEWAY=""                 # Gateway IP ("" for DHCP or no internet connection)
+DNS_SERVER=""              # DNS Server IP ("" for DHCP or none)
+SMB_USER="SHARE"           # User Login ("" for none)
+SMB_PWD=""                 # User Password ("" for none)
+
+# Services to be started at boot time
+
+TELNET_SERVER="yes"
+FTP_SERVER="yes"
+HTTP_SERVER="no"
+
+# Use UPnP MediaServer devices auto-discovery
+
+UPNP="no"

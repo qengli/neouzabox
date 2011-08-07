@@ -1,0 +1,135 @@
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/drivers/pci/pci.c linux-2.6.15/drivers/pci/pci.c
+--- linux-2.6.15.ref/drivers/pci/pci.c	2006-01-25 20:51:36.000000000 -0800
++++ linux-2.6.15/drivers/pci/pci.c	2007-04-24 12:27:41.000000000 -0700
+@@ -730,7 +730,7 @@
+ 	pcibios_set_master(dev);
+ }
+ 
+-#ifndef HAVE_ARCH_PCI_MWI
++// #ifndef HAVE_ARCH_PCI_MWI
+ /* This can be overridden by arch code. */
+ u8 pci_cache_line_size = L1_CACHE_BYTES >> 2;
+ 
+@@ -771,7 +771,7 @@
+ 
+ 	return -EINVAL;
+ }
+-#endif /* !HAVE_ARCH_PCI_MWI */
++// #endif /* !HAVE_ARCH_PCI_MWI */
+ 
+ /**
+  * pci_set_mwi - enables memory-write-invalidate PCI transaction
+@@ -789,7 +789,7 @@
+ 	int rc;
+ 	u16 cmd;
+ 
+-#ifdef HAVE_ARCH_PCI_MWI
++#if defined(HAVE_ARCH_PCI_MWI) && !defined(CONFIG_TANGOX)
+ 	rc = pcibios_prep_mwi(dev);
+ #else
+ 	rc = pci_generic_prep_mwi(dev);
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/drivers/scsi/libata-core.c linux-2.6.15/drivers/scsi/libata-core.c
+--- linux-2.6.15.ref/drivers/scsi/libata-core.c	2006-01-25 20:51:39.000000000 -0800
++++ linux-2.6.15/drivers/scsi/libata-core.c	2007-04-24 12:27:41.000000000 -0700
+@@ -78,7 +78,7 @@
+ static unsigned int ata_unique_id = 1;
+ static struct workqueue_struct *ata_wq;
+ 
+-int atapi_enabled = 0;
++int atapi_enabled = 1;
+ module_param(atapi_enabled, int, 0444);
+ MODULE_PARM_DESC(atapi_enabled, "Enable discovery of ATAPI devices (0=off, 1=on)");
+ 
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/drivers/scsi/libata-scsi.c linux-2.6.15/drivers/scsi/libata-scsi.c
+--- linux-2.6.15.ref/drivers/scsi/libata-scsi.c	2006-01-25 20:51:39.000000000 -0800
++++ linux-2.6.15/drivers/scsi/libata-scsi.c	2007-04-24 12:28:49.000000000 -0700
+@@ -684,7 +684,16 @@
+ 			 * other drives on this host may not support LBA48
+ 			 */
+ 			blk_queue_max_sectors(sdev->request_queue, 2048);
+-		}
++                 } else {
++#if defined(CONFIG_TANGO2_SMP863X) || defined(CONFIG_TANGO3_SMP865X)
++                        if (sdev->type == TYPE_ROM) {
++                                sdev->host->max_sectors = 1024;
++                                blk_queue_max_sectors(sdev->request_queue, 1024);
++                        }
++#endif
++                        printk(KERN_INFO "ata%u: dev %u max request %d sectors (non lba48)\n",
++                               ap->id, sdev->id, sdev->host->max_sectors);
++                }
+ 
+ 		/*
+ 		 * SATA DMA transfers must be multiples of 4 byte, so
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/drivers/scsi/sata_sil.c linux-2.6.15/drivers/scsi/sata_sil.c
+--- linux-2.6.15.ref/drivers/scsi/sata_sil.c	2006-01-25 20:51:40.000000000 -0800
++++ linux-2.6.15/drivers/scsi/sata_sil.c	2007-04-24 12:27:41.000000000 -0700
+@@ -396,6 +396,14 @@
+ 	if (rc)
+ 		return rc;
+ 
++#ifdef HAVE_ARCH_PCI_MWI
++	rc = pci_set_mwi(pdev);
++	if (rc) {
++		pci_dev_busy = 1;
++		goto err_out;
++	}
++#endif
++
+ 	rc = pci_request_regions(pdev, DRV_NAME);
+ 	if (rc) {
+ 		pci_dev_busy = 1;
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/include/asm-mips/pci.h linux-2.6.15/include/asm-mips/pci.h
+--- linux-2.6.15.ref/include/asm-mips/pci.h	2006-01-25 20:51:58.000000000 -0800
++++ linux-2.6.15/include/asm-mips/pci.h	2007-04-24 12:27:41.000000000 -0700
+@@ -121,6 +121,11 @@
+ 
+ #endif /* CONFIG_DMA_NEED_PCI_MAP_STATE  */
+ 
++#ifdef CONFIG_TANGOX
++/* Platform specific MWI support. */
++#define HAVE_ARCH_PCI_MWI
++#endif
++
+ /* This is always fine. */
+ #define pci_dac_dma_supported(pci_dev, mask)	(1)
+ 
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/include/linux/libata.h linux-2.6.15/include/linux/libata.h
+--- linux-2.6.15.ref/include/linux/libata.h	2006-01-25 20:52:01.000000000 -0800
++++ linux-2.6.15/include/linux/libata.h	2007-04-24 12:28:49.000000000 -0700
+@@ -82,7 +82,11 @@
+ 
+ enum {
+ 	/* various global constants */
++//#if defined(CONFIG_TANGO2_SMP863X) || defined(CONFIG_TANGO3_SMP865X)
++//	LIBATA_MAX_PRD		= ATA_MAX_PRD,
++//#else
+ 	LIBATA_MAX_PRD		= ATA_MAX_PRD / 2,
++//#endif
+ 	ATA_MAX_PORTS		= 8,
+ 	ATA_DEF_QUEUE		= 1,
+ 	ATA_MAX_QUEUE		= 1,
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/README.1017.satasil.patch linux-2.6.15/README.1017.satasil.patch
+--- linux-2.6.15.ref/README.1017.satasil.patch	1969-12-31 16:00:00.000000000 -0800
++++ linux-2.6.15/README.1017.satasil.patch	2007-04-24 12:31:06.000000000 -0700
+@@ -0,0 +1,20 @@
++Feature:
++--------
++Support Silicon Images PCI SATA controller.
++
++Prerequisite patch numbers:
++---------------------------
++0000
++1000
++1001
++
++Primary author:
++---------------
++YH Lin/Craig Qu
++
++Related to which chip version SMP86xx xx=?
++-----------------------------------------
++all
++
++(linux patches) which CONFIG_... are provided:
++----------------------------------------------

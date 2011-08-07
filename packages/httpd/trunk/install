@@ -1,0 +1,16 @@
+#!/bin/sh 
+
+. config/options
+
+mkdir -p $INSTALL/usr/local/gateway
+mkdir -p $INSTALL/usr/local/gateway/conf
+mkdir -p $INSTALL/usr/local/gateway/lib
+mkdir -p $INSTALL/usr/local/gateway/log
+mkdir -p $INSTALL/usr/local/gateway/bin
+
+cp $BUILD/$1*/.libs/httpd $INSTALL/usr/local/gateway/bin/
+cp $BUILD/$1*/srclib/apr-util/.libs/libaprutil-1.so.0 $INSTALL/usr/local/gateway/lib/
+cp $BUILD/$1*/srclib/apr/.libs/libapr-1.so.0 $INSTALL/usr/local/gateway/lib/
+cp $BUILD/$1*/srclib/apr-util/xml/expat/lib/.libs/libexpat.so.0 $INSTALL/usr/local/gateway/lib/
+
+exit 0

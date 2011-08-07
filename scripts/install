@@ -1,0 +1,30 @@
+#!/bin/sh
+
+. config/options
+
+if [ -z "$1" ]; then
+  echo "usage: $0 package_name"
+  exit 1
+fi
+
+echo "*-**-**-**-**-**-**-**-**-* preparing ($INSTALL) install $@ *-**-**-**-**-**-**-**-**-*"
+
+set_version_dir $1
+
+if [ -f $PACKAGES/$VDIR/arch ]; then
+  grep -q "$TARGET_ARCH" "$PACKAGES/$VDIR/arch" || exit 0
+fi
+
+$SCRIPTS/build $@
+
+printf "%${INDENT}c INSTALL  $1\n" >&$SILENT_OUT
+export INDENT=$((${INDENT:-1}+$INDENT_SIZE))
+
+echo "*-**-**-**-**-**-**-**-**-* ($INSTALL) install $@ *-**-**-**-**-**-**-**-**-*"
+
+if [ -f $PACKAGES/$VDIR/install ]; then
+  $PACKAGES/$VDIR/install $@ >&$VERBOSE_OUT
+else
+  mkdir -p $INSTALL/usr/bin
+  cp $BUILD/$1*/$1 $INSTALL/usr/bin
+fi

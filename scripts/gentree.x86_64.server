@@ -1,0 +1,68 @@
+#!/bin/sh
+
+. config/options
+echo "|||||||||||||||||||||||||||| install dir = $INSTALL |||||||||||||||||||||||||||"
+if [ "$2" != boot ]; then
+  mkdir -p $INSTALL/sbin
+  mkdir -p $INSTALL/etc/init.d
+  mkdir -p $INSTALL/firmwares
+  cp $CONFIG/init $INSTALL/sbin
+
+echo "++++++++++++++++++++gentree with $1+++++++++++++++++++++++++++++++"
+
+#  cp -i $PACKAGES/*/init.d/* $INSTALL/etc/init.d/
+#  modified by Leo 070606 to avoid the cp problem of above in Redhat ES AS 4
+#  the following is comment by Leo 
+#for  d in $(find $PACKAGES -name 'init.d' -type d -maxdepth 2)
+#do
+        #cp $d/* $INSTALL/etc/init.d/
+#done
+
+  cp $CONFIG/file_ext $INSTALL/etc
+  cp $CONFIG/list_ext $INSTALL/etc
+  #$SCRIPTS/install linux modules $1
+  
+  if [ "$NETWORK" = yes ]; then
+    $SCRIPTS/install webgui $1 #modified by Leo 20060227
+    $SCRIPTS/install bftpd
+  fi
+
+#$SCRIPTS/build dialog
+#$SCRIPTS/build util-linux
+[ "$DEBUG" = yes ] && $SCRIPTS/build gdb
+
+
+$SCRIPTS/install udev $1 
+$SCRIPTS/install openssl $1 
+$SCRIPTS/install httpd $1 
+
+echo "|||||||||||||||||||||||||||||||||| gentree lzma ||||||||||||||||||||||"
+tar cf - -C $INSTALL lib usr/bin usr/lib | lzma e $INSTALL/bin.tar.lzma -si -a2
+ 
+fi
+
+if [ $INSTALLATOR = "yes" ]; then
+  	#Leo 2007-07-15 added
+  	echo " ======================== make cramfs .....============="
+    mkdir -p $INSTALL/installator/
+	$SCRIPTS/install installator $1
+    chmod 755 $INSTALL/usr/bin/*  #Leo added 20080129
+ 	mkcramfs $INSTALL/usr $INSTALL/installator/usr.img
+	#mkcramfs $INSTALL/lib $INSTALL/installator/lib.img
+    
+fi
+
+if [ "$2" = boot -o "$2" = full ]; then
+echo "|||||||||||||||||||| install linux image ||||||||||"
+  $SCRIPTS/install linux image $1
+echo "|||||||||||||||||||| install initrd ||||||||||"
+   if [ $INSTALLATOR = "yes" ]; then
+        echo "===== install installed initrd ============="
+  	$SCRIPTS/install initrd installed
+   fi
+ $SCRIPTS/install initrd $1
+echo "|||||||||||||||||||| install syslinux ||||||||||"
+  $SCRIPTS/install syslinux $1
+echo "|||||||||||||||||||| install yaboot ||||||||||"
+  $SCRIPTS/install yaboot $1
+fi

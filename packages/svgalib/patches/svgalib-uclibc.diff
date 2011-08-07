@@ -1,0 +1,1930 @@
+Binary files orig-svgalib-1.9.24/kernel/svgalib_helper/displaystart.o and svgalib-1.9.24/kernel/svgalib_helper/displaystart.o differ
+diff -Nur orig-svgalib-1.9.24/kernel/svgalib_helper/.displaystart.o.cmd svgalib-1.9.24/kernel/svgalib_helper/.displaystart.o.cmd
+--- orig-svgalib-1.9.24/kernel/svgalib_helper/.displaystart.o.cmd	1970-01-01 08:00:00.000000000 +0800
++++ svgalib-1.9.24/kernel/svgalib_helper/.displaystart.o.cmd	2006-02-19 20:33:00.000000000 +0800
+@@ -0,0 +1,337 @@
++cmd_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/displaystart.o := /home/leo/neouzabox/build.i386/toolchain/bin/i386-pc-linux-uclibc-gcc -m32 -Wp,-MD,/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/.displaystart.o.d  -nostdinc -isystem /mnt/sda10/home/leo/neouzabox/build.i386/toolchain/bin/../lib/gcc/i386-pc-linux-uclibc/3.4.4/include -D__KERNEL__ -Iinclude  -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -ffreestanding -Os     -fomit-frame-pointer -pipe -msoft-float -mpreferred-stack-boundary=2 -fno-unit-at-a-time -march=i586 -Iinclude/asm-i386/mach-default -Wdeclaration-after-statement  -DSVGALIB_HELPER_MAJOR=209   -DMODULE -DKBUILD_BASENAME=displaystart -DKBUILD_MODNAME=svgalib_helper -c -o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/displaystart.o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/displaystart.c
++
++deps_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/displaystart.o := \
++  /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/displaystart.c \
++  include/linux/pci.h \
++    $(wildcard include/config/pci.h) \
++    $(wildcard include/config/isa.h) \
++    $(wildcard include/config/eisa.h) \
++    $(wildcard include/config/pci/msi.h) \
++    $(wildcard include/config/pci/domains.h) \
++  include/linux/mod_devicetable.h \
++  include/linux/types.h \
++    $(wildcard include/config/uid16.h) \
++  include/linux/config.h \
++    $(wildcard include/config/h.h) \
++  include/linux/posix_types.h \
++  include/linux/stddef.h \
++  include/linux/compiler.h \
++  include/linux/compiler-gcc3.h \
++  include/linux/compiler-gcc.h \
++  include/asm/posix_types.h \
++  include/asm/types.h \
++    $(wildcard include/config/highmem64g.h) \
++    $(wildcard include/config/lbd.h) \
++  include/linux/pci_regs.h \
++  include/linux/pci_ids.h \
++  include/linux/ioport.h \
++  include/linux/list.h \
++  include/linux/prefetch.h \
++  include/asm/processor.h \
++    $(wildcard include/config/smp.h) \
++    $(wildcard include/config/x86/ht.h) \
++    $(wildcard include/config/mk8.h) \
++    $(wildcard include/config/mk7.h) \
++    $(wildcard include/config/mtrr.h) \
++  include/asm/vm86.h \
++  include/asm/math_emu.h \
++  include/asm/sigcontext.h \
++  include/asm/segment.h \
++  include/asm/page.h \
++    $(wildcard include/config/x86/use/3dnow.h) \
++    $(wildcard include/config/x86/pae.h) \
++    $(wildcard include/config/hugetlb/page.h) \
++    $(wildcard include/config/highmem4g.h) \
++    $(wildcard include/config/physical/start.h) \
++    $(wildcard include/config/flatmem.h) \
++  include/asm-generic/page.h \
++  include/asm/cpufeature.h \
++  include/linux/bitops.h \
++  include/asm/bitops.h \
++  include/asm/msr.h \
++  include/asm/system.h \
++    $(wildcard include/config/x86/cmpxchg.h) \
++    $(wildcard include/config/x86/oostore.h) \
++  include/linux/kernel.h \
++    $(wildcard include/config/preempt/voluntary.h) \
++    $(wildcard include/config/debug/spinlock/sleep.h) \
++    $(wildcard include/config/printk.h) \
++    $(wildcard include/config/sysctl.h) \
++  /mnt/sda10/home/leo/neouzabox/build.i386/toolchain/bin/../lib/gcc/i386-pc-linux-uclibc/3.4.4/include/stdarg.h \
++  include/linux/linkage.h \
++  include/asm/linkage.h \
++    $(wildcard include/config/x86/alignment/16.h) \
++  include/asm/byteorder.h \
++    $(wildcard include/config/x86/bswap.h) \
++  include/linux/byteorder/little_endian.h \
++  include/linux/byteorder/swab.h \
++  include/linux/byteorder/generic.h \
++  include/asm/bug.h \
++    $(wildcard include/config/bug.h) \
++    $(wildcard include/config/debug/bugverbose.h) \
++  include/asm-generic/bug.h \
++  include/linux/cache.h \
++    $(wildcard include/config/x86.h) \
++    $(wildcard include/config/sparc64.h) \
++  include/asm/cache.h \
++    $(wildcard include/config/x86/l1/cache/shift.h) \
++  include/linux/threads.h \
++    $(wildcard include/config/nr/cpus.h) \
++    $(wildcard include/config/base/small.h) \
++  include/asm/percpu.h \
++  include/asm-generic/percpu.h \
++  include/linux/errno.h \
++  include/asm/errno.h \
++  include/asm-generic/errno.h \
++  include/asm-generic/errno-base.h \
++  include/linux/device.h \
++  include/linux/kobject.h \
++    $(wildcard include/config/hotplug.h) \
++  include/linux/sysfs.h \
++    $(wildcard include/config/sysfs.h) \
++  include/asm/atomic.h \
++    $(wildcard include/config/m386.h) \
++  include/linux/spinlock.h \
++    $(wildcard include/config/debug/spinlock.h) \
++    $(wildcard include/config/preempt.h) \
++  include/linux/preempt.h \
++    $(wildcard include/config/debug/preempt.h) \
++  include/linux/thread_info.h \
++  include/asm/thread_info.h \
++    $(wildcard include/config/4kstacks.h) \
++    $(wildcard include/config/debug/stack/usage.h) \
++  include/linux/stringify.h \
++  include/linux/spinlock_types.h \
++  include/linux/spinlock_types_up.h \
++  include/linux/spinlock_up.h \
++  include/linux/spinlock_api_up.h \
++  include/linux/rwsem.h \
++    $(wildcard include/config/rwsem/generic/spinlock.h) \
++  include/asm/rwsem.h \
++  include/linux/kref.h \
++  include/linux/kobject_uevent.h \
++    $(wildcard include/config/kobject/uevent.h) \
++  include/linux/klist.h \
++  include/linux/completion.h \
++  include/linux/wait.h \
++  include/asm/current.h \
++  include/linux/module.h \
++    $(wildcard include/config/modules.h) \
++    $(wildcard include/config/modversions.h) \
++    $(wildcard include/config/module/unload.h) \
++    $(wildcard include/config/kallsyms.h) \
++  include/linux/sched.h \
++    $(wildcard include/config/detect/softlockup.h) \
++    $(wildcard include/config/keys.h) \
++    $(wildcard include/config/inotify.h) \
++    $(wildcard include/config/schedstats.h) \
++    $(wildcard include/config/bsd/process/acct.h) \
++    $(wildcard include/config/numa.h) \
++    $(wildcard include/config/cpusets.h) \
++    $(wildcard include/config/hotplug/cpu.h) \
++    $(wildcard include/config/security.h) \
++    $(wildcard include/config/magic/sysrq.h) \
++    $(wildcard include/config/pm.h) \
++  include/asm/param.h \
++    $(wildcard include/config/hz.h) \
++  include/linux/capability.h \
++  include/linux/timex.h \
++    $(wildcard include/config/time/interpolation.h) \
++  include/linux/time.h \
++  include/linux/seqlock.h \
++  include/asm/timex.h \
++    $(wildcard include/config/x86/elan.h) \
++    $(wildcard include/config/x86/tsc.h) \
++    $(wildcard include/config/x86/generic.h) \
++  include/linux/jiffies.h \
++  include/asm/div64.h \
++  include/linux/rbtree.h \
++  include/linux/cpumask.h \
++  include/linux/bitmap.h \
++  include/linux/string.h \
++  include/asm/string.h \
++  include/linux/nodemask.h \
++  include/linux/numa.h \
++  include/asm/semaphore.h \
++  include/asm/ptrace.h \
++    $(wildcard include/config/frame/pointer.h) \
++  include/asm/mmu.h \
++  include/asm/cputime.h \
++  include/asm-generic/cputime.h \
++  include/linux/smp.h \
++  include/linux/sem.h \
++    $(wildcard include/config/sysvipc.h) \
++  include/linux/ipc.h \
++  include/asm/ipcbuf.h \
++  include/asm/sembuf.h \
++  include/linux/signal.h \
++  include/asm/signal.h \
++  include/asm-generic/signal.h \
++  include/asm/siginfo.h \
++  include/asm-generic/siginfo.h \
++  include/linux/securebits.h \
++  include/linux/fs_struct.h \
++  include/linux/pid.h \
++  include/linux/percpu.h \
++  include/linux/slab.h \
++    $(wildcard include/config/.h) \
++  include/linux/gfp.h \
++  include/linux/mmzone.h \
++    $(wildcard include/config/force/max/zoneorder.h) \
++    $(wildcard include/config/discontigmem.h) \
++    $(wildcard include/config/flat/node/mem/map.h) \
++    $(wildcard include/config/have/memory/present.h) \
++    $(wildcard include/config/need/node/memmap/size.h) \
++    $(wildcard include/config/need/multiple/nodes.h) \
++    $(wildcard include/config/sparsemem.h) \
++    $(wildcard include/config/have/arch/early/pfn/to/nid.h) \
++    $(wildcard include/config/sparsemem/extreme.h) \
++    $(wildcard include/config/nodes/span/other/nodes.h) \
++  include/linux/init.h \
++  include/linux/topology.h \
++    $(wildcard include/config/sched/smt.h) \
++  include/asm/topology.h \
++  include/asm-generic/topology.h \
++  include/linux/kmalloc_sizes.h \
++    $(wildcard include/config/mmu.h) \
++    $(wildcard include/config/large/allocs.h) \
++  include/linux/seccomp.h \
++    $(wildcard include/config/seccomp.h) \
++  include/linux/auxvec.h \
++  include/asm/auxvec.h \
++  include/linux/param.h \
++  include/linux/resource.h \
++  include/asm/resource.h \
++  include/asm-generic/resource.h \
++  include/linux/timer.h \
++  include/linux/aio.h \
++  include/linux/workqueue.h \
++  include/linux/aio_abi.h \
++  include/linux/stat.h \
++  include/asm/stat.h \
++  include/linux/kmod.h \
++    $(wildcard include/config/kmod.h) \
++  include/linux/elf.h \
++  include/asm/elf.h \
++  include/asm/user.h \
++  include/linux/utsname.h \
++  include/linux/moduleparam.h \
++  include/asm/local.h \
++  include/asm/module.h \
++    $(wildcard include/config/m486.h) \
++    $(wildcard include/config/m586.h) \
++    $(wildcard include/config/m586tsc.h) \
++    $(wildcard include/config/m586mmx.h) \
++    $(wildcard include/config/m686.h) \
++    $(wildcard include/config/mpentiumii.h) \
++    $(wildcard include/config/mpentiumiii.h) \
++    $(wildcard include/config/mpentiumm.h) \
++    $(wildcard include/config/mpentium4.h) \
++    $(wildcard include/config/mk6.h) \
++    $(wildcard include/config/mcrusoe.h) \
++    $(wildcard include/config/mefficeon.h) \
++    $(wildcard include/config/mwinchipc6.h) \
++    $(wildcard include/config/mwinchip2.h) \
++    $(wildcard include/config/mwinchip3d.h) \
++    $(wildcard include/config/mcyrixiii.h) \
++    $(wildcard include/config/mviac3/2.h) \
++    $(wildcard include/config/mgeodegx1.h) \
++    $(wildcard include/config/regparm.h) \
++  include/linux/pm.h \
++  include/linux/dmapool.h \
++  include/asm/io.h \
++    $(wildcard include/config/x86/ppro/fence.h) \
++    $(wildcard include/config/x86/numaq.h) \
++  include/asm-generic/iomap.h \
++  include/linux/vmalloc.h \
++  include/asm/scatterlist.h \
++  include/asm/pci.h \
++  include/linux/mm.h \
++    $(wildcard include/config/stack/growsup.h) \
++    $(wildcard include/config/highmem.h) \
++    $(wildcard include/config/shmem.h) \
++    $(wildcard include/config/proc/fs.h) \
++    $(wildcard include/config/debug/pagealloc.h) \
++  include/linux/prio_tree.h \
++  include/linux/fs.h \
++    $(wildcard include/config/dnotify.h) \
++    $(wildcard include/config/quota.h) \
++    $(wildcard include/config/epoll.h) \
++    $(wildcard include/config/auditsyscall.h) \
++    $(wildcard include/config/fs/xip.h) \
++  include/linux/limits.h \
++  include/linux/ioctl.h \
++  include/asm/ioctl.h \
++  include/linux/rcuref.h \
++  include/linux/interrupt.h \
++    $(wildcard include/config/generic/hardirqs.h) \
++    $(wildcard include/config/generic/irq/probe.h) \
++  include/linux/hardirq.h \
++    $(wildcard include/config/preempt/bkl.h) \
++    $(wildcard include/config/virt/cpu/accounting.h) \
++  include/linux/smp_lock.h \
++    $(wildcard include/config/lock/kernel.h) \
++  include/asm/hardirq.h \
++  include/linux/irq.h \
++    $(wildcard include/config/arch/s390.h) \
++    $(wildcard include/config/irq/release/method.h) \
++    $(wildcard include/config/generic/pending/irq.h) \
++    $(wildcard include/config/irqbalance.h) \
++  include/asm/irq.h \
++    $(wildcard include/config/x86/local/apic.h) \
++  include/asm-i386/mach-default/irq_vectors.h \
++  include/asm-i386/mach-default/irq_vectors_limits.h \
++    $(wildcard include/config/x86/io/apic.h) \
++  include/asm/hw_irq.h \
++  include/linux/profile.h \
++    $(wildcard include/config/profiling.h) \
++  include/asm/sections.h \
++  include/asm-generic/sections.h \
++  include/linux/irq_cpustat.h \
++  include/linux/kdev_t.h \
++  include/linux/dcache.h \
++  include/linux/rcupdate.h \
++  include/linux/radix-tree.h \
++  include/linux/quota.h \
++  include/linux/dqblk_xfs.h \
++  include/linux/dqblk_v1.h \
++  include/linux/dqblk_v2.h \
++  include/linux/nfs_fs_i.h \
++  include/linux/nfs.h \
++  include/linux/sunrpc/msg_prot.h \
++  include/linux/fcntl.h \
++  include/asm/fcntl.h \
++  include/asm-generic/fcntl.h \
++    $(wildcard include/config/64bit.h) \
++  include/linux/err.h \
++  include/asm/pgtable.h \
++    $(wildcard include/config/highpte.h) \
++  include/asm/fixmap.h \
++    $(wildcard include/config/x86/visws/apic.h) \
++    $(wildcard include/config/x86/f00f/bug.h) \
++    $(wildcard include/config/x86/cyclone/timer.h) \
++    $(wildcard include/config/acpi.h) \
++    $(wildcard include/config/pci/mmconfig.h) \
++  include/asm/acpi.h \
++    $(wildcard include/config/acpi/sleep.h) \
++  include/acpi/pdc_intel.h \
++  include/asm/apicdef.h \
++  include/asm/pgtable-2level-defs.h \
++  include/asm/pgtable-2level.h \
++  include/asm-generic/pgtable-nopmd.h \
++  include/asm-generic/pgtable-nopud.h \
++  include/asm-generic/pgtable.h \
++  include/linux/page-flags.h \
++    $(wildcard include/config/swap.h) \
++  include/asm-generic/pci-dma-compat.h \
++  include/linux/dma-mapping.h \
++  include/asm/dma-mapping.h \
++  include/asm-generic/pci.h \
++  /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/kernel26compat.h \
++    $(wildcard include/config/devfs/fs.h) \
++  include/linux/version.h \
++  /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.h \
++
++/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/displaystart.o: $(deps_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/displaystart.o)
++
++$(deps_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/displaystart.o):
+Binary files orig-svgalib-1.9.24/kernel/svgalib_helper/i810.o and svgalib-1.9.24/kernel/svgalib_helper/i810.o differ
+diff -Nur orig-svgalib-1.9.24/kernel/svgalib_helper/.i810.o.cmd svgalib-1.9.24/kernel/svgalib_helper/.i810.o.cmd
+--- orig-svgalib-1.9.24/kernel/svgalib_helper/.i810.o.cmd	1970-01-01 08:00:00.000000000 +0800
++++ svgalib-1.9.24/kernel/svgalib_helper/.i810.o.cmd	2006-02-19 20:32:59.000000000 +0800
+@@ -0,0 +1,8 @@
++cmd_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/i810.o := /home/leo/neouzabox/build.i386/toolchain/bin/i386-pc-linux-uclibc-gcc -m32 -Wp,-MD,/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/.i810.o.d  -nostdinc -isystem /mnt/sda10/home/leo/neouzabox/build.i386/toolchain/bin/../lib/gcc/i386-pc-linux-uclibc/3.4.4/include -D__KERNEL__ -Iinclude  -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -ffreestanding -Os     -fomit-frame-pointer -pipe -msoft-float -mpreferred-stack-boundary=2 -fno-unit-at-a-time -march=i586 -Iinclude/asm-i386/mach-default -Wdeclaration-after-statement  -DSVGALIB_HELPER_MAJOR=209   -DMODULE -DKBUILD_BASENAME=i810 -DKBUILD_MODNAME=svgalib_helper -c -o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/i810.o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/i810.c
++
++deps_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/i810.o := \
++  /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/i810.c \
++
++/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/i810.o: $(deps_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/i810.o)
++
++$(deps_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/i810.o):
+Binary files orig-svgalib-1.9.24/kernel/svgalib_helper/interrupt.o and svgalib-1.9.24/kernel/svgalib_helper/interrupt.o differ
+diff -Nur orig-svgalib-1.9.24/kernel/svgalib_helper/.interrupt.o.cmd svgalib-1.9.24/kernel/svgalib_helper/.interrupt.o.cmd
+--- orig-svgalib-1.9.24/kernel/svgalib_helper/.interrupt.o.cmd	1970-01-01 08:00:00.000000000 +0800
++++ svgalib-1.9.24/kernel/svgalib_helper/.interrupt.o.cmd	2006-02-19 20:32:59.000000000 +0800
+@@ -0,0 +1,337 @@
++cmd_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/interrupt.o := /home/leo/neouzabox/build.i386/toolchain/bin/i386-pc-linux-uclibc-gcc -m32 -Wp,-MD,/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/.interrupt.o.d  -nostdinc -isystem /mnt/sda10/home/leo/neouzabox/build.i386/toolchain/bin/../lib/gcc/i386-pc-linux-uclibc/3.4.4/include -D__KERNEL__ -Iinclude  -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -ffreestanding -Os     -fomit-frame-pointer -pipe -msoft-float -mpreferred-stack-boundary=2 -fno-unit-at-a-time -march=i586 -Iinclude/asm-i386/mach-default -Wdeclaration-after-statement  -DSVGALIB_HELPER_MAJOR=209   -DMODULE -DKBUILD_BASENAME=interrupt -DKBUILD_MODNAME=svgalib_helper -c -o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/interrupt.o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/interrupt.c
++
++deps_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/interrupt.o := \
++  /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/interrupt.c \
++  include/linux/pci.h \
++    $(wildcard include/config/pci.h) \
++    $(wildcard include/config/isa.h) \
++    $(wildcard include/config/eisa.h) \
++    $(wildcard include/config/pci/msi.h) \
++    $(wildcard include/config/pci/domains.h) \
++  include/linux/mod_devicetable.h \
++  include/linux/types.h \
++    $(wildcard include/config/uid16.h) \
++  include/linux/config.h \
++    $(wildcard include/config/h.h) \
++  include/linux/posix_types.h \
++  include/linux/stddef.h \
++  include/linux/compiler.h \
++  include/linux/compiler-gcc3.h \
++  include/linux/compiler-gcc.h \
++  include/asm/posix_types.h \
++  include/asm/types.h \
++    $(wildcard include/config/highmem64g.h) \
++    $(wildcard include/config/lbd.h) \
++  include/linux/pci_regs.h \
++  include/linux/pci_ids.h \
++  include/linux/ioport.h \
++  include/linux/list.h \
++  include/linux/prefetch.h \
++  include/asm/processor.h \
++    $(wildcard include/config/smp.h) \
++    $(wildcard include/config/x86/ht.h) \
++    $(wildcard include/config/mk8.h) \
++    $(wildcard include/config/mk7.h) \
++    $(wildcard include/config/mtrr.h) \
++  include/asm/vm86.h \
++  include/asm/math_emu.h \
++  include/asm/sigcontext.h \
++  include/asm/segment.h \
++  include/asm/page.h \
++    $(wildcard include/config/x86/use/3dnow.h) \
++    $(wildcard include/config/x86/pae.h) \
++    $(wildcard include/config/hugetlb/page.h) \
++    $(wildcard include/config/highmem4g.h) \
++    $(wildcard include/config/physical/start.h) \
++    $(wildcard include/config/flatmem.h) \
++  include/asm-generic/page.h \
++  include/asm/cpufeature.h \
++  include/linux/bitops.h \
++  include/asm/bitops.h \
++  include/asm/msr.h \
++  include/asm/system.h \
++    $(wildcard include/config/x86/cmpxchg.h) \
++    $(wildcard include/config/x86/oostore.h) \
++  include/linux/kernel.h \
++    $(wildcard include/config/preempt/voluntary.h) \
++    $(wildcard include/config/debug/spinlock/sleep.h) \
++    $(wildcard include/config/printk.h) \
++    $(wildcard include/config/sysctl.h) \
++  /mnt/sda10/home/leo/neouzabox/build.i386/toolchain/bin/../lib/gcc/i386-pc-linux-uclibc/3.4.4/include/stdarg.h \
++  include/linux/linkage.h \
++  include/asm/linkage.h \
++    $(wildcard include/config/x86/alignment/16.h) \
++  include/asm/byteorder.h \
++    $(wildcard include/config/x86/bswap.h) \
++  include/linux/byteorder/little_endian.h \
++  include/linux/byteorder/swab.h \
++  include/linux/byteorder/generic.h \
++  include/asm/bug.h \
++    $(wildcard include/config/bug.h) \
++    $(wildcard include/config/debug/bugverbose.h) \
++  include/asm-generic/bug.h \
++  include/linux/cache.h \
++    $(wildcard include/config/x86.h) \
++    $(wildcard include/config/sparc64.h) \
++  include/asm/cache.h \
++    $(wildcard include/config/x86/l1/cache/shift.h) \
++  include/linux/threads.h \
++    $(wildcard include/config/nr/cpus.h) \
++    $(wildcard include/config/base/small.h) \
++  include/asm/percpu.h \
++  include/asm-generic/percpu.h \
++  include/linux/errno.h \
++  include/asm/errno.h \
++  include/asm-generic/errno.h \
++  include/asm-generic/errno-base.h \
++  include/linux/device.h \
++  include/linux/kobject.h \
++    $(wildcard include/config/hotplug.h) \
++  include/linux/sysfs.h \
++    $(wildcard include/config/sysfs.h) \
++  include/asm/atomic.h \
++    $(wildcard include/config/m386.h) \
++  include/linux/spinlock.h \
++    $(wildcard include/config/debug/spinlock.h) \
++    $(wildcard include/config/preempt.h) \
++  include/linux/preempt.h \
++    $(wildcard include/config/debug/preempt.h) \
++  include/linux/thread_info.h \
++  include/asm/thread_info.h \
++    $(wildcard include/config/4kstacks.h) \
++    $(wildcard include/config/debug/stack/usage.h) \
++  include/linux/stringify.h \
++  include/linux/spinlock_types.h \
++  include/linux/spinlock_types_up.h \
++  include/linux/spinlock_up.h \
++  include/linux/spinlock_api_up.h \
++  include/linux/rwsem.h \
++    $(wildcard include/config/rwsem/generic/spinlock.h) \
++  include/asm/rwsem.h \
++  include/linux/kref.h \
++  include/linux/kobject_uevent.h \
++    $(wildcard include/config/kobject/uevent.h) \
++  include/linux/klist.h \
++  include/linux/completion.h \
++  include/linux/wait.h \
++  include/asm/current.h \
++  include/linux/module.h \
++    $(wildcard include/config/modules.h) \
++    $(wildcard include/config/modversions.h) \
++    $(wildcard include/config/module/unload.h) \
++    $(wildcard include/config/kallsyms.h) \
++  include/linux/sched.h \
++    $(wildcard include/config/detect/softlockup.h) \
++    $(wildcard include/config/keys.h) \
++    $(wildcard include/config/inotify.h) \
++    $(wildcard include/config/schedstats.h) \
++    $(wildcard include/config/bsd/process/acct.h) \
++    $(wildcard include/config/numa.h) \
++    $(wildcard include/config/cpusets.h) \
++    $(wildcard include/config/hotplug/cpu.h) \
++    $(wildcard include/config/security.h) \
++    $(wildcard include/config/magic/sysrq.h) \
++    $(wildcard include/config/pm.h) \
++  include/asm/param.h \
++    $(wildcard include/config/hz.h) \
++  include/linux/capability.h \
++  include/linux/timex.h \
++    $(wildcard include/config/time/interpolation.h) \
++  include/linux/time.h \
++  include/linux/seqlock.h \
++  include/asm/timex.h \
++    $(wildcard include/config/x86/elan.h) \
++    $(wildcard include/config/x86/tsc.h) \
++    $(wildcard include/config/x86/generic.h) \
++  include/linux/jiffies.h \
++  include/asm/div64.h \
++  include/linux/rbtree.h \
++  include/linux/cpumask.h \
++  include/linux/bitmap.h \
++  include/linux/string.h \
++  include/asm/string.h \
++  include/linux/nodemask.h \
++  include/linux/numa.h \
++  include/asm/semaphore.h \
++  include/asm/ptrace.h \
++    $(wildcard include/config/frame/pointer.h) \
++  include/asm/mmu.h \
++  include/asm/cputime.h \
++  include/asm-generic/cputime.h \
++  include/linux/smp.h \
++  include/linux/sem.h \
++    $(wildcard include/config/sysvipc.h) \
++  include/linux/ipc.h \
++  include/asm/ipcbuf.h \
++  include/asm/sembuf.h \
++  include/linux/signal.h \
++  include/asm/signal.h \
++  include/asm-generic/signal.h \
++  include/asm/siginfo.h \
++  include/asm-generic/siginfo.h \
++  include/linux/securebits.h \
++  include/linux/fs_struct.h \
++  include/linux/pid.h \
++  include/linux/percpu.h \
++  include/linux/slab.h \
++    $(wildcard include/config/.h) \
++  include/linux/gfp.h \
++  include/linux/mmzone.h \
++    $(wildcard include/config/force/max/zoneorder.h) \
++    $(wildcard include/config/discontigmem.h) \
++    $(wildcard include/config/flat/node/mem/map.h) \
++    $(wildcard include/config/have/memory/present.h) \
++    $(wildcard include/config/need/node/memmap/size.h) \
++    $(wildcard include/config/need/multiple/nodes.h) \
++    $(wildcard include/config/sparsemem.h) \
++    $(wildcard include/config/have/arch/early/pfn/to/nid.h) \
++    $(wildcard include/config/sparsemem/extreme.h) \
++    $(wildcard include/config/nodes/span/other/nodes.h) \
++  include/linux/init.h \
++  include/linux/topology.h \
++    $(wildcard include/config/sched/smt.h) \
++  include/asm/topology.h \
++  include/asm-generic/topology.h \
++  include/linux/kmalloc_sizes.h \
++    $(wildcard include/config/mmu.h) \
++    $(wildcard include/config/large/allocs.h) \
++  include/linux/seccomp.h \
++    $(wildcard include/config/seccomp.h) \
++  include/linux/auxvec.h \
++  include/asm/auxvec.h \
++  include/linux/param.h \
++  include/linux/resource.h \
++  include/asm/resource.h \
++  include/asm-generic/resource.h \
++  include/linux/timer.h \
++  include/linux/aio.h \
++  include/linux/workqueue.h \
++  include/linux/aio_abi.h \
++  include/linux/stat.h \
++  include/asm/stat.h \
++  include/linux/kmod.h \
++    $(wildcard include/config/kmod.h) \
++  include/linux/elf.h \
++  include/asm/elf.h \
++  include/asm/user.h \
++  include/linux/utsname.h \
++  include/linux/moduleparam.h \
++  include/asm/local.h \
++  include/asm/module.h \
++    $(wildcard include/config/m486.h) \
++    $(wildcard include/config/m586.h) \
++    $(wildcard include/config/m586tsc.h) \
++    $(wildcard include/config/m586mmx.h) \
++    $(wildcard include/config/m686.h) \
++    $(wildcard include/config/mpentiumii.h) \
++    $(wildcard include/config/mpentiumiii.h) \
++    $(wildcard include/config/mpentiumm.h) \
++    $(wildcard include/config/mpentium4.h) \
++    $(wildcard include/config/mk6.h) \
++    $(wildcard include/config/mcrusoe.h) \
++    $(wildcard include/config/mefficeon.h) \
++    $(wildcard include/config/mwinchipc6.h) \
++    $(wildcard include/config/mwinchip2.h) \
++    $(wildcard include/config/mwinchip3d.h) \
++    $(wildcard include/config/mcyrixiii.h) \
++    $(wildcard include/config/mviac3/2.h) \
++    $(wildcard include/config/mgeodegx1.h) \
++    $(wildcard include/config/regparm.h) \
++  include/linux/pm.h \
++  include/linux/dmapool.h \
++  include/asm/io.h \
++    $(wildcard include/config/x86/ppro/fence.h) \
++    $(wildcard include/config/x86/numaq.h) \
++  include/asm-generic/iomap.h \
++  include/linux/vmalloc.h \
++  include/asm/scatterlist.h \
++  include/asm/pci.h \
++  include/linux/mm.h \
++    $(wildcard include/config/stack/growsup.h) \
++    $(wildcard include/config/highmem.h) \
++    $(wildcard include/config/shmem.h) \
++    $(wildcard include/config/proc/fs.h) \
++    $(wildcard include/config/debug/pagealloc.h) \
++  include/linux/prio_tree.h \
++  include/linux/fs.h \
++    $(wildcard include/config/dnotify.h) \
++    $(wildcard include/config/quota.h) \
++    $(wildcard include/config/epoll.h) \
++    $(wildcard include/config/auditsyscall.h) \
++    $(wildcard include/config/fs/xip.h) \
++  include/linux/limits.h \
++  include/linux/ioctl.h \
++  include/asm/ioctl.h \
++  include/linux/rcuref.h \
++  include/linux/interrupt.h \
++    $(wildcard include/config/generic/hardirqs.h) \
++    $(wildcard include/config/generic/irq/probe.h) \
++  include/linux/hardirq.h \
++    $(wildcard include/config/preempt/bkl.h) \
++    $(wildcard include/config/virt/cpu/accounting.h) \
++  include/linux/smp_lock.h \
++    $(wildcard include/config/lock/kernel.h) \
++  include/asm/hardirq.h \
++  include/linux/irq.h \
++    $(wildcard include/config/arch/s390.h) \
++    $(wildcard include/config/irq/release/method.h) \
++    $(wildcard include/config/generic/pending/irq.h) \
++    $(wildcard include/config/irqbalance.h) \
++  include/asm/irq.h \
++    $(wildcard include/config/x86/local/apic.h) \
++  include/asm-i386/mach-default/irq_vectors.h \
++  include/asm-i386/mach-default/irq_vectors_limits.h \
++    $(wildcard include/config/x86/io/apic.h) \
++  include/asm/hw_irq.h \
++  include/linux/profile.h \
++    $(wildcard include/config/profiling.h) \
++  include/asm/sections.h \
++  include/asm-generic/sections.h \
++  include/linux/irq_cpustat.h \
++  include/linux/kdev_t.h \
++  include/linux/dcache.h \
++  include/linux/rcupdate.h \
++  include/linux/radix-tree.h \
++  include/linux/quota.h \
++  include/linux/dqblk_xfs.h \
++  include/linux/dqblk_v1.h \
++  include/linux/dqblk_v2.h \
++  include/linux/nfs_fs_i.h \
++  include/linux/nfs.h \
++  include/linux/sunrpc/msg_prot.h \
++  include/linux/fcntl.h \
++  include/asm/fcntl.h \
++  include/asm-generic/fcntl.h \
++    $(wildcard include/config/64bit.h) \
++  include/linux/err.h \
++  include/asm/pgtable.h \
++    $(wildcard include/config/highpte.h) \
++  include/asm/fixmap.h \
++    $(wildcard include/config/x86/visws/apic.h) \
++    $(wildcard include/config/x86/f00f/bug.h) \
++    $(wildcard include/config/x86/cyclone/timer.h) \
++    $(wildcard include/config/acpi.h) \
++    $(wildcard include/config/pci/mmconfig.h) \
++  include/asm/acpi.h \
++    $(wildcard include/config/acpi/sleep.h) \
++  include/acpi/pdc_intel.h \
++  include/asm/apicdef.h \
++  include/asm/pgtable-2level-defs.h \
++  include/asm/pgtable-2level.h \
++  include/asm-generic/pgtable-nopmd.h \
++  include/asm-generic/pgtable-nopud.h \
++  include/asm-generic/pgtable.h \
++  include/linux/page-flags.h \
++    $(wildcard include/config/swap.h) \
++  include/asm-generic/pci-dma-compat.h \
++  include/linux/dma-mapping.h \
++  include/asm/dma-mapping.h \
++  include/asm-generic/pci.h \
++  /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/kernel26compat.h \
++    $(wildcard include/config/devfs/fs.h) \
++  include/linux/version.h \
++  /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.h \
++
++/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/interrupt.o: $(deps_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/interrupt.o)
++
++$(deps_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/interrupt.o):
+Binary files orig-svgalib-1.9.24/kernel/svgalib_helper/main.o and svgalib-1.9.24/kernel/svgalib_helper/main.o differ
+diff -Nur orig-svgalib-1.9.24/kernel/svgalib_helper/.main.o.cmd svgalib-1.9.24/kernel/svgalib_helper/.main.o.cmd
+--- orig-svgalib-1.9.24/kernel/svgalib_helper/.main.o.cmd	1970-01-01 08:00:00.000000000 +0800
++++ svgalib-1.9.24/kernel/svgalib_helper/.main.o.cmd	2006-02-19 20:32:59.000000000 +0800
+@@ -0,0 +1,355 @@
++cmd_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/main.o := /home/leo/neouzabox/build.i386/toolchain/bin/i386-pc-linux-uclibc-gcc -m32 -Wp,-MD,/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/.main.o.d  -nostdinc -isystem /mnt/sda10/home/leo/neouzabox/build.i386/toolchain/bin/../lib/gcc/i386-pc-linux-uclibc/3.4.4/include -D__KERNEL__ -Iinclude  -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -ffreestanding -Os     -fomit-frame-pointer -pipe -msoft-float -mpreferred-stack-boundary=2 -fno-unit-at-a-time -march=i586 -Iinclude/asm-i386/mach-default -Wdeclaration-after-statement  -DSVGALIB_HELPER_MAJOR=209   -DMODULE -DKBUILD_BASENAME=main -DKBUILD_MODNAME=svgalib_helper -c -o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/main.o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/main.c
++
++deps_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/main.o := \
++  /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/main.c \
++    $(wildcard include/config/modversions.h) \
++    $(wildcard include/config/devfs/fs.h) \
++    $(wildcard include/config/sun3.h) \
++  include/linux/config.h \
++    $(wildcard include/config/h.h) \
++  include/linux/kernel.h \
++    $(wildcard include/config/preempt/voluntary.h) \
++    $(wildcard include/config/debug/spinlock/sleep.h) \
++    $(wildcard include/config/printk.h) \
++    $(wildcard include/config/sysctl.h) \
++  /mnt/sda10/home/leo/neouzabox/build.i386/toolchain/bin/../lib/gcc/i386-pc-linux-uclibc/3.4.4/include/stdarg.h \
++  include/linux/linkage.h \
++  include/asm/linkage.h \
++    $(wildcard include/config/x86/alignment/16.h) \
++  include/linux/stddef.h \
++  include/linux/compiler.h \
++  include/linux/compiler-gcc3.h \
++  include/linux/compiler-gcc.h \
++  include/linux/types.h \
++    $(wildcard include/config/uid16.h) \
++  include/linux/posix_types.h \
++  include/asm/posix_types.h \
++  include/asm/types.h \
++    $(wildcard include/config/highmem64g.h) \
++    $(wildcard include/config/lbd.h) \
++  include/linux/bitops.h \
++  include/asm/bitops.h \
++    $(wildcard include/config/smp.h) \
++  include/asm/byteorder.h \
++    $(wildcard include/config/x86/bswap.h) \
++  include/linux/byteorder/little_endian.h \
++  include/linux/byteorder/swab.h \
++  include/linux/byteorder/generic.h \
++  include/asm/bug.h \
++    $(wildcard include/config/bug.h) \
++    $(wildcard include/config/debug/bugverbose.h) \
++  include/asm-generic/bug.h \
++  include/linux/module.h \
++    $(wildcard include/config/modules.h) \
++    $(wildcard include/config/module/unload.h) \
++    $(wildcard include/config/kallsyms.h) \
++  include/linux/sched.h \
++    $(wildcard include/config/detect/softlockup.h) \
++    $(wildcard include/config/keys.h) \
++    $(wildcard include/config/inotify.h) \
++    $(wildcard include/config/schedstats.h) \
++    $(wildcard include/config/bsd/process/acct.h) \
++    $(wildcard include/config/numa.h) \
++    $(wildcard include/config/cpusets.h) \
++    $(wildcard include/config/hotplug/cpu.h) \
++    $(wildcard include/config/security.h) \
++    $(wildcard include/config/preempt.h) \
++    $(wildcard include/config/magic/sysrq.h) \
++    $(wildcard include/config/pm.h) \
++  include/asm/param.h \
++    $(wildcard include/config/hz.h) \
++  include/linux/capability.h \
++  include/linux/spinlock.h \
++    $(wildcard include/config/debug/spinlock.h) \
++  include/linux/preempt.h \
++    $(wildcard include/config/debug/preempt.h) \
++  include/linux/thread_info.h \
++  include/asm/thread_info.h \
++    $(wildcard include/config/4kstacks.h) \
++    $(wildcard include/config/debug/stack/usage.h) \
++  include/asm/page.h \
++    $(wildcard include/config/x86/use/3dnow.h) \
++    $(wildcard include/config/x86/pae.h) \
++    $(wildcard include/config/hugetlb/page.h) \
++    $(wildcard include/config/highmem4g.h) \
++    $(wildcard include/config/physical/start.h) \
++    $(wildcard include/config/flatmem.h) \
++  include/asm-generic/page.h \
++  include/asm/processor.h \
++    $(wildcard include/config/x86/ht.h) \
++    $(wildcard include/config/mk8.h) \
++    $(wildcard include/config/mk7.h) \
++    $(wildcard include/config/mtrr.h) \
++  include/asm/vm86.h \
++  include/asm/math_emu.h \
++  include/asm/sigcontext.h \
++  include/asm/segment.h \
++  include/asm/cpufeature.h \
++  include/asm/msr.h \
++  include/asm/system.h \
++    $(wildcard include/config/x86/cmpxchg.h) \
++    $(wildcard include/config/x86/oostore.h) \
++  include/linux/cache.h \
++    $(wildcard include/config/x86.h) \
++    $(wildcard include/config/sparc64.h) \
++  include/asm/cache.h \
++    $(wildcard include/config/x86/l1/cache/shift.h) \
++  include/linux/threads.h \
++    $(wildcard include/config/nr/cpus.h) \
++    $(wildcard include/config/base/small.h) \
++  include/asm/percpu.h \
++  include/asm-generic/percpu.h \
++  include/linux/stringify.h \
++  include/linux/spinlock_types.h \
++  include/linux/spinlock_types_up.h \
++  include/linux/spinlock_up.h \
++  include/linux/spinlock_api_up.h \
++  include/asm/atomic.h \
++    $(wildcard include/config/m386.h) \
++  include/linux/timex.h \
++    $(wildcard include/config/time/interpolation.h) \
++  include/linux/time.h \
++  include/linux/seqlock.h \
++  include/asm/timex.h \
++    $(wildcard include/config/x86/elan.h) \
++    $(wildcard include/config/x86/tsc.h) \
++    $(wildcard include/config/x86/generic.h) \
++  include/linux/jiffies.h \
++  include/asm/div64.h \
++  include/linux/rbtree.h \
++  include/linux/cpumask.h \
++  include/linux/bitmap.h \
++  include/linux/string.h \
++  include/asm/string.h \
++  include/linux/errno.h \
++  include/asm/errno.h \
++  include/asm-generic/errno.h \
++  include/asm-generic/errno-base.h \
++  include/linux/nodemask.h \
++  include/linux/numa.h \
++  include/asm/semaphore.h \
++  include/linux/wait.h \
++  include/linux/list.h \
++  include/linux/prefetch.h \
++  include/asm/current.h \
++  include/linux/rwsem.h \
++    $(wildcard include/config/rwsem/generic/spinlock.h) \
++  include/asm/rwsem.h \
++  include/asm/ptrace.h \
++    $(wildcard include/config/frame/pointer.h) \
++  include/asm/mmu.h \
++  include/asm/cputime.h \
++  include/asm-generic/cputime.h \
++  include/linux/smp.h \
++  include/linux/sem.h \
++    $(wildcard include/config/sysvipc.h) \
++  include/linux/ipc.h \
++  include/asm/ipcbuf.h \
++  include/asm/sembuf.h \
++  include/linux/signal.h \
++  include/asm/signal.h \
++  include/asm-generic/signal.h \
++  include/asm/siginfo.h \
++  include/asm-generic/siginfo.h \
++  include/linux/securebits.h \
++  include/linux/fs_struct.h \
++  include/linux/completion.h \
++  include/linux/pid.h \
++  include/linux/percpu.h \
++  include/linux/slab.h \
++    $(wildcard include/config/.h) \
++  include/linux/gfp.h \
++  include/linux/mmzone.h \
++    $(wildcard include/config/force/max/zoneorder.h) \
++    $(wildcard include/config/discontigmem.h) \
++    $(wildcard include/config/flat/node/mem/map.h) \
++    $(wildcard include/config/have/memory/present.h) \
++    $(wildcard include/config/need/node/memmap/size.h) \
++    $(wildcard include/config/need/multiple/nodes.h) \
++    $(wildcard include/config/sparsemem.h) \
++    $(wildcard include/config/have/arch/early/pfn/to/nid.h) \
++    $(wildcard include/config/sparsemem/extreme.h) \
++    $(wildcard include/config/nodes/span/other/nodes.h) \
++  include/linux/init.h \
++    $(wildcard include/config/hotplug.h) \
++  include/linux/topology.h \
++    $(wildcard include/config/sched/smt.h) \
++  include/asm/topology.h \
++  include/asm-generic/topology.h \
++  include/linux/kmalloc_sizes.h \
++    $(wildcard include/config/mmu.h) \
++    $(wildcard include/config/large/allocs.h) \
++  include/linux/seccomp.h \
++    $(wildcard include/config/seccomp.h) \
++  include/linux/auxvec.h \
++  include/asm/auxvec.h \
++  include/linux/param.h \
++  include/linux/resource.h \
++  include/asm/resource.h \
++  include/asm-generic/resource.h \
++  include/linux/timer.h \
++  include/linux/aio.h \
++  include/linux/workqueue.h \
++  include/linux/aio_abi.h \
++  include/linux/stat.h \
++  include/asm/stat.h \
++  include/linux/kmod.h \
++    $(wildcard include/config/kmod.h) \
++  include/linux/elf.h \
++  include/asm/elf.h \
++  include/asm/user.h \
++  include/linux/utsname.h \
++  include/linux/kobject.h \
++  include/linux/sysfs.h \
++    $(wildcard include/config/sysfs.h) \
++  include/linux/kref.h \
++  include/linux/kobject_uevent.h \
++    $(wildcard include/config/kobject/uevent.h) \
++  include/linux/moduleparam.h \
++  include/asm/local.h \
++  include/asm/module.h \
++    $(wildcard include/config/m486.h) \
++    $(wildcard include/config/m586.h) \
++    $(wildcard include/config/m586tsc.h) \
++    $(wildcard include/config/m586mmx.h) \
++    $(wildcard include/config/m686.h) \
++    $(wildcard include/config/mpentiumii.h) \
++    $(wildcard include/config/mpentiumiii.h) \
++    $(wildcard include/config/mpentiumm.h) \
++    $(wildcard include/config/mpentium4.h) \
++    $(wildcard include/config/mk6.h) \
++    $(wildcard include/config/mcrusoe.h) \
++    $(wildcard include/config/mefficeon.h) \
++    $(wildcard include/config/mwinchipc6.h) \
++    $(wildcard include/config/mwinchip2.h) \
++    $(wildcard include/config/mwinchip3d.h) \
++    $(wildcard include/config/mcyrixiii.h) \
++    $(wildcard include/config/mviac3/2.h) \
++    $(wildcard include/config/mgeodegx1.h) \
++    $(wildcard include/config/regparm.h) \
++  include/linux/fs.h \
++    $(wildcard include/config/dnotify.h) \
++    $(wildcard include/config/quota.h) \
++    $(wildcard include/config/epoll.h) \
++    $(wildcard include/config/auditsyscall.h) \
++    $(wildcard include/config/fs/xip.h) \
++  include/linux/limits.h \
++  include/linux/ioctl.h \
++  include/asm/ioctl.h \
++  include/linux/rcuref.h \
++  include/linux/interrupt.h \
++    $(wildcard include/config/generic/hardirqs.h) \
++    $(wildcard include/config/generic/irq/probe.h) \
++  include/linux/hardirq.h \
++    $(wildcard include/config/preempt/bkl.h) \
++    $(wildcard include/config/virt/cpu/accounting.h) \
++  include/linux/smp_lock.h \
++    $(wildcard include/config/lock/kernel.h) \
++  include/asm/hardirq.h \
++  include/linux/irq.h \
++    $(wildcard include/config/arch/s390.h) \
++    $(wildcard include/config/irq/release/method.h) \
++    $(wildcard include/config/generic/pending/irq.h) \
++    $(wildcard include/config/irqbalance.h) \
++    $(wildcard include/config/pci/msi.h) \
++  include/asm/irq.h \
++    $(wildcard include/config/x86/local/apic.h) \
++  include/asm-i386/mach-default/irq_vectors.h \
++  include/asm-i386/mach-default/irq_vectors_limits.h \
++    $(wildcard include/config/x86/io/apic.h) \
++  include/asm/hw_irq.h \
++  include/linux/profile.h \
++    $(wildcard include/config/proc/fs.h) \
++    $(wildcard include/config/profiling.h) \
++  include/asm/sections.h \
++  include/asm-generic/sections.h \
++  include/linux/irq_cpustat.h \
++  include/linux/kdev_t.h \
++  include/linux/dcache.h \
++  include/linux/rcupdate.h \
++  include/linux/radix-tree.h \
++  include/linux/prio_tree.h \
++  include/linux/quota.h \
++  include/linux/dqblk_xfs.h \
++  include/linux/dqblk_v1.h \
++  include/linux/dqblk_v2.h \
++  include/linux/nfs_fs_i.h \
++  include/linux/nfs.h \
++  include/linux/sunrpc/msg_prot.h \
++  include/linux/fcntl.h \
++  include/asm/fcntl.h \
++  include/asm-generic/fcntl.h \
++    $(wildcard include/config/64bit.h) \
++  include/linux/err.h \
++  include/linux/proc_fs.h \
++    $(wildcard include/config/proc/devicetree.h) \
++    $(wildcard include/config/proc/kcore.h) \
++  include/linux/ioport.h \
++  include/linux/pci.h \
++    $(wildcard include/config/pci.h) \
++    $(wildcard include/config/isa.h) \
++    $(wildcard include/config/eisa.h) \
++    $(wildcard include/config/pci/domains.h) \
++  include/linux/mod_devicetable.h \
++  include/linux/pci_regs.h \
++  include/linux/pci_ids.h \
++  include/linux/device.h \
++  include/linux/klist.h \
++  include/linux/pm.h \
++  include/linux/dmapool.h \
++  include/asm/io.h \
++    $(wildcard include/config/x86/ppro/fence.h) \
++    $(wildcard include/config/x86/numaq.h) \
++  include/asm-generic/iomap.h \
++  include/linux/vmalloc.h \
++  include/asm/scatterlist.h \
++  include/asm/pci.h \
++  include/linux/mm.h \
++    $(wildcard include/config/stack/growsup.h) \
++    $(wildcard include/config/highmem.h) \
++    $(wildcard include/config/shmem.h) \
++    $(wildcard include/config/debug/pagealloc.h) \
++  include/asm/pgtable.h \
++    $(wildcard include/config/highpte.h) \
++  include/asm/fixmap.h \
++    $(wildcard include/config/x86/visws/apic.h) \
++    $(wildcard include/config/x86/f00f/bug.h) \
++    $(wildcard include/config/x86/cyclone/timer.h) \
++    $(wildcard include/config/acpi.h) \
++    $(wildcard include/config/pci/mmconfig.h) \
++  include/asm/acpi.h \
++    $(wildcard include/config/acpi/sleep.h) \
++  include/acpi/pdc_intel.h \
++  include/asm/apicdef.h \
++  include/asm/pgtable-2level-defs.h \
++  include/asm/pgtable-2level.h \
++  include/asm-generic/pgtable-nopmd.h \
++  include/asm-generic/pgtable-nopud.h \
++  include/asm-generic/pgtable.h \
++  include/linux/page-flags.h \
++    $(wildcard include/config/swap.h) \
++  include/asm-generic/pci-dma-compat.h \
++  include/linux/dma-mapping.h \
++  include/asm/dma-mapping.h \
++  include/asm-generic/pci.h \
++  include/linux/devfs_fs_kernel.h \
++  include/linux/syscalls.h \
++    $(wildcard include/config/ia64.h) \
++    $(wildcard include/config/v850.h) \
++  include/linux/key.h \
++  include/linux/unistd.h \
++  include/asm/unistd.h \
++  include/asm/uaccess.h \
++    $(wildcard include/config/x86/intel/usercopy.h) \
++    $(wildcard include/config/x86/wp/works/ok.h) \
++  /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/kernel26compat.h \
++  include/linux/version.h \
++  /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.h \
++  /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/vgaversion.h \
++  /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/i810.h \
++  /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/interrupt.h \
++  /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/displaystart.h \
++
++/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/main.o: $(deps_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/main.o)
++
++$(deps_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/main.o):
+diff -Nur orig-svgalib-1.9.24/kernel/svgalib_helper/Makefile svgalib-1.9.24/kernel/svgalib_helper/Makefile
+--- orig-svgalib-1.9.24/kernel/svgalib_helper/Makefile	2005-12-16 20:53:10.000000000 +0800
++++ svgalib-1.9.24/kernel/svgalib_helper/Makefile	2006-02-19 20:34:33.000000000 +0800
+@@ -11,7 +11,7 @@
+ 
+ EXTRA_CFLAGS = -DSVGALIB_HELPER_MAJOR=$(SVGALIB_HELPER_MAJOR) $(CLASS_CFLAGS)
+ VER    ?= $(KERNELRELEASE)
+-KDIR	:= /lib/modules/$(VER)/build
++KDIR	:= /home/leo/neouzabox/build.i386/linux-2.6.14/modules
+ PWD	:= $(shell pwd)
+ TARGET  := svgalib_helper
+ 
+@@ -22,10 +22,10 @@
+ else
+ 
+ VER    ?= $(shell uname -r)
+-KDIR	:= /lib/modules/$(VER)/build
++KDIR	:= /home/leo/neouzabox/build.i386/linux-2.6.14
+ PWD	:= $(shell pwd)
+ TARGET  := svgalib_helper
+-
++MODULESDIR := /home/leo/neouzabox/build.i386/linux-2.6.14/modules/lib/modules/2.6.14/kernel/misc
+ endif
+ 
+ CLASS_SIMPLE := $(shell grep class_simple_create $(KDIR)/include/linux/device.h)
+@@ -60,7 +60,7 @@
+ install: device modules_install
+ 
+ modules_install: $(MODNAME)
+-	mkdir -p /lib/modules/$(VER)/kernel/misc
+-	install -m 0644 -c $(TARGET).ko /lib/modules/$(VER)/kernel/misc ||	install -m 0644 -c $(TARGET).o /lib/modules/$(VER)/kernel/misc
++	mkdir -p $(MODULESDIR)
++	install -m 0644 -c $(TARGET).ko $(MODULESDIR) ||	install -m 0644 -c $(TARGET).o $(MODULESDIR)
+ 	depmod -a $(VER)
+ 
+Binary files orig-svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.ko and svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.ko differ
+diff -Nur orig-svgalib-1.9.24/kernel/svgalib_helper/.svgalib_helper.ko.cmd svgalib-1.9.24/kernel/svgalib_helper/.svgalib_helper.ko.cmd
+--- orig-svgalib-1.9.24/kernel/svgalib_helper/.svgalib_helper.ko.cmd	1970-01-01 08:00:00.000000000 +0800
++++ svgalib-1.9.24/kernel/svgalib_helper/.svgalib_helper.ko.cmd	2006-02-19 20:33:00.000000000 +0800
+@@ -0,0 +1 @@
++cmd_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.ko := /home/leo/neouzabox/build.i386/toolchain/bin/i386-pc-linux-uclibc-ld -m elf_i386 -m elf_i386 -r -o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.ko /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.mod.o
+diff -Nur orig-svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.mod.c svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.mod.c
+--- orig-svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.mod.c	1970-01-01 08:00:00.000000000 +0800
++++ svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.mod.c	2006-02-19 20:33:00.000000000 +0800
+@@ -0,0 +1,21 @@
++#include <linux/module.h>
++#include <linux/vermagic.h>
++#include <linux/compiler.h>
++
++MODULE_INFO(vermagic, VERMAGIC_STRING);
++
++#undef unix
++struct module __this_module
++__attribute__((section(".gnu.linkonce.this_module"))) = {
++ .name = __stringify(KBUILD_MODNAME),
++ .init = init_module,
++#ifdef CONFIG_MODULE_UNLOAD
++ .exit = cleanup_module,
++#endif
++};
++
++static const char __module_depends[]
++__attribute_used__
++__attribute__((section(".modinfo"))) =
++"depends=";
++
+Binary files orig-svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.mod.o and svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.mod.o differ
+diff -Nur orig-svgalib-1.9.24/kernel/svgalib_helper/.svgalib_helper.mod.o.cmd svgalib-1.9.24/kernel/svgalib_helper/.svgalib_helper.mod.o.cmd
+--- orig-svgalib-1.9.24/kernel/svgalib_helper/.svgalib_helper.mod.o.cmd	1970-01-01 08:00:00.000000000 +0800
++++ svgalib-1.9.24/kernel/svgalib_helper/.svgalib_helper.mod.o.cmd	2006-02-19 20:33:00.000000000 +0800
+@@ -0,0 +1,233 @@
++cmd_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.mod.o := /home/leo/neouzabox/build.i386/toolchain/bin/i386-pc-linux-uclibc-gcc -m32 -Wp,-MD,/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/.svgalib_helper.mod.o.d  -nostdinc -isystem /mnt/sda10/home/leo/neouzabox/build.i386/toolchain/bin/../lib/gcc/i386-pc-linux-uclibc/3.4.4/include -D__KERNEL__ -Iinclude  -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -ffreestanding -Os     -fomit-frame-pointer -pipe -msoft-float -mpreferred-stack-boundary=2 -fno-unit-at-a-time -march=i586 -Iinclude/asm-i386/mach-default -Wdeclaration-after-statement     -DKBUILD_BASENAME=svgalib_helper -DKBUILD_MODNAME=svgalib_helper -DMODULE -c -o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.mod.o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.mod.c
++
++deps_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.mod.o := \
++  /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.mod.c \
++    $(wildcard include/config/module/unload.h) \
++  include/linux/module.h \
++    $(wildcard include/config/modules.h) \
++    $(wildcard include/config/modversions.h) \
++    $(wildcard include/config/kallsyms.h) \
++  include/linux/config.h \
++    $(wildcard include/config/h.h) \
++  include/linux/sched.h \
++    $(wildcard include/config/detect/softlockup.h) \
++    $(wildcard include/config/keys.h) \
++    $(wildcard include/config/inotify.h) \
++    $(wildcard include/config/schedstats.h) \
++    $(wildcard include/config/smp.h) \
++    $(wildcard include/config/bsd/process/acct.h) \
++    $(wildcard include/config/numa.h) \
++    $(wildcard include/config/cpusets.h) \
++    $(wildcard include/config/hotplug/cpu.h) \
++    $(wildcard include/config/security.h) \
++    $(wildcard include/config/preempt.h) \
++    $(wildcard include/config/magic/sysrq.h) \
++    $(wildcard include/config/pm.h) \
++  include/asm/param.h \
++    $(wildcard include/config/hz.h) \
++  include/linux/capability.h \
++  include/linux/types.h \
++    $(wildcard include/config/uid16.h) \
++  include/linux/posix_types.h \
++  include/linux/stddef.h \
++  include/linux/compiler.h \
++  include/linux/compiler-gcc3.h \
++  include/linux/compiler-gcc.h \
++  include/asm/posix_types.h \
++  include/asm/types.h \
++    $(wildcard include/config/highmem64g.h) \
++    $(wildcard include/config/lbd.h) \
++  include/linux/spinlock.h \
++    $(wildcard include/config/debug/spinlock.h) \
++  include/linux/preempt.h \
++    $(wildcard include/config/debug/preempt.h) \
++  include/linux/linkage.h \
++  include/asm/linkage.h \
++    $(wildcard include/config/x86/alignment/16.h) \
++  include/linux/thread_info.h \
++  include/linux/bitops.h \
++  include/asm/bitops.h \
++  include/asm/thread_info.h \
++    $(wildcard include/config/4kstacks.h) \
++    $(wildcard include/config/debug/stack/usage.h) \
++  include/asm/page.h \
++    $(wildcard include/config/x86/use/3dnow.h) \
++    $(wildcard include/config/x86/pae.h) \
++    $(wildcard include/config/hugetlb/page.h) \
++    $(wildcard include/config/highmem4g.h) \
++    $(wildcard include/config/physical/start.h) \
++    $(wildcard include/config/flatmem.h) \
++  include/asm-generic/page.h \
++  include/asm/processor.h \
++    $(wildcard include/config/x86/ht.h) \
++    $(wildcard include/config/mk8.h) \
++    $(wildcard include/config/mk7.h) \
++    $(wildcard include/config/mtrr.h) \
++  include/asm/vm86.h \
++  include/asm/math_emu.h \
++  include/asm/sigcontext.h \
++  include/asm/segment.h \
++  include/asm/cpufeature.h \
++  include/asm/msr.h \
++  include/asm/system.h \
++    $(wildcard include/config/x86/cmpxchg.h) \
++    $(wildcard include/config/x86/oostore.h) \
++  include/linux/kernel.h \
++    $(wildcard include/config/preempt/voluntary.h) \
++    $(wildcard include/config/debug/spinlock/sleep.h) \
++    $(wildcard include/config/printk.h) \
++    $(wildcard include/config/sysctl.h) \
++  /mnt/sda10/home/leo/neouzabox/build.i386/toolchain/bin/../lib/gcc/i386-pc-linux-uclibc/3.4.4/include/stdarg.h \
++  include/asm/byteorder.h \
++    $(wildcard include/config/x86/bswap.h) \
++  include/linux/byteorder/little_endian.h \
++  include/linux/byteorder/swab.h \
++  include/linux/byteorder/generic.h \
++  include/asm/bug.h \
++    $(wildcard include/config/bug.h) \
++    $(wildcard include/config/debug/bugverbose.h) \
++  include/asm-generic/bug.h \
++  include/linux/cache.h \
++    $(wildcard include/config/x86.h) \
++    $(wildcard include/config/sparc64.h) \
++  include/asm/cache.h \
++    $(wildcard include/config/x86/l1/cache/shift.h) \
++  include/linux/threads.h \
++    $(wildcard include/config/nr/cpus.h) \
++    $(wildcard include/config/base/small.h) \
++  include/asm/percpu.h \
++  include/asm-generic/percpu.h \
++  include/linux/stringify.h \
++  include/linux/spinlock_types.h \
++  include/linux/spinlock_types_up.h \
++  include/linux/spinlock_up.h \
++  include/linux/spinlock_api_up.h \
++  include/asm/atomic.h \
++    $(wildcard include/config/m386.h) \
++  include/linux/timex.h \
++    $(wildcard include/config/time/interpolation.h) \
++  include/linux/time.h \
++  include/linux/seqlock.h \
++  include/asm/timex.h \
++    $(wildcard include/config/x86/elan.h) \
++    $(wildcard include/config/x86/tsc.h) \
++    $(wildcard include/config/x86/generic.h) \
++  include/linux/jiffies.h \
++  include/asm/div64.h \
++  include/linux/rbtree.h \
++  include/linux/cpumask.h \
++  include/linux/bitmap.h \
++  include/linux/string.h \
++  include/asm/string.h \
++  include/linux/errno.h \
++  include/asm/errno.h \
++  include/asm-generic/errno.h \
++  include/asm-generic/errno-base.h \
++  include/linux/nodemask.h \
++  include/linux/numa.h \
++  include/asm/semaphore.h \
++  include/linux/wait.h \
++  include/linux/list.h \
++  include/linux/prefetch.h \
++  include/asm/current.h \
++  include/linux/rwsem.h \
++    $(wildcard include/config/rwsem/generic/spinlock.h) \
++  include/asm/rwsem.h \
++  include/asm/ptrace.h \
++    $(wildcard include/config/frame/pointer.h) \
++  include/asm/mmu.h \
++  include/asm/cputime.h \
++  include/asm-generic/cputime.h \
++  include/linux/smp.h \
++  include/linux/sem.h \
++    $(wildcard include/config/sysvipc.h) \
++  include/linux/ipc.h \
++  include/asm/ipcbuf.h \
++  include/asm/sembuf.h \
++  include/linux/signal.h \
++  include/asm/signal.h \
++  include/asm-generic/signal.h \
++  include/asm/siginfo.h \
++  include/asm-generic/siginfo.h \
++  include/linux/securebits.h \
++  include/linux/fs_struct.h \
++  include/linux/completion.h \
++  include/linux/pid.h \
++  include/linux/percpu.h \
++  include/linux/slab.h \
++    $(wildcard include/config/.h) \
++  include/linux/gfp.h \
++  include/linux/mmzone.h \
++    $(wildcard include/config/force/max/zoneorder.h) \
++    $(wildcard include/config/discontigmem.h) \
++    $(wildcard include/config/flat/node/mem/map.h) \
++    $(wildcard include/config/have/memory/present.h) \
++    $(wildcard include/config/need/node/memmap/size.h) \
++    $(wildcard include/config/need/multiple/nodes.h) \
++    $(wildcard include/config/sparsemem.h) \
++    $(wildcard include/config/have/arch/early/pfn/to/nid.h) \
++    $(wildcard include/config/sparsemem/extreme.h) \
++    $(wildcard include/config/nodes/span/other/nodes.h) \
++  include/linux/init.h \
++    $(wildcard include/config/hotplug.h) \
++  include/linux/topology.h \
++    $(wildcard include/config/sched/smt.h) \
++  include/asm/topology.h \
++  include/asm-generic/topology.h \
++  include/linux/kmalloc_sizes.h \
++    $(wildcard include/config/mmu.h) \
++    $(wildcard include/config/large/allocs.h) \
++  include/linux/seccomp.h \
++    $(wildcard include/config/seccomp.h) \
++  include/linux/auxvec.h \
++  include/asm/auxvec.h \
++  include/linux/param.h \
++  include/linux/resource.h \
++  include/asm/resource.h \
++  include/asm-generic/resource.h \
++  include/linux/timer.h \
++  include/linux/aio.h \
++  include/linux/workqueue.h \
++  include/linux/aio_abi.h \
++  include/linux/stat.h \
++  include/asm/stat.h \
++  include/linux/kmod.h \
++    $(wildcard include/config/kmod.h) \
++  include/linux/elf.h \
++  include/asm/elf.h \
++  include/asm/user.h \
++  include/linux/utsname.h \
++  include/linux/kobject.h \
++  include/linux/sysfs.h \
++    $(wildcard include/config/sysfs.h) \
++  include/linux/kref.h \
++  include/linux/kobject_uevent.h \
++    $(wildcard include/config/kobject/uevent.h) \
++  include/linux/moduleparam.h \
++  include/asm/local.h \
++  include/asm/module.h \
++    $(wildcard include/config/m486.h) \
++    $(wildcard include/config/m586.h) \
++    $(wildcard include/config/m586tsc.h) \
++    $(wildcard include/config/m586mmx.h) \
++    $(wildcard include/config/m686.h) \
++    $(wildcard include/config/mpentiumii.h) \
++    $(wildcard include/config/mpentiumiii.h) \
++    $(wildcard include/config/mpentiumm.h) \
++    $(wildcard include/config/mpentium4.h) \
++    $(wildcard include/config/mk6.h) \
++    $(wildcard include/config/mcrusoe.h) \
++    $(wildcard include/config/mefficeon.h) \
++    $(wildcard include/config/mwinchipc6.h) \
++    $(wildcard include/config/mwinchip2.h) \
++    $(wildcard include/config/mwinchip3d.h) \
++    $(wildcard include/config/mcyrixiii.h) \
++    $(wildcard include/config/mviac3/2.h) \
++    $(wildcard include/config/mgeodegx1.h) \
++    $(wildcard include/config/regparm.h) \
++  include/linux/vermagic.h \
++  include/linux/version.h \
++
++/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.mod.o: $(deps_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.mod.o)
++
++$(deps_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.mod.o):
+Binary files orig-svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.o and svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.o differ
+diff -Nur orig-svgalib-1.9.24/kernel/svgalib_helper/.svgalib_helper.o.cmd svgalib-1.9.24/kernel/svgalib_helper/.svgalib_helper.o.cmd
+--- orig-svgalib-1.9.24/kernel/svgalib_helper/.svgalib_helper.o.cmd	1970-01-01 08:00:00.000000000 +0800
++++ svgalib-1.9.24/kernel/svgalib_helper/.svgalib_helper.o.cmd	2006-02-19 20:33:00.000000000 +0800
+@@ -0,0 +1 @@
++cmd_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.o := /home/leo/neouzabox/build.i386/toolchain/bin/i386-pc-linux-uclibc-ld -m elf_i386 -m elf_i386  -r -o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/main.o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/i810.o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/interrupt.o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/virtual.o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/displaystart.o
+diff -Nur orig-svgalib-1.9.24/kernel/svgalib_helper/.tmp_versions/svgalib_helper.mod svgalib-1.9.24/kernel/svgalib_helper/.tmp_versions/svgalib_helper.mod
+--- orig-svgalib-1.9.24/kernel/svgalib_helper/.tmp_versions/svgalib_helper.mod	1970-01-01 08:00:00.000000000 +0800
++++ svgalib-1.9.24/kernel/svgalib_helper/.tmp_versions/svgalib_helper.mod	2006-02-19 20:33:00.000000000 +0800
+@@ -0,0 +1,2 @@
++/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/svgalib_helper.ko
++/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/main.o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/i810.o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/interrupt.o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/virtual.o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/displaystart.o
+Binary files orig-svgalib-1.9.24/kernel/svgalib_helper/virtual.o and svgalib-1.9.24/kernel/svgalib_helper/virtual.o differ
+diff -Nur orig-svgalib-1.9.24/kernel/svgalib_helper/.virtual.o.cmd svgalib-1.9.24/kernel/svgalib_helper/.virtual.o.cmd
+--- orig-svgalib-1.9.24/kernel/svgalib_helper/.virtual.o.cmd	1970-01-01 08:00:00.000000000 +0800
++++ svgalib-1.9.24/kernel/svgalib_helper/.virtual.o.cmd	2006-02-19 20:32:59.000000000 +0800
+@@ -0,0 +1,8 @@
++cmd_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/virtual.o := /home/leo/neouzabox/build.i386/toolchain/bin/i386-pc-linux-uclibc-gcc -m32 -Wp,-MD,/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/.virtual.o.d  -nostdinc -isystem /mnt/sda10/home/leo/neouzabox/build.i386/toolchain/bin/../lib/gcc/i386-pc-linux-uclibc/3.4.4/include -D__KERNEL__ -Iinclude  -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -ffreestanding -Os     -fomit-frame-pointer -pipe -msoft-float -mpreferred-stack-boundary=2 -fno-unit-at-a-time -march=i586 -Iinclude/asm-i386/mach-default -Wdeclaration-after-statement  -DSVGALIB_HELPER_MAJOR=209   -DMODULE -DKBUILD_BASENAME=virtual -DKBUILD_MODNAME=svgalib_helper -c -o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/virtual.o /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/virtual.c
++
++deps_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/virtual.o := \
++  /mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/virtual.c \
++
++/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/virtual.o: $(deps_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/virtual.o)
++
++$(deps_/mnt/sda10/home/leo/neouzabox/build.i386/svgalib-1.9.24/kernel/svgalib_helper/virtual.o):
+Binary files orig-svgalib-1.9.24/lrmi-0.6m/dosint and svgalib-1.9.24/lrmi-0.6m/dosint differ
+Binary files orig-svgalib-1.9.24/lrmi-0.6m/lrmi.o and svgalib-1.9.24/lrmi-0.6m/lrmi.o differ
+Binary files orig-svgalib-1.9.24/lrmi-0.6m/mode3 and svgalib-1.9.24/lrmi-0.6m/mode3 differ
+Binary files orig-svgalib-1.9.24/lrmi-0.6m/vbemodeinfo and svgalib-1.9.24/lrmi-0.6m/vbemodeinfo differ
+Binary files orig-svgalib-1.9.24/lrmi-0.6m/vbetest and svgalib-1.9.24/lrmi-0.6m/vbetest differ
+Binary files orig-svgalib-1.9.24/lrmi-0.6m/vga_reset and svgalib-1.9.24/lrmi-0.6m/vga_reset differ
+diff -Nur orig-svgalib-1.9.24/Makefile.cfg svgalib-1.9.24/Makefile.cfg
+--- orig-svgalib-1.9.24/Makefile.cfg	2005-10-25 19:19:13.000000000 +0800
++++ svgalib-1.9.24/Makefile.cfg	2006-02-19 20:32:52.000000000 +0800
+@@ -23,7 +23,7 @@
+ S_KERNELRELEASE = $(shell uname -r)
+ endif
+ 
+-INCLUDEDIR = /lib/modules/$(S_KERNELRELEASE)/build/include
++INCLUDEDIR = $(SYSROOT_PREFIX)/usr/include
+ 
+ DIREXIST = $(shell if [ -e $(INCLUDEDIR) ] ; then echo OK ; fi)
+ ifneq ($(DIREXIST), OK)
+@@ -43,7 +43,7 @@
+ 
+ # Common prefix for installation directories.
+ # NOTE: This directory must exist when you start the install.
+-TOPDIR=
++TOPDIR= $(SYSROOT_PREFIX)
+ prefix = $(TOPDIR)/usr/local
+ exec_prefix = $(prefix)
+ 
+@@ -57,7 +57,7 @@
+ bindir = $(exec_prefix)/bin
+ 
+ # Directory where the run-time configuration files will be installed.
+-datadir = $(TOPDIR)/etc/vga
++datadir = /etc
+ 
+ # Directory where the header files will be installed.
+ includedir = $(prefix)/include
+@@ -96,13 +96,13 @@
+ # LIBC_MEMCPY = y
+ 
+ # Uncomment this if you want to compile and install the static libs.
+-# INSTALLSTATICLIB = installstaticlib
++ INSTALLSTATICLIB = installstaticlib
+ 
+ # Comment this out if you don't want to install the shared libs.
+ # If you do not install the shared nor the static libs, 'make static'
+ # first to enforce just building the static lib, then the demos will
+ # use this local static library!
+-INSTALLSHAREDLIB = installsharedlib
++#INSTALLSHAREDLIB = installsharedlib
+ 
+ # Comment this out if you want to keep old shared images. Old header files,
+ # library stubs and static libraries CANNOT be kept in public locations
+@@ -113,7 +113,7 @@
+ INSTALLUTILS = installutils
+ 
+ # Comment this out if you don't want to install the man pages by default
+-INSTALLMAN = installman
++#INSTALLMAN = installman
+ 
+ # Remove the '# ' from one of the next two lines if you want to install the
+ # man pages compressed (with gzip) or not. If you comment out both lines,
+@@ -129,7 +129,7 @@
+ # MAKEWHATIS = makewhatis # Beware, this will really need a few minutes!
+ 
+ # Comment this out if you use devfs only and don't want to make svga nodes
+-INSTALLDEV = installdev
++# INSTALLDEV = installdev
+ 
+ # Select which makefile to use to install the module, or comment both out if
+ # you are going to install the kernel module manually
+diff -Nur orig-svgalib-1.9.24/src/svgalib_helper.h svgalib-1.9.24/src/svgalib_helper.h
+--- orig-svgalib-1.9.24/src/svgalib_helper.h	1970-01-01 08:00:00.000000000 +0800
++++ svgalib-1.9.24/src/svgalib_helper.h	2005-03-13 22:55:03.000000000 +0800
+@@ -0,0 +1,117 @@
++#ifndef SVGALIB_HELPER_H
++#define SVGALIB_HELPER_H
++
++#ifdef __KERNEL__
++
++#define MAX_NR_DEVICES 15
++
++#define address_t unsigned long
++
++struct sh_pci_device {
++   unsigned short vendor;
++   unsigned short id;
++   unsigned char revision;
++   struct pci_dev *dev;
++   address_t mem[6];
++   address_t len[6];
++   address_t mask[6];
++   int flags[6];
++   unsigned long iobase;
++   u8 * membase;
++   int (*test_vsync)(struct sh_pci_device *);
++   void (*ack_vsync)(struct sh_pci_device *);
++   void (*enable_vsync)(struct sh_pci_device *);
++   void (*disable_vsync)(struct sh_pci_device *);
++   int opencount;
++   int vsync;
++   wait_queue_head_t vsync_wait;
++#ifndef NO_TASK
++   wait_queue_head_t startad_wait;
++   long startad;
++   struct tq_struct tq_startad;
++#endif
++};
++
++extern int debug;
++
++#endif
++
++typedef struct {
++  int port;
++  int length;
++  unsigned char* string;
++} io_string_t;
++
++typedef struct {
++   int port;
++   unsigned int val;
++} io_t;
++
++typedef struct {
++   int pcipos;
++   unsigned int address;
++   unsigned long val;
++} pcic_t;
++
++typedef struct {
++   void *win;
++   void *lfb;
++} windowing_t;
++
++typedef struct dhahelper_vmi_s
++{
++    void *	virtaddr;
++    unsigned long length;
++    unsigned long *realaddr;
++}dhahelper_vmi_t;
++
++typedef struct dhahelper_mem_s
++{
++    void *	addr;
++    unsigned long length;
++}dhahelper_mem_t;
++
++#define SVGAHELPER_MAGIC 0xB3
++
++#define SVGAHELPER_OUTB		_IOR(SVGAHELPER_MAGIC,1,io_t)
++#define SVGAHELPER_OUTW		_IOR(SVGAHELPER_MAGIC,2,io_t)
++#define SVGAHELPER_OUTL		_IOR(SVGAHELPER_MAGIC,3,io_t)
++#define SVGAHELPER_INB		_IOW(SVGAHELPER_MAGIC,4,io_t)
++#define SVGAHELPER_INW		_IOW(SVGAHELPER_MAGIC,5,io_t)
++#define SVGAHELPER_INL		_IOW(SVGAHELPER_MAGIC,6,io_t)
++
++#define SVGAHELPER_PCIOUTB	_IOR(SVGAHELPER_MAGIC,11,pcic_t)
++#define SVGAHELPER_PCIOUTW	_IOR(SVGAHELPER_MAGIC,12,pcic_t)
++#define SVGAHELPER_PCIOUTL	_IOR(SVGAHELPER_MAGIC,13,pcic_t)
++#define SVGAHELPER_PCIINB	_IOW(SVGAHELPER_MAGIC,14,pcic_t)
++#define SVGAHELPER_PCIINW	_IOW(SVGAHELPER_MAGIC,15,pcic_t)
++#define SVGAHELPER_PCIINL	_IOW(SVGAHELPER_MAGIC,16,pcic_t)
++#define SVGAHELPER_PCIAPLEN	_IOW(SVGAHELPER_MAGIC,17,pcic_t)
++
++#define SVGAHELPER_DVMA		_IO(SVGAHELPER_MAGIC,7)
++#define SVGAHELPER_WIND		_IOR(SVGAHELPER_MAGIC,8,windowing_t)
++
++#define SVGAHELPER_IOPERM	_IO(SVGAHELPER_MAGIC,9)
++#define SVGAHELPER_REPOUTB	_IOR(SVGAHELPER_MAGIC,10,io_t)
++
++#define SVGAHELPER_I810GTT	_IOW(SVGAHELPER_MAGIC,128,unsigned int *)
++#define SVGAHELPER_I810GTTE	_IOW(SVGAHELPER_MAGIC,129,unsigned int *)
++
++#define SVGAHELPER_WRITEB	_IOR(SVGAHELPER_MAGIC,21,io_t)
++#define SVGAHELPER_WRITEW	_IOR(SVGAHELPER_MAGIC,22,io_t)
++#define SVGAHELPER_WRITEL	_IOR(SVGAHELPER_MAGIC,23,io_t)
++#define SVGAHELPER_READB	_IOW(SVGAHELPER_MAGIC,24,io_t)
++#define SVGAHELPER_READW	_IOW(SVGAHELPER_MAGIC,25,io_t)
++#define SVGAHELPER_READL	_IOW(SVGAHELPER_MAGIC,26,io_t)
++
++#define SVGAHELPER_WAITRETRACE	_IO(SVGAHELPER_MAGIC,31)
++#define SVGAHELPER_SETDISPLAYSTART _IOR(SVGAHELPER_MAGIC,32, int)
++
++#define SVGAHELPER_VIRT_TO_PHYS  _IOWR(SVGAHELPER_MAGIC, 40, dhahelper_vmi_t)
++#define SVGAHELPER_VIRT_TO_BUS   _IOWR(SVGAHELPER_MAGIC, 41, dhahelper_vmi_t)
++#define SVGAHELPER_ALLOC_PA      _IOWR(SVGAHELPER_MAGIC, 42, dhahelper_mem_t)
++#define SVGAHELPER_FREE_PA       _IOWR(SVGAHELPER_MAGIC, 43, dhahelper_mem_t)
++#define SVGAHELPER_LOCK_MEM      _IOWR(SVGAHELPER_MAGIC, 44, dhahelper_mem_t)
++#define SVGAHELPER_UNLOCK_MEM    _IOWR(SVGAHELPER_MAGIC, 45, dhahelper_mem_t)
++
++#endif /* SVGALIB_HELPER_H */
+Binary files orig-svgalib-1.9.24/staticlib/accel.o and svgalib-1.9.24/staticlib/accel.o differ
+Binary files orig-svgalib-1.9.24/staticlib/cbitmap.o and svgalib-1.9.24/staticlib/cbitmap.o differ
+Binary files orig-svgalib-1.9.24/staticlib/clockchip/icd2061a.o and svgalib-1.9.24/staticlib/clockchip/icd2061a.o differ
+diff -Nur orig-svgalib-1.9.24/staticlib/.depend.gl svgalib-1.9.24/staticlib/.depend.gl
+--- orig-svgalib-1.9.24/staticlib/.depend.gl	1970-01-01 08:00:00.000000000 +0800
++++ svgalib-1.9.24/staticlib/.depend.gl	2006-02-19 20:32:57.000000000 +0800
+@@ -0,0 +1,16 @@
++# GL Module dependencies
++grlib.o: ../gl/grlib.c ../include/vga.h ../gl/inlstring.h \
++  ../gl/../src/ppcmemset.h ../gl/vgagl.h ../gl/def.h ../gl/driver.h
++driver.o: ../gl/driver.c ../include/vga.h ../gl/inlstring.h \
++  ../gl/../src/ppcmemset.h ../gl/vgagl.h ../gl/def.h ../gl/driver.h
++line.o: ../gl/line.c ../include/vga.h ../gl/inlstring.h \
++  ../gl/../src/ppcmemset.h ../gl/vgagl.h ../gl/def.h ../gl/driver.h
++palette.o: ../gl/palette.c ../include/vga.h ../gl/vgagl.h ../gl/def.h
++scale.o: ../gl/scale.c ../include/vga.h ../gl/inlstring.h \
++  ../gl/../src/ppcmemset.h ../gl/vgagl.h ../gl/def.h
++text.o: ../gl/text.c ../include/vga.h ../gl/inlstring.h \
++  ../gl/../src/ppcmemset.h ../gl/vgagl.h ../gl/def.h
++font8x8.o: ../gl/font8x8.c
++cbitmap.o: ../gl/cbitmap.c ../include/vga.h ../gl/inlstring.h \
++  ../gl/../src/ppcmemset.h ../gl/vgagl.h ../gl/def.h
++mem.o: ../gl/mem.c
+diff -Nur orig-svgalib-1.9.24/staticlib/.depend.src svgalib-1.9.24/staticlib/.depend.src
+--- orig-svgalib-1.9.24/staticlib/.depend.src	1970-01-01 08:00:00.000000000 +0800
++++ svgalib-1.9.24/staticlib/.depend.src	2006-02-19 20:32:54.000000000 +0800
+@@ -0,0 +1,221 @@
++# Module dependencies
++vga.o: ../src/vga.c ../src/libvga.h ../src/driver.h ../src/vga.h \
++  ../src/timing.h ../src/accel.h ../src/io.h ../src/vgapci.h \
++  ../src/vganullio.h ../src/vgaio.h ../src/vga_console.h \
++  ../src/mouse/vgamouse.h ../src/keyboard/vgakeyboard.h \
++  ../src/vgaversion.h ../src/svgalib_helper.h
++vgaio.o: ../src/vgaio.c ../src/libvga.h
++vgadraw.o: ../src/vgadraw.c ../src/vga.h ../src/libvga.h ../src/driver.h \
++  ../src/timing.h ../src/accel.h ../src/io.h
++vgaclear.o: ../src/vgaclear.c ../src/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/timing.h ../src/accel.h ../src/io.h \
++  ../src/ppcmemset.h
++vgaline.o: ../src/vgaline.c ../src/vga.h ../src/libvga.h
++vgapix.o: ../src/vgapix.c ../src/vga.h ../src/libvga.h ../src/driver.h \
++  ../src/timing.h ../src/accel.h ../src/io.h
++vgapal.o: ../src/vgapal.c ../src/vga.h ../src/vgaio.h ../src/libvga.h \
++  ../src/driver.h ../src/timing.h ../src/accel.h ../src/io.h
++vgacol.o: ../src/vgacol.c ../src/vga.h ../src/libvga.h
++vgamodesel.o: ../src/vgamodesel.c ../src/vga.h ../src/libvga.h
++vgamisc.o: ../src/vgamisc.c ../src/vga.h ../src/libvga.h ../src/driver.h \
++  ../src/timing.h ../src/accel.h ../src/io.h ../src/mouse/vgamouse.h \
++  ../src/keyboard/vgakeyboard.h ../src/svgalib_helper.h
++vgadump.o: ../src/vgadump.c ../src/vga.h ../src/libvga.h ../src/driver.h \
++  ../src/timing.h ../src/accel.h ../src/io.h
++vgaconvplanar.o: ../src/vgaconvplanar.c ../src/vga.h ../src/libvga.h
++vgaaccel.o: ../src/vgaaccel.c ../src/vga.h ../src/driver.h \
++  ../src/libvga.h ../src/timing.h ../src/accel.h ../src/io.h
++timing.o: ../src/timing.c ../src/timing.h ../src/driver.h ../src/vga.h \
++  ../src/libvga.h ../src/accel.h ../src/io.h
++vgaregs.o: ../src/vgaregs.c ../src/timing.h ../src/vgaregs.h
++interface.o: ../src/interface.c ../src/timing.h ../src/libvga.h \
++  ../src/ramdac/ramdac.h ../src/accel.h
++accel.o: ../src/accel.c ../src/vga.h ../src/timing.h ../src/accel.h
++vgapci.o: ../src/vgapci.c ../src/endianess.h ../src/libvga.h \
++  ../src/svgalib_helper.h ../src/vgapci.h
++vga_helper.o: ../src/vga_helper.c ../src/svgalib_helper.h ../src/libvga.h
++vga_console.o: ../src/vga_console.c ../src/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/timing.h ../src/accel.h ../src/io.h \
++  ../src/vgapci.h ../src/vgaio.h ../src/mouse/vgamouse.h \
++  ../src/keyboard/vgakeyboard.h
++vgarelvgaio.o: ../src/vgarelvgaio.c ../src/libvga.h
++vgammvgaio.o: ../src/vgammvgaio.c ../src/libvga.h ../src/io.h
++vgacursor.o: ../src/vgacursor.c ../src/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/timing.h ../src/accel.h ../src/io.h
++vganullio.o: ../src/vganullio.c ../src/libvga.h
++# Mouse dependencies
++mouse/mouse.o: ../src/mouse/mouse.c ../include/vga.h ../src/mouse/vgamouse.h \
++  ../src/mouse/../libvga.h ../src/mouse/ms.c ../src/driver.h ../src/vga.h \
++  ../src/libvga.h ../src/timing.h ../src/accel.h ../src/io.h
++# Joystick dependencies
++joystick/joystick.o: ../src/joystick/joystick.c ../src/joystick/joydev.h \
++  ../src/joystick/vgajoystick.h ../src/driver.h ../src/vga.h \
++  ../src/libvga.h ../src/timing.h ../src/accel.h ../src/io.h
++# Keyboard dependencies
++keyboard/keyboard.o: ../src/keyboard/keyboard.c ../include/vga.h \
++  ../src/keyboard/../libvga.h ../src/keyboard/vgakeyboard.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h
++# Driver dependencies
++vgadrv.o: ../src/vgadrv.c ../src/vga.h ../src/libvga.h ../src/driver.h \
++  ../src/timing.h ../src/accel.h ../src/io.h
++regextr.o: ../src/regextr.c ../src/vga.h ../src/libvga.h ../src/driver.h \
++  ../src/timing.h ../src/accel.h ../src/io.h
++modetab.o: ../src/modetab.c ../src/driver.h ../src/vga.h ../src/libvga.h \
++  ../src/timing.h ../src/accel.h ../src/io.h
++cirrus.o: ../src/drivers/cirrus.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/vgaregs.h \
++  ../src/interface.h ../src/accel.h ../src/vgapci.h
++tvga8900.o: ../src/drivers/tvga8900.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/regs/tvga8900.regs \
++  ../src/regs/tvga9440.regs ../src/regs/tvga9680.regs
++trident.o: ../src/drivers/trident.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/vgaregs.h \
++  ../src/interface.h ../src/vgapci.h ../src/drivers/trident.h \
++  ../src/vgammvgaio.h ../src/endianess.h
++s3.o: ../src/drivers/s3.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/ramdac/ramdac.h \
++  ../src/clockchip/clockchip.h ../src/vgaregs.h ../src/interface.h \
++  ../src/8514a.h ../src/vgapci.h
++ark.o: ../src/drivers/ark.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/ramdac/ramdac.h \
++  ../src/vgaregs.h ../src/interface.h ../src/accel.h
++ali.o: ../src/drivers/ali.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/regs/ali.regs
++chips.o: ../src/drivers/chips.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/vgaregs.h \
++  ../src/interface.h ../src/accel.h ../src/vgapci.h
++apm.o: ../src/drivers/apm.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/vgapci.h ../src/timing.h \
++  ../src/vgaregs.h ../src/vgammvgaio.h ../src/interface.h
++vesa.o: ../src/drivers/vesa.c ../src/lrmi.h ../src/lrmi.6.h ../src/vga.h \
++  ../src/libvga.h ../src/driver.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/vgaregs.h \
++  ../src/interface.h ../src/drivers/vbe.h
++lrmi.o: ../src/lrmi.c ../src/lrmi.6.c ../src/lrmi.h ../src/lrmi.6.h \
++  ../src/vga.h ../src/libvga.h
++nv3.o: ../src/drivers/nv3.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/vgaregs.h \
++  ../src/interface.h ../src/drivers/nv3ref.h ../src/drivers/nvreg.h \
++  ../src/vgapci.h ../src/drivers/nv3io.c
++savage.o: ../src/drivers/savage.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/vgaregs.h \
++  ../src/interface.h ../src/vgapci.h ../src/endianess.h \
++  ../src/vgammvgaio.h
++g400.o: ../src/drivers/g400.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/vgaregs.h \
++  ../src/interface.h ../src/vgapci.h ../src/drivers/mga.h \
++  ../src/drivers/mga_g450pll.c ../src/vgammvgaio.h
++pm2.o: ../src/drivers/pm2.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/vgaregs.h \
++  ../src/interface.h ../src/vgapci.h ../src/drivers/glint_regs.h \
++  ../src/drivers/pm2io.h
++unichrome.o: ../src/drivers/unichrome.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/vgarelvgaio.h ../src/timing.h \
++  ../src/vgaregs.h ../src/interface.h ../src/vgapci.h
++millennium.o: ../src/drivers/millennium.c ../include/vga.h \
++  ../src/libvga.h ../src/driver.h ../src/vga.h ../src/libvga.h \
++  ../src/timing.h ../src/accel.h ../src/io.h ../src/timing.h \
++  ../src/vgaregs.h ../src/interface.h ../src/vgapci.h ../src/vgammvgaio.h \
++  ../src/drivers/mga.h
++r128.o: ../src/drivers/r128.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/vgaregs.h \
++  ../src/interface.h ../src/vgapci.h ../src/endianess.h \
++  ../src/drivers/r128_reg.h ../src/drivers/xf86PciInfo.h \
++  ../src/drivers/r128io.h
++mx.o: ../src/drivers/mx.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/vgaregs.h \
++  ../src/interface.h ../src/vgapci.h
++paradise.o: ../src/drivers/paradise.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/regs/paradise.regs
++rage.o: ../src/drivers/rage.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/vgaregs.h \
++  ../src/interface.h ../src/vgapci.h ../src/drivers/rage.h \
++  ../src/drivers/rageio.c
++banshee.o: ../src/drivers/banshee.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/vgarelvgaio.h ../src/timing.h \
++  ../src/vgaregs.h ../src/interface.h ../src/vgapci.h
++sis.o: ../src/drivers/sis.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/vgaregs.h \
++  ../src/interface.h ../src/vgapci.h ../src/vgarelvgaio.h
++i740.o: ../src/drivers/i740.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/vgaregs.h \
++  ../src/interface.h ../src/vgapci.h ../src/drivers/i740_reg.h \
++  ../src/vgammvgaio.h
++i810.o: ../src/drivers/i810.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/vgaregs.h \
++  ../src/interface.h ../src/vgapci.h ../src/drivers/i810_reg.h \
++  ../src/drivers/i810_wmark.c ../src/vgammvgaio.h ../src/svgalib_helper.h
++laguna.o: ../src/drivers/laguna.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/vgaregs.h \
++  ../src/interface.h ../src/vgapci.h ../src/drivers/lagunaio.h
++et6000.o: ../src/drivers/et6000.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/interface.h \
++  ../src/vgaregs.h ../src/vgapci.h
++neo.o: ../src/drivers/neo.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/vgaregs.h \
++  ../src/interface.h ../src/vgapci.h
++fbdev.o: ../src/drivers/fbdev.c ../src/drivers/fb_lnx.h ../include/vga.h \
++  ../src/libvga.h ../src/driver.h ../src/vga.h ../src/libvga.h \
++  ../src/timing.h ../src/accel.h ../src/io.h ../src/timing.h \
++  ../src/interface.h
++rendition.o: ../src/drivers/rendition.c ../include/vga.h ../src/libvga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h ../src/timing.h ../src/vgaregs.h \
++  ../src/interface.h ../src/vgapci.h ../src/drivers/v2kregs.h \
++  ../src/drivers/renditionio.h
++# Ramdac dependencies
++ramdac/ramdac.o: ../src/ramdac/ramdac.c ../src/libvga.h ../src/timing.h \
++  ../src/vgaregs.h ../src/driver.h ../src/vga.h ../src/libvga.h \
++  ../src/timing.h ../src/accel.h ../src/io.h ../src/ramdac/ramdac.h
++ramdac/normal.o: ../src/ramdac/normal.c ../src/libvga.h ../src/timing.h \
++  ../src/vgaregs.h ../src/driver.h ../src/vga.h ../src/libvga.h \
++  ../src/timing.h ../src/accel.h ../src/io.h ../src/ramdac/ramdac.h
++ramdac/attdacs.o: ../src/ramdac/attdacs.c ../src/libvga.h ../src/timing.h \
++  ../src/vgaregs.h ../src/driver.h ../src/vga.h ../src/libvga.h \
++  ../src/timing.h ../src/accel.h ../src/io.h ../src/ramdac/ramdac.h
++ramdac/sierra.o: ../src/ramdac/sierra.c ../src/libvga.h ../src/timing.h \
++  ../src/vgaregs.h ../src/driver.h ../src/vga.h ../src/libvga.h \
++  ../src/timing.h ../src/accel.h ../src/io.h ../src/ramdac/ramdac.h
++ramdac/icw.o: ../src/ramdac/icw.c ../src/libvga.h ../src/timing.h \
++  ../src/vgaregs.h ../src/driver.h ../src/vga.h ../src/libvga.h \
++  ../src/timing.h ../src/accel.h ../src/io.h ../src/ramdac/ramdac.h
++ramdac/s3dacs.o: ../src/ramdac/s3dacs.c ../src/libvga.h ../src/timing.h \
++  ../src/vgaregs.h ../src/driver.h ../src/vga.h ../src/libvga.h \
++  ../src/timing.h ../src/accel.h ../src/io.h ../src/ramdac/ramdac.h
++ramdac/IBMRGB52x.o: ../src/ramdac/IBMRGB52x.c ../src/libvga.h ../src/timing.h \
++  ../src/vgaregs.h ../src/driver.h ../src/vga.h ../src/libvga.h \
++  ../src/timing.h ../src/accel.h ../src/io.h ../src/ramdac/ramdac.h \
++  ../src/ramdac/IBMRGB52x.h
++ramdac/ics_gendac.o: ../src/ramdac/ics_gendac.c ../src/libvga.h ../src/timing.h \
++  ../src/vgaregs.h ../src/driver.h ../src/vga.h ../src/libvga.h \
++  ../src/timing.h ../src/accel.h ../src/io.h ../src/ramdac/ramdac.h
++# Clockchip dependencies
++clockchip/icd2061a.o: ../src/clockchip/icd2061a.c ../src/timing.h ../src/libvga.h \
++  ../src/ramdac/ramdac.h ../src/clockchip/clockchip.h ../src/driver.h \
++  ../src/vga.h ../src/libvga.h ../src/timing.h ../src/accel.h ../src/io.h \
++  ../include/vga.h
+Binary files orig-svgalib-1.9.24/staticlib/driver.o and svgalib-1.9.24/staticlib/driver.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/ali.o and svgalib-1.9.24/staticlib/drivers/ali.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/apm.o and svgalib-1.9.24/staticlib/drivers/apm.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/ark.o and svgalib-1.9.24/staticlib/drivers/ark.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/banshee.o and svgalib-1.9.24/staticlib/drivers/banshee.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/chips.o and svgalib-1.9.24/staticlib/drivers/chips.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/cirrus.o and svgalib-1.9.24/staticlib/drivers/cirrus.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/et6000.o and svgalib-1.9.24/staticlib/drivers/et6000.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/fbdev.o and svgalib-1.9.24/staticlib/drivers/fbdev.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/g400.o and svgalib-1.9.24/staticlib/drivers/g400.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/i740.o and svgalib-1.9.24/staticlib/drivers/i740.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/i810.o and svgalib-1.9.24/staticlib/drivers/i810.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/laguna.o and svgalib-1.9.24/staticlib/drivers/laguna.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/millennium.o and svgalib-1.9.24/staticlib/drivers/millennium.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/mx.o and svgalib-1.9.24/staticlib/drivers/mx.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/neo.o and svgalib-1.9.24/staticlib/drivers/neo.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/nv3.o and svgalib-1.9.24/staticlib/drivers/nv3.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/paradise.o and svgalib-1.9.24/staticlib/drivers/paradise.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/pm2.o and svgalib-1.9.24/staticlib/drivers/pm2.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/r128.o and svgalib-1.9.24/staticlib/drivers/r128.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/rage.o and svgalib-1.9.24/staticlib/drivers/rage.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/rendition.o and svgalib-1.9.24/staticlib/drivers/rendition.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/s3.o and svgalib-1.9.24/staticlib/drivers/s3.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/savage.o and svgalib-1.9.24/staticlib/drivers/savage.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/sis.o and svgalib-1.9.24/staticlib/drivers/sis.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/trident.o and svgalib-1.9.24/staticlib/drivers/trident.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/tvga8900.o and svgalib-1.9.24/staticlib/drivers/tvga8900.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/unichrome.o and svgalib-1.9.24/staticlib/drivers/unichrome.o differ
+Binary files orig-svgalib-1.9.24/staticlib/drivers/vesa.o and svgalib-1.9.24/staticlib/drivers/vesa.o differ
+Binary files orig-svgalib-1.9.24/staticlib/font8x8.o and svgalib-1.9.24/staticlib/font8x8.o differ
+Binary files orig-svgalib-1.9.24/staticlib/grlib.o and svgalib-1.9.24/staticlib/grlib.o differ
+Binary files orig-svgalib-1.9.24/staticlib/interface.o and svgalib-1.9.24/staticlib/interface.o differ
+Binary files orig-svgalib-1.9.24/staticlib/joystick/joystick.o and svgalib-1.9.24/staticlib/joystick/joystick.o differ
+Binary files orig-svgalib-1.9.24/staticlib/keyboard/keyboard.o and svgalib-1.9.24/staticlib/keyboard/keyboard.o differ
+Binary files orig-svgalib-1.9.24/staticlib/libvga.a and svgalib-1.9.24/staticlib/libvga.a differ
+Binary files orig-svgalib-1.9.24/staticlib/libvgagl.a and svgalib-1.9.24/staticlib/libvgagl.a differ
+Binary files orig-svgalib-1.9.24/staticlib/line.o and svgalib-1.9.24/staticlib/line.o differ
+Binary files orig-svgalib-1.9.24/staticlib/lrmi.o and svgalib-1.9.24/staticlib/lrmi.o differ
+Binary files orig-svgalib-1.9.24/staticlib/mem.o and svgalib-1.9.24/staticlib/mem.o differ
+Binary files orig-svgalib-1.9.24/staticlib/modetab.o and svgalib-1.9.24/staticlib/modetab.o differ
+Binary files orig-svgalib-1.9.24/staticlib/mouse/mouse.o and svgalib-1.9.24/staticlib/mouse/mouse.o differ
+Binary files orig-svgalib-1.9.24/staticlib/palette.o and svgalib-1.9.24/staticlib/palette.o differ
+Binary files orig-svgalib-1.9.24/staticlib/ramdac/attdacs.o and svgalib-1.9.24/staticlib/ramdac/attdacs.o differ
+Binary files orig-svgalib-1.9.24/staticlib/ramdac/IBMRGB52x.o and svgalib-1.9.24/staticlib/ramdac/IBMRGB52x.o differ
+Binary files orig-svgalib-1.9.24/staticlib/ramdac/ics_gendac.o and svgalib-1.9.24/staticlib/ramdac/ics_gendac.o differ
+Binary files orig-svgalib-1.9.24/staticlib/ramdac/icw.o and svgalib-1.9.24/staticlib/ramdac/icw.o differ
+Binary files orig-svgalib-1.9.24/staticlib/ramdac/normal.o and svgalib-1.9.24/staticlib/ramdac/normal.o differ
+Binary files orig-svgalib-1.9.24/staticlib/ramdac/ramdac.o and svgalib-1.9.24/staticlib/ramdac/ramdac.o differ
+Binary files orig-svgalib-1.9.24/staticlib/ramdac/s3dacs.o and svgalib-1.9.24/staticlib/ramdac/s3dacs.o differ
+Binary files orig-svgalib-1.9.24/staticlib/ramdac/sierra.o and svgalib-1.9.24/staticlib/ramdac/sierra.o differ
+Binary files orig-svgalib-1.9.24/staticlib/regextr.o and svgalib-1.9.24/staticlib/regextr.o differ
+Binary files orig-svgalib-1.9.24/staticlib/scale.o and svgalib-1.9.24/staticlib/scale.o differ
+Binary files orig-svgalib-1.9.24/staticlib/text.o and svgalib-1.9.24/staticlib/text.o differ
+Binary files orig-svgalib-1.9.24/staticlib/timing.o and svgalib-1.9.24/staticlib/timing.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vgaaccel.o and svgalib-1.9.24/staticlib/vgaaccel.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vgaclear.o and svgalib-1.9.24/staticlib/vgaclear.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vgacol.o and svgalib-1.9.24/staticlib/vgacol.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vga_console.o and svgalib-1.9.24/staticlib/vga_console.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vgaconvplanar.o and svgalib-1.9.24/staticlib/vgaconvplanar.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vgacursor.o and svgalib-1.9.24/staticlib/vgacursor.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vgadraw.o and svgalib-1.9.24/staticlib/vgadraw.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vgadrv.o and svgalib-1.9.24/staticlib/vgadrv.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vgadump.o and svgalib-1.9.24/staticlib/vgadump.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vga_helper.o and svgalib-1.9.24/staticlib/vga_helper.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vgaio.o and svgalib-1.9.24/staticlib/vgaio.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vgaline.o and svgalib-1.9.24/staticlib/vgaline.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vgamisc.o and svgalib-1.9.24/staticlib/vgamisc.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vgammvgaio.o and svgalib-1.9.24/staticlib/vgammvgaio.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vgamodesel.o and svgalib-1.9.24/staticlib/vgamodesel.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vganullio.o and svgalib-1.9.24/staticlib/vganullio.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vga.o and svgalib-1.9.24/staticlib/vga.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vgapal.o and svgalib-1.9.24/staticlib/vgapal.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vgapci.o and svgalib-1.9.24/staticlib/vgapci.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vgapix.o and svgalib-1.9.24/staticlib/vgapix.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vgaregs.o and svgalib-1.9.24/staticlib/vgaregs.o differ
+Binary files orig-svgalib-1.9.24/staticlib/vgarelvgaio.o and svgalib-1.9.24/staticlib/vgarelvgaio.o differ
+Binary files orig-svgalib-1.9.24/utils/convfont and svgalib-1.9.24/utils/convfont differ
+Binary files orig-svgalib-1.9.24/utils/convfont.o and svgalib-1.9.24/utils/convfont.o differ
+diff -Nur orig-svgalib-1.9.24/utils/.depend svgalib-1.9.24/utils/.depend
+--- orig-svgalib-1.9.24/utils/.depend	1970-01-01 08:00:00.000000000 +0800
++++ svgalib-1.9.24/utils/.depend	2006-02-19 20:32:58.000000000 +0800
+@@ -0,0 +1,10 @@
++restorefont.o: ../utils/restorefont.c ../include/vga.h ../src/libvga.h
++convfont.o: ../utils/convfont.c
++restoretextmode.o: ../utils/restoretextmode.c ../include/vga.h \
++  ../src/driver.h ../src/vga.h ../src/libvga.h ../src/timing.h \
++  ../src/accel.h ../src/io.h
++restorepalette.o: ../utils/restorepalette.c ../include/vga.h \
++  ../src/libvga.h
++dumpreg.o: ../utils/dumpreg.c ../include/vga.h
++fix132x43.o: ../utils/fix132x43.c ../include/vga.h
++setmclk.o: ../utils/setmclk.c ../include/vga.h
+Binary files orig-svgalib-1.9.24/utils/dumpreg and svgalib-1.9.24/utils/dumpreg differ
+Binary files orig-svgalib-1.9.24/utils/dumpreg.o and svgalib-1.9.24/utils/dumpreg.o differ
+Binary files orig-svgalib-1.9.24/utils/fix132x43 and svgalib-1.9.24/utils/fix132x43 differ
+Binary files orig-svgalib-1.9.24/utils/fix132x43.o and svgalib-1.9.24/utils/fix132x43.o differ
+Binary files orig-svgalib-1.9.24/utils/gtfcalc and svgalib-1.9.24/utils/gtfcalc differ
+Binary files orig-svgalib-1.9.24/utils/restorefont and svgalib-1.9.24/utils/restorefont differ
+Binary files orig-svgalib-1.9.24/utils/restorefont.o and svgalib-1.9.24/utils/restorefont.o differ
+Binary files orig-svgalib-1.9.24/utils/restorepalette and svgalib-1.9.24/utils/restorepalette differ
+Binary files orig-svgalib-1.9.24/utils/restorepalette.o and svgalib-1.9.24/utils/restorepalette.o differ
+Binary files orig-svgalib-1.9.24/utils/restoretextmode and svgalib-1.9.24/utils/restoretextmode differ
+Binary files orig-svgalib-1.9.24/utils/restoretextmode.o and svgalib-1.9.24/utils/restoretextmode.o differ
+Binary files orig-svgalib-1.9.24/utils/setmclk and svgalib-1.9.24/utils/setmclk differ
+Binary files orig-svgalib-1.9.24/utils/setmclk.o and svgalib-1.9.24/utils/setmclk.o differ

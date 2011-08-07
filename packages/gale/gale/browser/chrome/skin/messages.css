@@ -1,0 +1,10 @@
+#messages-window
+{
+    background-color : gray;
+    -moz-opacity     : 1;
+    border-color     : #ff0000; 
+    border-style     : none; 
+    border-width     : 0px;
+    padding          : 0px;
+    margin           : 0px;
+}

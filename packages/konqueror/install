@@ -1,0 +1,9 @@
+#!/bin/sh
+
+. config/options
+
+mkdir -p $SYSROOT_PREFIX/usr/local/konqueror
+echo "||||||||||||| install konqueror... |||||||||||||"
+cp -fr $SYSROOT_PREFIX/usr/local/konqueror $INSTALL/usr/local/
+mv $INSTALL/usr/local/$1/bin/$1 $INSTALL/usr/bin
+exit 0

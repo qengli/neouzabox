@@ -1,0 +1,7 @@
+#!/bin/sh
+
+. config/options
+
+#$SCRIPTS/build alsa-driver  #added by Leo 
+$SCRIPTS/build alsa-lib
+$SCRIPTS/build alsa-utils

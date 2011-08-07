@@ -1,0 +1,6 @@
+#!/bin/sh
+
+. config/options
+
+SMB=`ls -d $BUILD/$1*/source`
+

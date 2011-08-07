@@ -1,0 +1,11 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/install make
+$SCRIPTS/install sed
+
+if [ $DIRECTFB = yes ]; then
+  patch -d $BUILD/$1*/ -p1 < $PACKAGES/$1/patches.dfb/TEL_GTKDFB_2_10_1_patch.patch
+fi
+

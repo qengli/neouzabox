@@ -1,0 +1,27 @@
+diff -u php-4.4.9/ext/standard/basic_functions.c php-4.4.9.new/ext/standard/basic_functions.c
+--- php-4.4.9/ext/standard/basic_functions.c	2007-12-31 15:22:51.000000000 +0800
++++ php-4.4.9.new/ext/standard/basic_functions.c	2008-09-18 12:42:53.000000000 +0800
+@@ -436,7 +436,7 @@
+ 	PHP_FE(gethostbyname,													NULL)
+ 	PHP_FE(gethostbynamel,													NULL)
+ 
+-#if HAVE_RES_SEARCH && !(defined(__BEOS__) || defined(PHP_WIN32) || defined(NETWARE))
++#if HAVE_RES_SEARCH && HAVE_DN_SKIPNAME && !(defined(__BEOS__) || defined(PHP_WIN32) || defined(NETWARE))
+ 	PHP_FE(checkdnsrr,														NULL)
+ 	PHP_FE(getmxrr,second_and_third_args_force_ref)
+ #endif
+diff -u php-4.4.9/ext/standard/dns.c php-4.4.9.new/ext/standard/dns.c
+--- php-4.4.9/ext/standard/dns.c	2007-12-31 15:22:52.000000000 +0800
++++ php-4.4.9.new/ext/standard/dns.c	2008-09-18 12:39:15.000000000 +0800
+@@ -207,7 +207,7 @@
+ }
+ /* }}} */
+ 
+-#if HAVE_RES_SEARCH && !(defined(__BEOS__)||defined(PHP_WIN32) || defined(NETWARE))
++#if HAVE_RES_SEARCH && HAVE_DN_SKIPNAME && !(defined(__BEOS__)||defined(PHP_WIN32) || defined(NETWARE))
+ 
+ /* {{{ proto int checkdnsrr(string host [, string type])
+    Check DNS records corresponding to a given Internet host name or IP address */
+Common subdirectories: php-4.4.9/ext/standard/tests and php-4.4.9.new/ext/standard/tests
+Only in php-4.4.9/ext/standard/: url_scanner_ex.c.orig
+Only in php-4.4.9/ext/standard/: var_unserializer.c.orig

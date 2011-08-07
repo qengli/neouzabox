@@ -1,0 +1,13 @@
+--- mozilla/configure.orig	2008-09-04 15:31:28.000000000 +0800
++++ mozilla/configure	2008-09-04 15:32:08.000000000 +0800
+@@ -5959,8 +5959,8 @@
+         MOZ_ENABLE_OLD_ABI_COMPAT_WRAPPERS=1
+     ;;
+     mips*)
+-        CFLAGS="$CFLAGS -Wa,-xgot"
+-        CXXFLAGS="$CXXFLAGS -Wa,-xgot"
++        CFLAGS="$CFLAGS -mips32r2 -pipe -Os "
++        CXXFLAGS="$CXXFLAGS -mips32r2 -pipe -Os "
+     ;;
+     esac
+     ;;

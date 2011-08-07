@@ -1,0 +1,73 @@
+#!/bin/sh
+
+. config/options
+
+setup_toolchain host
+CWD=`pwd`
+
+cd $BUILD/$1*/ncurses-host
+./configure
+make -C include
+make -C progs tic
+cd "$CWD"
+
+setup_toolchain target
+
+$SCRIPTS/build toolchain
+
+cd $BUILD/$1*
+./configure --host=$TARGET_NAME \
+            --build=$HOST_NAME \
+            --prefix=$LIB_PREFIX \
+            --datadir=/usr/share \
+            --with-build-cc=$HOST_CC \
+            --with-build-cppflags="$HOST_CPPFLAGS -I../include" \
+            --with-build-cflags="$HOST_CFLAGS" \
+            --with-build-ldflags="$HOST_LDFLAGS" \
+            --without-cxx \
+            --without-cxx-binding \
+            --without-ada \
+            --without-progs \
+            --with-shared \
+            --without-normal \
+            --without-debug \
+            --without-profile \
+            --without-termlib \
+            --without-dbmalloc \
+            --without-dmalloc \
+            --without-gpm \
+            --disable-rpath \
+            --disable-overwrite \
+            --enable-database \
+            --disable-big-core \
+            --enable-termcap \
+            --enable-getcap \
+            --disable-getcap-cache \
+            --disable-bsdpad \
+            --without-rcs-ids \
+            --enable-ext-funcs \
+            --disable-const \
+            --enable-no-padding \
+            --disable-sigwinch \
+            --disable-tcap-names \
+            --without-develop \
+            --disable-hard-tabs \
+            --disable-xmc-glitch \
+            --disable-hashmap \
+            --enable-safe-sprintf \
+            --disable-scroll-hints \
+            --disable-widec \
+            --disable-echo \
+            --disable-warnings \
+            --disable-assertions
+make -C include
+make -C ncurses
+$AR cru lib/libncurses.a obj_s/*.o
+make -C include install
+make -C ncurses install
+cd $LIB_PREFIX/include/ncurses
+cp curses.h term.h ../
+
+#added by Leo 2006-03-25
+echo "====================cp libncurse ............"
+#cp lib/libncurses.a $LIB_PREFIX/lib/ #comment  by leo 20070603 due to build fail cannot find libncurse.a

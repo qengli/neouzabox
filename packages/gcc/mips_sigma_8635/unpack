@@ -1,0 +1,11 @@
+#!/bin/sh 
+. config/options
+
+#cd $BUILD/$1*/
+#cat >> gcc/config/linux.h <<EOF
+#undef STARTFILE_PREFIX_SPEC
+#define STARTFILE_PREFIX_SPEC "${SYSROOT_PREFIX}/usr/lib/"
+#EOF
+
+ 
+#sed -i -e "s@\(^CROSS_SYSTEM_HEADER_DIR =\).*@\\1 ${SYSROOT_PREFIX}/usr/include/@g" gcc/Makefile.in

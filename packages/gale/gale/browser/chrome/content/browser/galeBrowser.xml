@@ -1,0 +1,216 @@
+﻿<?xml version="1.0" encoding="UTF-8"?> 
+<galeBrowser> 
+    <trustablesite>
+        /**live tv and vcd website domain*/
+        <site> 
+             <domin>http://58.196.13.12:8003</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**live tv and vcd website domain1*/
+        <site> 
+             <domin>http://58.196.13.12:8013</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**live tv and vcd website domain2*/
+        <site> 
+             <domin>http://58.196.13.12:8023</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**phone website domain*/
+        <site> 
+             <domin>http://58.196.13.12:8004</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8005</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8006</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8007</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8017</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8024</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8025</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8026</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8027</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8031</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8033</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8034</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8035</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8036</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8037</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8040</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8041</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8042</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8043</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8044</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8045</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8046</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.12:8047</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**phone website domain1*/
+        <site> 
+             <domin>http://58.196.13.12:8014</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**gateway website domain, used for error tip*/ 
+        <site> 
+             <domin>http://58.196.13.12:8000</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        <site> 
+             <domin>http://58.196.13.53</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**game website domain*/
+        <site> 
+             <domin>http://58.196.13.53:8080</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**home and menu website domain*/
+        <site> 
+             <domin>http://58.196.13.12:8001</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**home and menu website domain1*/
+        <site> 
+             <domin>http://58.196.13.12:8011</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**home and menu website domain2*/
+        <site> 
+             <domin>http://58.196.13.12:8021</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**push website domain*/
+        <site> 
+             <domin>http://58.196.13.12:8002</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**push website domain1*/
+        <site> 
+             <domin>http://58.196.13.12:8012</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**push website domain2*/
+        <site> 
+             <domin>http://58.196.13.12:8022</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**push website domain3*/
+        <site> 
+             <domin>http://58.196.13.12:8032</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**reader website domain*/
+        <site> 
+             <domin>http://58.196.13.12:8005</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**reader website domain1*/
+        <site> 
+             <domin>http://58.196.13.12:8015</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**ctrip website domain*/
+        <site> 
+             <domin>http://58.196.13.12:8006</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**ctrip website domain2*/
+        <site> 
+             <domin>http://58.196.13.12:8016</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**city8 website domain*/ 
+        <site>
+             <domin>http://58.196.13.53:8088</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site> 
+        /**catong website domain*/
+        <site>
+             <domin>http://58.196.13.52</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**message website domain*/
+        <site>
+             <domin>http://58.196.13.54</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site>
+        /**ehealth website domain*/
+        <site>
+             <domin>http://58.196.112.15:88</domin>
+             <privilege>UniversalXPConnect UniversalBrowserRead UniversalBrowserWrite</privilege>
+        </site> 
+    </trustablesite>
+    <loginPageURL>chrome://gale/content/login/login.html</loginPageURL>
+    <loginURL>http://58.196.13.12:8000/gateway/action/00000/000001/</loginURL>
+    <homeURL>http://58.196.13.12:8000/gateway/action/00000/000051/</homeURL>
+    <menuURL>http://58.196.13.12:8001/portal/choose_embed_menu/</menuURL>
+    <!--the url for connecting push server through gateway-->
+    <getMessageURL>http://58.196.13.12:8000/gateway/action/00000/000053/</getMessageURL>
+    <!--the actual url for connecting push server,but should first connect through gateway 
+    then use this url, for decrease gateway pressure-->
+    <getMsgActualURL>http://58.196.13.12:8002/issue/get_msg_list</getMsgActualURL>    
+</galeBrowser>  

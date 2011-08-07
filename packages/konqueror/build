@@ -1,0 +1,46 @@
+#!/bin/sh 
+
+. config/options
+
+$SCRIPTS/build toolchain
+$SCRIPTS/build qtopia
+
+cd $BUILD/qt-*
+
+QTDIR=`pwd`
+export QTDIR
+
+cd -
+cd $BUILD/qtopia*
+
+QPEDIR=`pwd`
+QTEDIR=`pwd`
+export QTEDIR
+export QPEDIR
+cd -
+ln -fs $QPEDIR/lib/libqpe.a $QTDIR/lib/libqpe.a
+
+cd $BUILD/$1*
+mkdir -p objdir
+cd objdir
+../configure --prefix=$SYSROOT_PREFIX/usr/local/konqueror \
+	    --disable-debug \
+            --enable-embedded \
+            --enable-qt-embedded \
+            --enable-static \
+	    --disable-dlopen \
+            --disable-shared \
+            --enable-qtopia \
+            --enable-qpe \
+            --disable-mt \
+            --with-gui=qpe \
+	    --with-extralibdir="$LIB_PREFIX/lib" \
+	    --with-extraincdir="$LIB_PREFIX/include" \
+	    --without-ssl \
+            --with-qt-dir="$QTDIR" \
+	    --with-qt-includes="$QTDIR/include" \
+            --with-qt-libraries="$QTDIR/lib" \
+            --with-qtopia-dir="$QPEDIR" \
+	    --host=$HOST_NAME #added by Leo 2007-06-19 info the configure it is cross compiling
+make
+make install

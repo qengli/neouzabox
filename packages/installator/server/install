@@ -1,0 +1,19 @@
+#!/bin/sh
+
+. config/options
+
+#Leo added 2008-02-18
+cp -f $PACKAGES/$VDIR/init.d/* $INSTALL/etc/init.d/
+
+mkdir -p $INSTALL/sbin
+
+cp $PACKAGES/$VDIR/scripts/$1.sh $INSTALL/sbin/$1
+sed -i "s/VERSION=.*/VERSION=$NEOUBOX_VERSION/" $INSTALL/sbin/$1
+$SCRIPTS/install ncurses
+$SCRIPTS/install dialog
+#@todo I will fix this later
+cp /usr/lib64/libncursesw.so.5 $INSTALL/usr/lib/libncurses.so.5 
+$SCRIPTS/install util-linux
+$SCRIPTS/install dosfstools
+#$SCRIPTS/install grub $2
+$SCRIPTS/install syslinux binary

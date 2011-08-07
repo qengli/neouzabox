@@ -1,0 +1,15 @@
+#!/bin/sh
+
+. config/options
+
+mkdir -p $INSTALL/bin
+mkdir -p $INSTALL/usr/share/udhcpc
+
+cp $BUILD/$1*/$1 $INSTALL/bin
+cp $PACKAGES/$VDIR/scripts/udhcp.script $INSTALL/usr/share/udhcpc/default.script
+
+mkdir -p $INSTALL/etc
+cp $PACKAGES/$VDIR/config/passwd $INSTALL/etc
+cp $PACKAGES/$VDIR/config/group $INSTALL/etc
+cp -f $PACKAGES/$VDIR/init.d/* $BUILD/iso/NEOUBOX/etc/init.d/
+

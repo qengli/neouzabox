@@ -1,0 +1,61 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Login Gale</title>
+<link rel=stylesheet href="chrome://gale/skin/login.css" type="text/css">
+<script type="text/javascript" src="chrome://gale/content/common/inf.js"></script>
+<script type="text/javascript" src="chrome://gale/content/common/keyboard.js"></script>
+<script language="javascript" src="AjaxHelper.js"></script>
+<script language="javascript" src="loginconf.js"></script>
+<script language="javascript" src="login.js"></script>
+</HEAD>
+
+<BODY onload="init();">
+
+<!--
+<img id="basePic" src="" style="position:absolute;left:0px;top:0px;width:0px;height:0px;
+    margin:0px;border-style:none;padding:0px;z-index:0;visibility:visible">
+-->
+
+<img id="backgroundPic" src="">
+<div id="logininfo"> 
+  <div id="title_div" align=center > </div>
+  <div id="error_div">
+    <div id="first_div" > </div>
+    <div id="second_div" > </div>
+    <div id="third_div" > </div>
+  </div>
+
+ <form action="" method=get>
+   <div id="userName" align=center  > </div>
+   <input id="user" type="text" maxlength="11" name=user value="">
+   <div id="userPasswd" align=center > </div>
+   <input id="password" type="password" maxlength="6" name=password value="">
+
+   <img id="btnLoginPic" src="">
+   <div id="btnLoginLbl" align=center > </div>
+   <input id="btnLogin" name="btnlogin" type=button>
+
+   <img id="btnCancelPic" src="" >
+   <div id="btnCancelLbl" align=center > </div>
+   <input id="btnCancel" name="btncancel" type=button >
+
+ </form>
+</div>
+
+
+<img id="blackPic" src="">
+<img id="backProgressPic" src="">
+<div id="progressDiv" >
+<embed id="progress" name="progress" src="chrome://gale/skin/icon/login/loginProgress.swf" 
+    quality="high" devicefont="true" 
+    bgcolor="" width="330" height="50"
+    align="middle" 
+    allowScriptAccess="always" 
+    wmode="opaque"
+    type="application/x-shockwave-flash" 
+    pluginspage="http://www.macromedia.com/go/getflashplayer"/>
+</div>
+</BODY>
+</HTML>

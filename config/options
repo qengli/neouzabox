@@ -1,0 +1,195 @@
+# Target system we want to cross compile for (i386/ppc)
+TARGET_ARCH=i386 #mips    #option: i386 arm mips
+VERSION=server #option: trunk mips_0_1 arm_0_1 mips_sigma_8635 server
+TARGET_LIBC=glibc   #option: glibc uClibc
+# The TARGET_CPU variable controls which processor should be targeted for
+# generated code.
+case $TARGET_ARCH in
+  i386)
+    # (AMD CPUs)    opteron athlon64 athlon-fx athlon-mp athlon-xp athlon-4
+    #               athlon-tbird athlon k8 k6-3 k6-2 k6
+    # (Intel CPUs)  nocona prescott pentium4[m] pentium3[m] pentium-m
+    #               pentium2 pentiumpro pentium-mmx pentium
+    #               i686 i586 i486 i386
+    TARGET_CPU=x86_64     #i686 #Leo 20060213 i586 #2008.6.13 it can't be i386 or the glibc will build fail
+    ;;
+
+  arm)
+    TARGET_CPU=arm
+    ;;
+
+  mips)
+    TARGET_CPU=mipsel #mips cpu can use mips (big endding) mipsel (little endingh)
+    ;;
+
+  powerpc)
+    # 401 403 405 405fp 440 440fp 505 601 602 603 603e ec603e 604 604e
+    # 620 630 740 7400 7450 750 801 821 823 860 970 rios rios1 rios2 rsc rs64a
+    # common G3 G4 G5 power power2 power3 power4 power5 powerpc powerpc64
+    TARGET_CPU=
+    ;;
+esac
+
+if [ ${TARGET_ARCH} != i386 ]; then
+  GENTREE=gentree.${VERSION}
+  if [ ! -f scripts/$GENTREE ]; then
+    GENTREE=gentree.${TARGET_ARCH}
+  fi
+else
+  if [ $TARGET_CPU = x86_64 ]; then
+    GENTREE=gentree.x86_64
+  else
+    GENTREE=gentree
+  fi
+fi 
+
+GENTREE=gentree.x86_64.server
+#modified by Leo 20070804 to support basing on glibc
+# Target system library C (uClibc/glibc)
+TARGET_LIBC=${TARGET_LIBC}
+
+#modified by Leo 20070804 to support c++
+# Support C++ in toolchain
+TOOLCHAIN_CXX=yes
+
+# Need to point to your actual cc
+# If you have ccache installed, take care that LOCAL_CC don't point to it
+LOCAL_CC=`which gcc`
+
+# Need to point to your actual g++
+# If you have ccache installed, take care that LOCAL_CXX don't point to it
+LOCAL_CXX=`which g++`
+
+# Theme (omc/movies)
+THEME=neouza
+
+# Menu language (bg/br/ca/cs/de/en/es/et/fi/fr/gr/he/hu/it/nl/no/pl/ro/ru/sk/sr/sv)
+LANG=en
+
+# Add LIVE555 support (forces c++ support)
+LIVE555=no
+
+# Subtitle charset (bg/br/ca/cs/de/en/es/et/fi/fr/gr/he/hu/it/nl/no/pl/ro/ru/sk/sr/sv)
+# Can also be set to a charset code (iso-8859-{1,2,7,8,9}/windows-125{0,1}/koi8-r)
+# when empty it defaults to $LANG
+SUB_CHARSET=
+
+# Remote to Use (pctv/logitech/hauppauge/realmagic/creative/leadtek/RM-S6/
+#           RX-V850/animax/avermedia/packard_bell/atiusb/LG/D-10/digimatrix)
+REMOTE=atiusb
+
+# Remote receiver to use (animax/avermedia/atiusb/creative/hauppauge/homemade/
+#                         irman/leadtek/logitech/pctv/realmagic/digimatrix)
+RECEIVER=atiusb
+
+# Use Extra Binary Codecs - RealMedia/WindowsMedia 9 (yes/no)
+EXTRACODECS=yes
+
+# Network Support (Samba shares and FTP Server) (yes/no)
+NETWORK=yes
+
+# Start network services ? (Anonymous Telnet and FTP server as root) (yes/no)
+SERVICES=yes
+
+# Wireless network support (yes/no)
+WIFI=no #Leo 20060213
+
+# Auto-discovery of UPnP MediaServer devices (yes/no)
+UPNP=no #Leo 20060213 i586
+
+#Added by Leo 20070803
+TV_CARD=no
+DVB_APP=no
+MPTV=no
+
+# Add radio tuner support (yes/no)
+RADIO=no #Leo 20060213
+
+# Add DXR3/Hollywood+ support (EXPERIMENTAL)
+DXR3=no #Leo 20060213
+
+# Image viewer / dia show support (yes/no)
+VIEW_IMG=no
+
+# Default timeout in seconds for dia show (0 to disable)
+VIEW_IMG_TIMEOUT=10
+
+# Size of the initrd file system
+RAMDISK_SIZE=4096
+
+# enable debuging (build gdb...)
+DEBUG=no
+
+# enable devel tools (yes/no)
+DEVTOOLS=yes
+
+# verbose compilation mode (yes/no)
+VERBOSE=yes
+
+# download new sources when url file is updated (yes/no/ask)
+AUTOUPDATE=no
+
+
+# Burning options
+
+# device (ex: 0,0,0). See the output of cdrecord -scanbus.
+BURNER=/dev/hda
+
+# blank the CD-RW before burning (yes/no)
+BLANK=yes
+
+# you can also pass options to cdrecord :
+CDRECORD_OPTS=
+
+# Embedded konqueror support added by Leo 2006-3-1
+KONQUEROR=no
+
+# gtk support added by Leo 2007-06-13
+GTK=yes
+
+# gtk with frambuffer otherwise with x
+# if GTK equals no this option will be omitted
+GTK_FB=yes
+
+#Leo added 2008.06.03
+DIRECTFB=yes
+
+# X11
+X11=no
+
+# Mozilla added by Leo 2007-7-2
+MOZILLA=yes
+
+#build mozilla app xulrunner or firefox
+MOZ_APP=firefox
+
+MPLAYER=no
+
+# install gale
+GALE=yes
+
+PPPOE=yes
+
+VIAFB=no
+
+DEBUG_TOOLS=yes
+# gdbserver support added by Leo 2006-3-2
+GDB=no
+
+JAVA=no
+
+#INSTALLOR support added by Leo 2007-7-15
+INSTALLATOR=yes
+
+# PXE boot options
+DEFAULT_NFS_SERVER=192.168.0.2
+
+# Concurrency make level (-j option)
+#  Try value 1 (default) to 4 on single CPU computer, or more on
+#  multi-processor computer (like hyperthreading SMP CPU)
+CONCURRENCY_MAKE_LEVEL=1
+
+# read personal options if available
+test -f "$HOME/.neouzabox-options" && . "$HOME/.neouzabox-options"
+
+. config/path

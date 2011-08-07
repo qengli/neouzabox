@@ -1,0 +1,36 @@
+#!/bin/sh
+echo "||||||||||||||||||||||||||| build qtopia |||||||||||||||||||||||||"
+. config/options
+
+$SCRIPTS/build toolchain
+
+#qtopia build need uuid header files , Added by Leo 2006-03-02
+if [ ! -d $BUILD/busybox* ]; then  #need busybox uuid include directory
+   echo "||||||||||||||||||||| busybox source not exists,extract it first |||||||||||||||||"
+   $SCRIPTS/unpack busybox
+fi
+
+
+cd $BUILD/$1*
+
+export QPEDIR=`pwd`
+cd -
+cd $BUILD/qt-*
+
+export QTEDIR=`pwd`
+export QTDIR=`pwd`
+
+export PATH=$QPEDIR/bin:$PATH
+export PATH=$QTDIR/bin:$PATH 
+export LD_LIBRARY_PATH=$QTDIR/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$QPEDIR/lib:$LD_LIBRARY_PATH
+
+cd -
+$SCRIPTS/unpack busybox #added by Leo 20070618
+echo "ln -sf $ROOT/$BUILD/busybox*/e2fsprogs/uuid $QTDIR/include/uuid"
+ln -sf $ROOT/$BUILD/busybox*/e2fsprogs/uuid $QTDIR/include/uuid
+cd $QPEDIR/src/
+
+./configure -xplatform linux-uclibc-g++ -static 
+make libraries
+echo "|||||||||||||||||||||||||||| build qtopia success ||||||||||||"

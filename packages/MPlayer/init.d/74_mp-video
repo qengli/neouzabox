@@ -1,0 +1,67 @@
+#!/bin/sh
+#
+# configure MPlayer's video settings
+#
+# runlevels: neoubox, debug
+
+echo "### Configuring MPlayer's video settings ###"
+
+# include tvout configuration file
+. /etc/tvout
+
+# set mplayer resolution when using offb
+if [ -e /dev/fb0 ]; then
+  RES=`/usr/sbin/fbset | sed -n 's/mode "\(.*\)-.*"/\1/p'`
+  RESX=`echo $RES | cut -f1 -dx`
+  RESY=`echo $RES | cut -f2 -dx`
+  mp_set_option screenw "$RESX"
+  mp_set_option screenh "$RESY"
+else
+  mp_set_option screenw 800
+  mp_set_option screenh 600
+fi
+
+# set double to no for nvidia, sis and Kyro cards and VMWare
+for i in '0300: 10de:' '0300: 1039:' '0300: 104a:0010' '0300: 15ad:'; do
+  if grep -q "$i" /tmp/pci; then
+    # except if we want to try nvidia vidix
+    if [ "$i" = '0300: 10de:' -a ! -f /etc/mplayer/no_nvidia_vidix ]; then
+      mp_set_option vf "format=yuy2" concat
+    # nvidia card on powerpc
+    elif [ "$i" = '0300: 10de:' -a "`cat /etc/arch`" = powerpc ]; then
+      mp_set_option vo "directfb:noinput"
+      if [ -f /usr/bin/freevo ]; then
+        freevo_set_option MPLAYER_VO_DEV "directfb:noinput"
+      fi
+    else
+      mp_set_option vo "vesa"
+      if [ -f /usr/bin/freevo ]; then
+        freevo_set_option MPLAYER_VO_DEV "vesa"
+      fi
+      mp_set_option double "no"
+      mp_set_option vf "expand=-1:-1:-1:-1:1" concat
+    fi
+  fi
+done
+
+# Force -vo vesa for some ATI Mobility Radeons
+if grep -q '0300: 1002:4c59' /tmp/pci; then
+  mp_set_option vo "vesa"
+  if [ -f /usr/bin/freevo ]; then
+    freevo_set_option MPLAYER_VO_DEV "vesa"
+  fi
+fi
+
+# do not use VESA Direct Graphic Access on Intel i855, i865, i910,
+# i915 and i945 cards
+if grep -q -e '0300: 8086:3582' -e '0300: 8086:2572' -e '0300: 8086:2592' -e '0300: 8086:2582' -e '0300: 8086:27a2' /tmp/pci; then
+  mp_set_option vo "vesa:nodga"
+  if [ -f /usr/bin/freevo ]; then
+    freevo_set_option MPLAYER_VO_DEV "vesa:nodga"
+  fi
+fi
+
+# set the tvout aspect
+mp_set_option monitoraspect "$TVOUT_ASPECT"
+
+exit 0

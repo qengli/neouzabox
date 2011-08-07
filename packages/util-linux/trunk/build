@@ -1,0 +1,19 @@
+#!/bin/sh
+
+. config/options
+
+$SCRIPTS/build ncurses
+
+cd $BUILD/$1*
+#added by Leo 20071206 to support basing on uClibc
+#without these lines the uClibc version can't be build success 
+if [ "$TARGET_LIBC" = "uClibc" ]; then 
+  sed -i s/"LIBS=\"\""/"LIBS=\"-lintl\""/g $ROOT/$BUILD/$1*/configure
+fi
+
+
+./configure --host=$TARGET_NAME \
+            --build=$HOST_NAME \
+	    --with-libintl-prefix=$LIB_PREFIX
+make -C fdisk sfdisk
+make -C fdisk cfdisk

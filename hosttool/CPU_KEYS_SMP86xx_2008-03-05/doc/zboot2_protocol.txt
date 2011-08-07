@@ -1,0 +1,375 @@
+Zboot2 protocol:
+===============
+
+This document describes the secure boot protocol for the SMP8634 cpu (not xpu) known as zboot2.
+This protocol is implemented by xos for build version > "0xa0".
+
+This document does not specify:
+- The parallel flash map except the presence of an xenv block at offset 0.
+- The cpu control flow and trust chain after the initial bootloader.
+- The eventual use of the xenv block by cpu code.
+
+
+Overview
+--------
+
+On SMP8634, the cpu boot is controlled by the xpu.
+
+The boot process is based on the analysis of an environment block in the XENV format
+located on the parallel flash. 
+
+The xenv block can contains parameters used by xos to setup the board
+(csf, dram) and boot the cpu. The related keys are defined in the
+section "zboot2 protocol xenv keys" below.
+
+The xenv block can also contains other keys used by the cpu bootloader and
+operating system. Refer to your bootloader/system documentation for a
+definition of such keys.
+
+The xenv block must be located at offset zero on a parallel flash connected
+to the peripheral bus, at CS2 or CS3, in either 8 bits or 16 bits mode.
+From xos build version "0xd0", only 16 bits mode flash are supported.
+
+The CPU bootloader must be packaged inside an XLOAD xrpc located on parallel
+flash. 
+
+zboot error codes:
+------------------
+
+Since xos build version 0xde, xos will report a status code 
+for the zboot boot process.
+
+xos will print a message of this form:
+
+	zboot (0) ok
+or
+	zboot (7) failed
+
+The number is the status code. '0' means the process was sucessful
+ and xos wil print 'ok', any her number means failure, and xos will
+ print 'failed'.
+
+Currently the following zboot status code are defined:
+
+0: ok
+1: 'x.zboot' key was not found in the xenv block
+2: The zboot xrpc block size is invalid. It is too small, too big or
+   not a multiple of 4 bytes.
+3: The zboot xrpc block xrpcid is invalid. Must be XRPC_ID_XLOAD=5.
+4: The zboot xload certificate type is invalid. Must be XLOAD_CERTTYPE_ZBOOT.
+5: The zboot load address ('param1' of the xrpc) is invalid. Must be in DRAM
+   or CPU local RAM.
+6: Xload decryption failed. The cause can be:
+     - Invalid certificate signature.
+     - Binding to a different certificate.
+     - xload size (as indicated by xrpc header) is too small.
+     - decrypted payload size (as indicate by xrpc 'param0') is invalid.
+     - The SEK block on the serial flash is missing.
+7: Signature verification failed. The cause could be:
+    - The payload signature is corrupted.
+    - The payload has been corrupted.
+    - The signature was not done with the key in the certificate.
+    - The SekID indicated in the certificate is invalid. This case would not
+      be caught at decryption time, the decryption would proceed with an
+      invalid key, and the error would only be caught at signature verification
+      time.
+
+
+zboot xrpc format:
+------------------
+
+The xrpc used to boot the cpu must be an XLOAD xrpc with the following
+restrictions:
+(refer to xrpc_list for a generic description of the XLOAD xrpc)
+
+Input Parameters:
+	xrpcid: XRPC_ID_XLOAD (5)       
+	param0: Size of the decrypted bootloader binary.
+	param1: Load address.
+	param2: Reserved
+	param3: Reserved
+	param4: Reserved
+
+Payload: Binary in xload format. The certificate in the xload block must
+        be of the ZBOOT type.
+	
+Output Parameters:
+        No output parameters are available during the boot sequence.
+
+Notes:
+	* The Load address must be aligned on a 64K boundary
+	  for proper remapping of the boot vector.
+	* The load address must either be in DRAM0 or in CPU local ram.
+	  There must be enough space left in DRAM0 or CPU local ram after
+	  this address to fit the entiry xload block.
+	
+zboot2 protocol xenv keys:
+-------------------------
+
+Default Values are the values used by xos if the key is not present.
+
+ZB_XENV_STR_ZBOOT ("x.boot") :
+    Location of the xrpc block to execute to load the CPU bootloader.
+    
+    If the value is < 0x40000000, the value is the offset from the
+    start of the current parrallel flash. Otherwise, its the physical
+    address. This allows to use the zboot from another parallel flash.
+    
+    Encoding : little endian 32 bits word
+    Expected Size : 4 bytes
+    Default Value: None.
+
+ZB_XENV_STR_DRAMSTUFFING ("x.ds") :
+    Dram stuffing option.
+
+    Bits 0-9   : Size in MB, on DRAM controller 0.
+    Bits 10-19 : Size in MB, on DRAM controller 1.
+
+    The MKRAM macro can be used to define this value:
+    
+    #define MKRAM(sz2, sz1, sz0) (sz2<<20 | sz1<<10 | sz0)
+    
+    Encoding : little endian 32 bits word
+    Expected Size : 4 bytes
+    Default Value : MKRAM(0,0,64) (64 MB on DRAM Controller 0)
+
+ZB_XENV_STR_DODRAMTEST ("x.dt")
+    Enable or disable the initial DRAM configuration tests performed by XOS.
+    
+    This is a bitmask, each bit controlling one type of test. For xos
+    build version less than "0xbe", only 1 bit is used. For xos builds
+    version "0xbe" or above, 3 bits are used, the dram configuration
+    test can be run with 3 different CL/CCL settings.
+    
+    Encoding : little endian 32 bits word.
+    Expected Size : 4 bytes.
+    Default Value : 1
+
+ZB_XENV_STR_DRAM0_CFG ("x.d0.cfg") :
+ZB_XENV_STR_DRAM1_CFG ("x.d1.cfg") :
+    Configuration register value for DRAM controllers 0 and 1.
+    
+    These values might be overidden if the dram test is performed.
+    
+    Encoding : little endian 32 bits word
+    Expected Size : 4 bytes
+    Default Value : 0xe34111ba
+      
+ZB_XENV_STR_DRAM0_DELAY0 ("x.d0.dl0") :
+ZB_XENV_STR_DRAM1_DELAY0 ("x.d1.dl0") :
+    Delay0 register value for DRAM controllers 0 and 1.
+    
+    These values might be overidden if the dram test is performed.
+    
+    Encoding : little endian 32 bits word
+    Expected Size : 4 bytes
+    Default Value : 0x000a3333
+    
+ZB_XENV_STR_CSF ("x.csf") :
+    Cpu and System Frequency setting.
+    
+    Available configurations are:
+        '0' : cpu @250 system @166 
+        '1' : cpu @166 system @166
+        '2' : cpu @300 system @200 (only with 200Mhz DDR)
+        '3' : cpu @300 system @150
+        '8' : cpu @150 system @150
+    Other values are reserved. Refer to xos/include/xos_csf.h for details
+    
+    Encoding : little endian 32 bits word.
+    Expected Size : 4 bytes.
+    Default Value : 2
+
+ZB_XENV_STR_LOG2_XPUZONE ("x.l2xz") :
+    Define the size of the XPUZONE area in DRAM0.
+
+    The XPUZONE is an area at the top of DRAM reserved for XOS and used
+    for xtasks and irq_handler loading.  Protections curtains are placed
+    according to this zone. See dram_map.pdf for more details.
+    
+    The reserved size is (1<<x.l2xz). The actual resevered size is
+    adjusted to the minimum valid size (4K).
+    From xos build version "0xd0" x.l2xz=0, means the actual reserved
+    size is 0 bytes.
+
+    Encoding: little endian 32 bits word.
+    Expected Size : 4 bytes.
+    Default Value : 22 (4MB)
+
+ZB_XENV_STR_LOG2_XPUZONE1 ("x.l2xz1") :
+    Define the size of the XPUZONE area in DRAM1
+
+    This is supported only from xos build version "0xd0".
+    
+    Same remarks as with ZB_XENV_STR_LOG2_XPUZONE applys.
+
+    Encoding: little endian 32 bits word.
+    Expected Size : 4 bytes.
+    Default Value : 0 (0MB)
+
+ZB_XENV_STR_LOG2_RISCZONEC ("x.l2rzc") :
+    Define the size of the RISCZONEC area in DRAM0.
+
+    The RISCZONEC is an area at the top of DRAM reserved for XOS and used for
+    secure microcode loading. Protections curtains are placed according to
+    this zone. See dram_map.pdf for more details.
+    
+    The reserved size is (1<<x.l2xz). The actual resevered size is
+    adjusted to the minimum valid size (4K).
+    From xos build version "0xd0" x.l2xz=0, means the actual reserved
+    size is 0 bytes.
+
+    Encoding: little endian 32 bits word.
+    Expected Size : 4 bytes.
+    Default Value : 21 (2MB)
+
+ZB_XENV_STR_LOG2_RISCZONEC1 ("x.l2rzc1") :
+    Define the size of the RISCZONEC area in DRAM1
+
+    This is supported only from xos build version "0xd0".
+    
+    Same remarks as with ZB_XENV_STR_LOG2_RISCZONEC applys.
+
+    Encoding: little endian 32 bits word.
+    Expected Size : 4 bytes.
+    Default Value : 0 (0MB)
+
+ZB_XENV_STR_ROSFLASH ("x.rosflash") :
+    Serial flash write-protect-lock enable.
+    
+    This is supported only from xos build version "0xd0".
+    
+    When x.rosflash is set to 1, the write-protect-lock feature of 8634
+    internal serial flash is activated as soon as this key is read from
+    parallel flash, at an early stage of board startup (before cpu startup).
+    The complete serial flash is made read-only with no ability to disarm
+    this feature by software. Upgrading xos, setting a HDCP key, creating
+    bindings, updating customer environment sectors, changing ownership, 
+    will have no effect.
+
+    Changing x.rosflash key value on parallel flash back to its default will
+    disarm this feature after the next reboot. This requires the board be
+    deployed in an environment where parallel flash is writable and can be
+    remotely power cycled (by software or user).
+
+    Encoding : little endian 32 bits word.
+    Expected Size : 4 bytes
+    Default Value : 0
+
+ZB_XENV_STR_PLL3 ("x.pll3") :
+    ClockGen PLL 3 register value. 
+    
+    Overrides the predefined values defined by the x.csf setting.
+    
+    Encoded as a little endian 32 bits word.
+    Expected Size : 4 bytes.
+    Default Value : Use CSF setting.
+
+ZB_XENV_STR_MUX ("x.mux") :
+    ClockGen mux register value.
+    This overrides the predefined values defined by the x.csf setting.
+    
+    Encoding : little endian 32 bits word.
+    Expected Size : 4 bytes.
+    Default Value : Use CSF setting. 
+
+ZB_XENV_STR_PLL1 ("x.pll1")
+    Clock Generator PLL 1 register value.
+
+    This is supported only from xos build version "0xd8".
+
+    Only used for debugging purposes.
+
+    Encoding : little endian 32 bits word.
+    Expected Size : 4 bytes.
+    Default Value : 0x0101002b
+
+ZB_XENV_STR_DIV1 ("x.div1")
+    ClockGen Divider 1 register value.
+
+    This is supported only from xos build version "0xd8".
+
+    Only used for debugging purposes.
+
+    Encoding : little endian 32 bits word.
+    Expected Size : 4 bytes.
+    Default Value : 0xf0f
+
+ZB_XENV_STR_PREMUX ("x.premux")
+    ClockGen premux register value.
+
+    This is supported only from xos build version "0xd8".
+
+    Only used for debugging purposes.
+
+    Encoding : little endian 32 bits word.
+    Expected Size : 4 bytes.
+    Default Value : 0x203
+
+ZB_XENV_STR_AVMUX ("x.avmux")
+    ClockGen AV mux register value.
+
+    This is supported only from xos build version "0xd8".
+
+    Only used for debugging purposes. Do not use.
+
+    Encoding : little endian 32 bits word.
+    Expected Size : 4 bytes.
+    Default Value : 0x00400000
+
+ZB_XENV_STR_DIVCD4 ("x.divcd4")
+    ClockGen Clean Divider 4 register value.
+
+    This is supported only from xos build version "0xd8".
+
+    Only used for debugging purposes.
+
+    Encoding : little endian 32 bits word.
+    Expected Size : 4 bytes.
+    Default Value : 0x522e8ba2
+
+ZB_XENV_STR_DIV3 ("x.div3")
+    ClockGen Divider 3 register value.
+
+    This is supported only from xos build version "0xd8".
+
+    Only used for debugging purposes.
+
+    Encoding : little endian 32 bits word.
+    Expected Size : 4 bytes.
+    Default Value : 0x202
+
+
+preparation of cpu boot sequence
+--------------------------------
+
+Step 1: Find a valid xenv block on parallel flash at offset 0.
+        xos will look at the flash in this order:
+	CS2 16 bits, CS3 16 bits, CS2 8 bits, CS3 8 bits.
+	If no xenv block is found go to step 6.
+
+Step 2: Setup PLL using xenv settings.
+
+Step 3: Setup DRAM using xenv settings.
+
+Step 4: Execute xrpc found at the flash offset indicated by the "x.boot" key 
+        If the xrpc execution fails go to step 6.
+        The xrpc execution might fail for the following reasons:
+	 - The xrpc is not an XLOAD xrpc.
+	 - The certificate used in the xload is not of the ZBOOT type.
+	 - The load address is not valid: the loaded bootloader must
+	 fit in DRAM0 or the CPU local ram.
+	 - The xload signature is incorrect for this chip.
+        On success the signed bootloader is loaded at the load address 
+
+Step 5: xos remap the CPU boot address to the load address. and goto Step 7
+
+Step 6: Setup a infinite loop in CPU local ram and remap the CPU boot address
+        to the CPU local ram.
+
+Step 7: Write the gbus adress of the xenv block used in CPU local ram at
+        offset LR_XENV_LOCATION (gbus address 0x61ff0). 
+	If no xenv is found write -1.
+
+Step 8: Unreset CPU.
+

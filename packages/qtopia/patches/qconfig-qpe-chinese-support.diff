@@ -1,0 +1,72 @@
+diff -Nur orig-qtopia/src/qt/qconfig-qpe.h qtopia-free-1.7.0/src/qt/qconfig-qpe.h
+--- orig-qtopia/src/qt/qconfig-qpe.h	2006-03-02 12:42:10.000000000 +0800
++++ qtopia-free-1.7.0/src/qt/qconfig-qpe.h	2006-03-02 12:43:27.000000000 +0800
+@@ -34,9 +34,9 @@
+ #endif
+ 
+ // No builtin codecs (Qtopia uses plugins to add codecs individually)
+-#ifndef QT_NO_CODECS
+-#define QT_NO_CODECS
+-#endif
++//#ifndef QT_NO_CODECS
++//#define QT_NO_CODECS
++//#endif
+ 
+ // No builtin font factories (Qtopia uses plugins)
+ #define QT_NO_FREETYPE
+@@ -54,7 +54,7 @@
+ #define QT_NO_QWS_BEOS_WM_STYLE
+ #define QT_NO_QWS_KDE2_WM_STYLE
+ #define QT_NO_QWS_KDE_WM_STYLE
+-#define QT_NO_QWS_WINDOWS_WM_STYLE
++//#define QT_NO_QWS_WINDOWS_WM_STYLE
+ 
+ // Space savings: disable expensive features
+ #define QT_NO_UNICODETABLES
+@@ -67,31 +67,31 @@
+ // Space savings: features insufficiently useful on handheld device
+ #define QT_NO_IMAGEIO_PPM
+ #define QT_NO_NETWORKPROTOCOL
+-#define QT_NO_PICTURE
+-#define QT_NO_PRINTER
+-#define QT_NO_QWS_SAVEFONTS
++//#define QT_NO_PICTURE
++//#define QT_NO_PRINTER
++//#define QT_NO_QWS_SAVEFONTS
+ 
+ // Space savings: features impractical on small display
+-#define QT_NO_COLORDIALOG
+-#define QT_NO_FILEDIALOG
+-#define QT_NO_FONTDIALOG
++//#define QT_NO_COLORDIALOG
++//#define QT_NO_FILEDIALOG
++//#define QT_NO_FONTDIALOG
+ 
+ // Space savings: features impractical on stylus device
+-#define QT_NO_DIAL
++//#define QT_NO_DIAL
+ #define QT_NO_DRAGANDDROP
+-#define QT_NO_IMAGE_TEXT
++//#define QT_NO_IMAGE_TEXT
+ #define QT_NO_INPUTDIALOG
+-#define QT_NO_PRINTDIALOG
+-#define QT_NO_PROGRESSDIALOG
++//#define QT_NO_PRINTDIALOG
++//#define QT_NO_PROGRESSDIALOG
+ #define QT_NO_SEMIMODAL
+ #define QT_NO_SIZEGRIP
+-#define QT_NO_SPLITTER
+-#define QT_NO_WORKSPACE
++//#define QT_NO_SPLITTER
++//#define QT_NO_WORKSPACE
+ 
+ // Speed savings: features that incur unacceptable performance penalty
+-#define QT_NO_DOM
+-#define QT_NO_EFFECTS
+-#define QT_NO_TRANSFORMATIONS
++//#define QT_NO_DOM
++//#define QT_NO_EFFECTS
++//#define QT_NO_TRANSFORMATIONS
+ 
+ // Qt 3 features (not relevant at this time)
+ #define QT_NO_TRANSLATION_BUILDER

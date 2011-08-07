@@ -1,0 +1,161 @@
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/arch/mips/tangox/gpio.c linux-2.6.15/arch/mips/tangox/gpio.c
+--- linux-2.6.15.ref/arch/mips/tangox/gpio.c	1969-12-31 16:00:00.000000000 -0800
++++ linux-2.6.15/arch/mips/tangox/gpio.c	2006-08-16 16:19:13.000000000 -0700
+@@ -0,0 +1,125 @@
++/*********************************************************************
++ Copyright (C) 2001-2007
++ Sigma Designs, Inc. All Rights Reserved
++
++ This program is free software; you can redistribute it and/or modify
++ it under the terms of the GNU General Public License version 2 as
++ published by the Free Software Foundation.
++ *********************************************************************/
++
++#include <linux/module.h>
++#include "setup.h"
++
++int em86xx_gpio_read(int gpio)
++{
++#if (defined(CONFIG_TANGO2) && (EM86XX_REVISION > 3)) || defined(CONFIG_TANGO3)
++	if ((gpio >= 0) && (gpio < 16))
++		return (gbus_readl(REG_BASE_system_block +
++				   SYS_gpio_data) >> gpio) & 1;
++	/* Upper 16 */
++	return (gbus_readl(REG_BASE_host_interface +
++			   ETH_gpio_data2) >> (gpio - 16)) & 1;
++#else
++	return (gbus_readl(REG_BASE_system_block + SYS_gpio_data) >> gpio) & 1;
++#endif
++}
++
++void em86xx_gpio_write(int gpio, int data)
++{
++#if (defined(CONFIG_TANGO2) && (EM86XX_REVISION > 3)) || defined(CONFIG_TANGO3)
++	if ((gpio >= 0) && (gpio < 16))
++		gbus_writel(REG_BASE_system_block + SYS_gpio_data, data ?
++			    GPIO_DATA_SET(gpio) : GPIO_DATA_CLEAR(gpio));
++	else /* Upper 16 */
++		gbus_writel(REG_BASE_host_interface + ETH_gpio_data2, data ?
++			    GPIO_DATA_SET(gpio - 16) : GPIO_DATA_CLEAR(gpio - 16));
++#else
++	gbus_writel(REG_BASE_system_block + SYS_gpio_data,
++		    data ? GPIO_DATA_SET(gpio) : GPIO_DATA_CLEAR(gpio));
++#endif
++}
++
++void em86xx_gpio_setdirection(int gpio, int dir)
++{
++#if (defined(CONFIG_TANGO2) && (EM86XX_REVISION > 3)) || defined(CONFIG_TANGO3)
++	if ((gpio >= 0) && (gpio < 16))
++		gbus_writel(REG_BASE_system_block + SYS_gpio_dir, dir ?
++			    GPIO_DIR_OUTPUT(gpio) : GPIO_DIR_INPUT(gpio));
++	else /* Upper 16 */
++		gbus_writel(REG_BASE_host_interface + ETH_gpio_dir2, dir ?
++			    GPIO_DIR_OUTPUT(gpio - 16) : GPIO_DIR_INPUT(gpio - 16));
++#else
++	gbus_writel(REG_BASE_system_block + SYS_gpio_dir,
++		    dir ? GPIO_DIR_OUTPUT(gpio) : GPIO_DIR_INPUT(gpio));
++#endif
++}
++
++EXPORT_SYMBOL(em86xx_gpio_read);
++EXPORT_SYMBOL(em86xx_gpio_write);
++EXPORT_SYMBOL(em86xx_gpio_setdirection);
++
++int em86xx_uart0_get_gpio_mode(void)
++{
++	return gbus_readl(REG_BASE_cpu_block + CPU_uart0_gpio_mode) & 0x7f;
++}
++
++int em86xx_uart0_set_gpio_mode(int mode)
++{
++	int old_mode = em86xx_uart0_get_gpio_mode();
++	gbus_writel(REG_BASE_cpu_block + CPU_uart0_gpio_mode, 0x7f00 | (mode & 0x7f));
++	return(old_mode);
++}
++
++int em86xx_uart0_gpio_read(int gpio)
++{
++	return (gbus_readl(REG_BASE_cpu_block + CPU_uart0_gpio_data) >> gpio) & 1;
++}
++
++void em86xx_uart0_gpio_write(int gpio, int data)
++{
++	gbus_writel(REG_BASE_cpu_block + CPU_uart0_gpio_data,
++			data ? UART_GPIO_DATA_SET(gpio) : UART_GPIO_DATA_CLEAR(gpio));
++}
++
++void em86xx_uart0_gpio_setdirection(int gpio, int dir)
++{
++	gbus_writel(REG_BASE_cpu_block + CPU_uart0_gpio_dir,
++			dir ? UART_GPIO_DIR_OUTPUT(gpio) : UART_GPIO_DIR_INPUT(gpio));
++}
++
++int em86xx_uart1_get_gpio_mode(void)
++{
++	return gbus_readl(REG_BASE_cpu_block + CPU_uart1_gpio_mode) & 0x7f;
++}
++
++int em86xx_uart1_set_gpio_mode(int mode)
++{
++	int old_mode = em86xx_uart1_get_gpio_mode();
++	gbus_writel(REG_BASE_cpu_block + CPU_uart1_gpio_mode, 0x7f00 | (mode & 0x7f));
++	return(old_mode);
++}
++
++int em86xx_uart1_gpio_read(int gpio)
++{
++	return (gbus_readl(REG_BASE_cpu_block + CPU_uart1_gpio_data) >> gpio) & 1;
++}
++
++void em86xx_uart1_gpio_write(int gpio, int data)
++{
++	gbus_writel(REG_BASE_cpu_block + CPU_uart1_gpio_data,
++			data ? UART_GPIO_DATA_SET(gpio) : UART_GPIO_DATA_CLEAR(gpio));
++}
++
++void em86xx_uart1_gpio_setdirection(int gpio, int dir)
++{
++	gbus_writel(REG_BASE_cpu_block + CPU_uart1_gpio_dir,
++			dir ? UART_GPIO_DIR_OUTPUT(gpio) : UART_GPIO_DIR_INPUT(gpio));
++}
++
++EXPORT_SYMBOL(em86xx_uart0_gpio_read);
++EXPORT_SYMBOL(em86xx_uart0_gpio_write);
++EXPORT_SYMBOL(em86xx_uart0_gpio_setdirection);
++EXPORT_SYMBOL(em86xx_uart1_gpio_read);
++EXPORT_SYMBOL(em86xx_uart1_gpio_write);
++EXPORT_SYMBOL(em86xx_uart1_gpio_setdirection);
++
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/arch/mips/tangox/Makefile linux-2.6.15/arch/mips/tangox/Makefile
+--- linux-2.6.15.ref/arch/mips/tangox/Makefile	2006-08-16 14:58:55.000000000 -0700
++++ linux-2.6.15/arch/mips/tangox/Makefile	2006-08-16 16:17:59.000000000 -0700
+@@ -12,3 +12,5 @@
+ 
+ obj-$(CONFIG_TANGOX_XENV_READ) += sha.o xenv.o
+ 
++obj-y += gpio.o
++
+diff -Naur --exclude=CVS --exclude='*.o' --exclude='*.a' --exclude='*.so' --exclude='*.elf' --exclude=System.map --exclude=Makefile.d --exclude='*log' --exclude='*log2' --exclude='*~' --exclude='.*~' --exclude='.#*' --exclude='*.bak' --exclude='*.orig' --exclude='*.rej' --exclude='core.[0-9]*' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=.depend --exclude='.*.o.flags' --exclude='*.gz' --exclude=vmlinux --exclude=vmlinux.bin --exclude=yamon-02.06-SIGMADESIGNS-01_el.bin linux-2.6.15.ref/README.1002.gpio.patch linux-2.6.15/README.1002.gpio.patch
+--- linux-2.6.15.ref/README.1002.gpio.patch	1969-12-31 16:00:00.000000000 -0800
++++ linux-2.6.15/README.1002.gpio.patch	2006-08-16 16:19:48.000000000 -0700
+@@ -0,0 +1,19 @@
++Feature:
++--------
++GPIO support for SMP863x and SMP865x
++
++Prerequisite patch numbers:
++---------------------------
++0000
++1000
++
++Primary author:
++---------------
++External (YH Lin)
++
++Related to which chip version SMP86xx xx=?
++------------------------------------------
++Tango2 ES6/RevA or above, or Tango3 ES1 or above
++
++(linux patches) which CONFIG_... are provided:
++----------------------------------------------

@@ -1,0 +1,39 @@
+#!/bin/sh
+#
+# configure MPlayer's menu
+#
+# runlevels: neoubox, debug
+
+echo "### Configuring MPlayer's menu ###"
+
+# remove CD from menu if no cd drive is available
+test -e /dev/cdrom || sed -i 's/.*play_vcd.*//' /etc/mplayer/menu.conf
+test -e /dev/cdrom || sed -i 's/.*play_cdda.*//' /etc/mplayer/menu.conf
+
+# remove DVD from the menu if no dvd drive is available
+test -e /dev/dvd || sed -i 's/.*play_dvd.*//' /etc/mplayer/menu.conf
+
+# disable image file display if fbi is not present or fb not initialized
+test -x /usr/bin/fbi -a -e /dev/fb0 || ( echo -n "" > /etc/img_ext; sed -i 's/.*set_menu view_img_timeout.*//' /etc/mplayer/menu.conf )
+
+# build a single file extensions filter
+cat /etc/file_ext > /etc/extensions
+cat /etc/list_ext >> /etc/extensions
+cat /etc/img_ext >> /etc/extensions
+
+# add partitions space informations in menu
+for i in `mount | sed -n 's%/dev/\(disk[0-9]*\(part[0-9]*\)*\).*%\1%p'`; do
+  MENU_DF="$MENU_DF <e property=\"$i\"/>"
+done
+# do the same for cdrom drives
+for i in `ls /dev/cdrom* | sed -n 's%/dev/\(cdrom[0-9]\).*%\1%p'`; do
+  MENU_DF="$MENU_DF <e property=\"$i\"/>"
+done
+[ -n "$MENU_DF" ] && sed -i "s%property=\"MAC\"/>%property=\"MAC\"/> $MENU_DF%" /etc/mplayer/menu.conf
+
+# do not load neoubox OSD menu at movie playback if running through Freevo
+if [ -f /usr/bin/freevo ]; then
+  mp_set_option menu-startup "no"
+fi
+
+exit 0

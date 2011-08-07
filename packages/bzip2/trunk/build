@@ -1,0 +1,11 @@
+#!/bin/sh
+
+. config/options
+
+cd $BUILD/$1*
+
+setup_toolchain target
+
+PKG_CONFIG=$LIB_PREFIX/bin/pkg-config \
+CFLAGS="-mips32r2 -D_FILE_OFFSET_BITS=64" \
+make -f Makefile-libbz2_so
